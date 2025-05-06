@@ -1,0 +1,163 @@
+import { Error } from '../models/openapi';
+import { createSystemError } from './error-util';
+import { Product } from '../__generated__/linkedup-web-api-client';
+
+const randomPrice = () => Math.floor(Math.random() * 500); // 0
+const randomLikes = () => Math.floor(Math.random() * 101); // 0
+const randomRating = () => Number.parseFloat((Math.random() < 0.999999 ? Math.random() * 5 : 5).toFixed(2));
+
+const products: Product[] = [
+  {
+    id: '1',
+    name: 'Stationery Set',
+    summary: 'Complete set of stationery',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_001.png',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Nathan Cheng',
+    sellerClass: '1A-4',
+  },
+  {
+    id: '2',
+    name: 'T-Shirt',
+    summary: 'Classic navy blue T-Shirt',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_004.png',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Carol Chan',
+    sellerClass: '2E-30',
+  },
+  {
+    id: '3',
+    name: 'Notebook Set',
+    summary: 'Book & pen for note taking',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_003.png',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Adrian Wong',
+    sellerClass: '4B-4',
+  },
+  {
+    id: '4',
+    name: 'Tomica Toy Car',
+    summary: 'Popular model of Volkswagen',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_005.png',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Connor Chu',
+    sellerClass: '4E-1',
+  },
+  {
+    id: '5',
+    name: 'Stationery Set',
+    summary: 'Minimal set of stationery',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_002.png',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Connor Chu',
+    sellerClass: '4E-1',
+  },
+  {
+    id: '6',
+    name: 'Blue Jeans',
+    summary: 'Timeless, effortlessly cool.',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_006.png',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Karen Cheng',
+    sellerClass: '5C-27',
+  },
+  {
+    id: '7',
+    name: 'Action Figure',
+    summary: 'Looks like your Dad ?',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_007.png',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Amanda Chow',
+    sellerClass: '3B-30',
+
+  },
+  {
+    id: '8',
+    name: 'Action Figure',
+    summary: 'Make America Great Again',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_008.png',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Penelope Chan',
+    sellerClass: '6D-1',
+  },
+  {
+    id: '9',
+    name: 'Tomica Toy Car',
+    summary: 'Vintage model, collectors item',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_009.jpg',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Joan Lau',
+    sellerClass: '1B-22',
+  },
+  {
+    id: '10',
+    name: 'Coffee Mug',
+    summary: 'Take a break when feel exhausted',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_010.jpeg',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Blake Chan',
+    sellerClass: '5B-11',
+  },
+  {
+    id: '11',
+    name: 'Handmade Bracelet',
+    summary: 'Accordable gift for your friend',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_012.jpeg',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Yvonne Cheng',
+    sellerClass: '5D-27',
+  },
+  {
+    id: '12',
+    name: 'Water Flask',
+    summary: 'Drink water wherever you go',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_013.jpeg',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Dominic Kwok',
+    sellerClass: '2A-17',
+  },
+  {
+    id: '13',
+    name: 'Book Stand',
+    summary: 'Save your hand when you read',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_014.jpeg',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    seller: 'Dominic Kwok',
+    sellerClass: '2A-17',
+  },
+];
+
+export const findProduct = async (): Promise<Product[] | Error> => {
+  try {
+    return products;
+  } catch (error: any) {
+    return createSystemError(error);
+  }
+};
+

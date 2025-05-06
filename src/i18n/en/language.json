@@ -1,0 +1,216 @@
+{
+  "system": {
+    "language": {
+      "label": "Language",
+      "value": {
+        "en": "English",
+        "zhHant": "繁體中文",
+        "zhHans": "简体中文",
+        "English": "English",
+        "TraditionalChinese": "繁體中文",
+        "SimplifiedChinese": "简体中文"
+      }
+    },
+    "mode": { "label": "Mode", "value": { "operator": "Operator", "administrator": "Admin" } },
+    "menu": {
+      "0": "",
+      "muStaticData": "Static Data",
+      "muSecurity": "Security",
+      "miCurrencyMaintenance": "Currency Maintenance",
+      "miFunctionGroupMaintenance": "Function Group Maintenance",
+      "miUserMaintenance": "User Maintenance",
+      "miPayment": "Payment",
+      "miDeal": "Deal",
+      "miDealMonitor": "Deal Monitor"
+    },
+    "message": {
+      "action": "Action",
+      "add": "Add",
+      "back": "Back",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "confirm": "Confirm",
+      "confirmAction": "Confirm ${1}",
+      "detail": "Detail",
+      "doYouWantToDiscardChange": "Are you sure to discard unsaved changes",
+      "doYouWantToSaveChange": "Do you want to save the changes",
+      "discardChange": "Discard change",
+      "dismiss": "Dismiss",
+      "edit": "Edit",
+      "error": "Error",
+      "next": "Next",
+      "no": "No",
+      "noMatchedData": "No matched record",
+      "noSearchPerformed": "No search performed",
+      "or": "or",
+      "refresh": "Refresh",
+      "reset": "Reset",
+      "resetPassword": "Reset Password",
+      "save": "Save",
+      "saveObjectSuccess": "${1} [${2}] is saved successfully",
+      "search": "Search",
+      "searchCriteria": "Search Criteria",
+      "signOut": "Sign Out",
+      "site": "Site",
+      "start": "Start",
+      "submit": "Submit",
+      "success": "Success",
+      "typeHere": "Type here...",
+      "view": "View",
+      "yes": "Yes"
+    },
+    "theme": { "label": "Theme", "value": { "light": "Light Theme", "dark": "Dark Theme" } },
+    "error": {
+      "S9999": "System error - ${1}",
+      "invalid-email-address": "Invalid email address",
+      "functionGroupMaintenance": {
+        "missingFunctionEntitlement": "Function entitlement is required",
+        "siteFunctionEntitlementRequired": "Both site and function entitlement are required for operator"
+      },
+      "paymentMaintenance": { "provideOneAmount": "Credit or debit amount only" },
+      "INVALID_EMAIL_PASSWORD": "User with email [${1}] is not found or password is invalid"
+    }
+  },
+  "login": {
+    "greeting": "Welcome to",
+    "email": "Email",
+    "emailHint": "Try admin@linkedup.org",
+    "forgotPassword": "Forgot Password",
+    "newUser": "Not a user",
+    "password": "Password",
+    "passwordHint": "123456",
+    "register": "Register",
+    "signIn": "Sign In",
+    "signInWithGoogle": "Sign in with Google",
+    "studentAccount": "a student account",
+    "success": "Login success"
+  },
+  "signup": {
+    "greeting": "Register to",
+    "studentId": "Student ID",
+    "name": "Name",
+    "alreadyUser": "Already a user",
+    "login": "Login",
+    "signUpWithGoogle": "Sign up with Google",
+    "withCredential": "with credential",
+    "success": "Sucessfully registered user ${1}"
+  },
+  "userProfile": {
+    "doYouWantToSignOut": "Do you want to sign out",
+    "discardChangeAndSignOut": "Are you sure to discard unsaved changes and sign out",
+    "lastLogin": "Last login",
+    "name": "Name",
+    "signOut": "Sign Out"
+  },
+  "currencyMaintenance": {
+    "code": "Code",
+    "name": "Name",
+    "precision": "Precision",
+    "shortName": "Short Name",
+    "title": "Currency List",
+    "titleEdit": "${1} Currency"
+  },
+  "functionGroupMaintenance": {
+    "code": "Code",
+    "entitlement": {
+      "base": "Entitlement",
+      "function": "Function Entitlement",
+      "site": "Site Entitlement"
+    },
+    "name": "Name",
+    "title": "Function Group List",
+    "titleEdit": "${1} Function Group"
+  },
+  "userMaintenance": {
+    "id": "Id",
+    "email": "Email",
+    "name": "Name",
+    "role": {
+      "label": "Role",
+      "value": { "Student": "Student", "Parent": "Parent", "Teacher": "Teacher", "Admin": "Admin" }
+    },
+    "classId": "Class ID",
+    "studentId": "Student ID",
+    "status": {
+      "label": "Status",
+      "value": { "Active": "Active", "Inactive": "Inactive", "Suspend": "Suspend" }
+    },
+    "title": "User List",
+    "titleEdit": "${1} User"
+  },
+  "productApproval": {
+    "classNo": "Class ID",
+    "studentId": "Student ID",
+    "studentName": "Student Name",
+    "productName": "Product Name",
+    "productSummary": "Product Summary",
+    "cost": "e-Coin",
+    "status": {
+      "label": "Status",
+      "value": { "Pending": "Pending", "Approved": "Approved", "Rejected": "Rejected" }
+    },
+    "submissionDate": "Submission Date",
+    "title": "Product Approval"
+  },
+  "paymentMaintenance": {
+    "account": "Account",
+    "accountHint": "Valid account code is PK1999 or GJ71WHP",
+    "action": "Action",
+    "amount": "Amount",
+    "code": "Code",
+    "direction": {
+      "label": "Direction",
+      "value": { "incoming": "Incoming", "outgoing": "Outgoing" }
+    },
+    "bankBuy": "Bank Buy (Credit)",
+    "bankBuyCcy": "Bank Buy CCY",
+    "bankSell": "Bank Sell (Debit)",
+    "bankSellCcy": "Bank Sell CCY",
+    "dealCcy": "Deal CCY",
+    "dealAmount": "Deal Amount",
+    "executeDate": "Execute Date",
+    "fxRef": "FX Ref",
+    "instructionId": "Instruction Id",
+    "memo": "Memo",
+    "message": {
+      "doYouWantToInitiatePaymentRequest": "Do you want to initiate payment request",
+      "doYouWantToSubmitMatchingRequest": "Do you want to submit matching request with fxRef [${1}]",
+      "doYouWantToSubmitBookingRequest": "Do you want to submit booking request with product [${1}] and value date [${2}]",
+      "initiatePaymentSuccess": "Payment is initated successfully",
+      "submitRequestSuccess": "${1} request is submitted successfully"
+    },
+    "name": "Name",
+    "pairedFxRef": "Paired FX Ref",
+    "pairing": {
+      "title": "Submit Matching or Booking",
+      "value": { "matching": "Matching", "booking": "Booking" }
+    },
+    "product": "Product",
+    "remainingCcy": "Remaining CCY",
+    "remainingAmount": "Remaining Amount",
+    "site": "Site",
+    "status": {
+      "label": "Status",
+      "value": {
+        "new": "New",
+        "started": "Started",
+        "cancelled": "Cancelled",
+        "rejected": "Rejected",
+        "submitted": "Submitted",
+        "paired": "Paired"
+      }
+    },
+    "title": "Payment List",
+    "titleEdit": "${1} Payment Detail",
+    "valueDate": "Value Date"
+  },
+  "zod": {
+    "error": {
+      "Required": "Mandatory Field",
+      "Invalid email": "Invalid Email Address",
+      "user": {
+        "invalidStudentId": "Invalid Student Id"
+      }
+    }
+  }
+}
