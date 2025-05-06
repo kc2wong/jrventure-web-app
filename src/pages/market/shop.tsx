@@ -1,14 +1,9 @@
 import * as React from 'react';
 import {
   makeStyles,
-  Caption1,
   Text,
   tokens,
-  mergeClasses,
-  Label,
-  RatingDisplay,
   Avatar,
-  Image,
   Button,
   Title3,
   Tooltip,
@@ -29,11 +24,8 @@ import {
   CheckmarkStarburstRegular,
   DismissCircleFilled,
   DismissCircleRegular,
-  HeartRegular,
-  PenRegular,
+  EditRegular,
 } from '@fluentui/react-icons';
-import { BsCoin } from 'react-icons/bs';
-import { Card, CardHeader, CardPreview } from '@fluentui/react-components';
 import { useAtom } from 'jotai';
 import {
   productListAtom,
@@ -43,10 +35,9 @@ import {
 } from '../../states/product-list';
 import { useEffect, useState } from 'react';
 import { useMessage } from '../../hooks/use-message';
-import { Product } from '../../__generated__/linkedup-web-api-client';
 import { t } from 'i18next';
-import { useNavigateWithSpinner } from '../../hooks/use-delay-navigate';
 import { useParams } from 'react-router-dom';
+import { ProductCard } from '../product/product-card';
 
 const useStyles = makeStyles({
   main: {
@@ -136,65 +127,10 @@ const useStyles = makeStyles({
   },
 });
 
-const ProductCard: React.FC<{
-  product: Product;
-  selected: boolean;
-  onSelect: (selected: boolean) => void;
-}> = ({ product, selected }) => {
-  const [, action] = useAtom(productListAtom);
-  const styles = useStyles();
-  const navigate = useNavigateWithSpinner();
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalXS }}>
-      <Card
-        className={styles.card}
-        onClick={() => {
-          action({ select: { product } });
-          setTimeout(() => {
-            navigate(`/market/${product.id}/edit`);
-          });
-        }}
-        selected={selected}
-      >
-        <CardPreview className={styles.grayBackground}>
-          <Image
-            alt={product.name}
-            className={styles.smallRadius}
-            fit="contain"
-            src={product.imageUrl}
-          ></Image>
-        </CardPreview>
-
-        <CardHeader
-          description={<Caption1 className={styles.caption}>{product.summary}</Caption1>}
-          header={<Text weight="semibold">{product.name}</Text>}
-        />
-
-        <footer className={mergeClasses(styles.flex, styles.footer)}>
-          <div className={styles.flex}>
-            <BsCoin fontSize={16} />
-            <Label>{product.cost}</Label>
-          </div>
-          <div className={styles.flex}>
-            <HeartRegular fontSize={16} />
-            <Label>{product.likes}</Label>
-          </div>
-        </footer>
-
-        <footer className={mergeClasses(styles.flex, styles.footer)}>
-          <PenRegular fontSize={16} />
-          <RatingDisplay color="brand" size="medium" value={product.rating} />
-        </footer>
-      </Card>
-    </div>
-  );
-};
-
 export const ShopPage = () => {
   const styles = useStyles();
   const [state, action] = useAtom(productListAtom);
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  // const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { showSpinner, stopSpinner } = useMessage();
 
@@ -203,9 +139,9 @@ export const ShopPage = () => {
 
   const pageNumbers = [1, 2, 3, 4, 5]; // Example only, update dynamically as needed
 
-  const handleSelectionChange = (id: string, isSelected: boolean) => {
-    setSelected((prev) => ({ ...prev, [id]: isSelected }));
-  };
+  // const handleSelectionChange = (id: string, isSelected: boolean) => {
+  //   setSelected((prev) => ({ ...prev, [id]: isSelected }));
+  // };
 
   const [selectedValue, setSelectedValue] = useState<TabValue>('tab1');
 
@@ -236,9 +172,8 @@ export const ShopPage = () => {
           .map((product) => (
             <ProductCard
               key={product.id}
-              onSelect={(isSelected) => handleSelectionChange(product.id, isSelected)}
+              editAction={() => {}}
               product={product}
-              selected={!!selected[product.id]}
             />
           ))}
       </div>
@@ -284,7 +219,7 @@ export const ShopPage = () => {
                   <Button appearance="transparent" icon={<AddCircleRegular />}></Button>
                 </Tooltip>
                 <Tooltip content={'Edit Profile'} relationship="label" withArrow>
-                  <Button appearance="transparent" icon={<PenRegular />}></Button>
+                  <Button appearance="transparent" icon={<EditRegular />}></Button>
                 </Tooltip>
                 <Tooltip content={t('system.message.refresh')} relationship="label" withArrow>
                   <Button appearance="transparent" icon={<ArrowClockwiseRegular />}></Button>

@@ -1,24 +1,13 @@
-import * as React from 'react';
 import {
   makeStyles,
-  Caption1,
-  Text,
   tokens,
-  mergeClasses,
-  Label,
-  RatingDisplay,
-  Avatar,
   Dropdown,
   Option,
-  Image,
   Button,
   Title1,
   Tooltip,
-  Caption2,
 } from '@fluentui/react-components';
-import { ArrowClockwiseRegular, HeartRegular, SearchRegular } from '@fluentui/react-icons';
-import { BsCoin } from 'react-icons/bs';
-import { Card, CardHeader, CardPreview } from '@fluentui/react-components';
+import { ArrowClockwiseRegular, SearchRegular } from '@fluentui/react-icons';
 import { useAtom } from 'jotai';
 import {
   productListAtom,
@@ -28,9 +17,8 @@ import {
 } from '../../states/product-list';
 import { useEffect, useState } from 'react';
 import { useMessage } from '../../hooks/use-message';
-import { Product } from '../../__generated__/linkedup-web-api-client';
 import { t } from 'i18next';
-import { useNavigateWithSpinner } from '../../hooks/use-delay-navigate';
+import { ProductCard } from '../product/product-card';
 
 const useStyles = makeStyles({
   main: {
@@ -112,87 +100,19 @@ const useStyles = makeStyles({
   },
 });
 
-const ProductCard: React.FC<{
-  product: Product;
-  selected: boolean;
-  onSelect: (selected: boolean) => void;
-}> = ({ product, selected }) => {
-  const [, action] = useAtom(productListAtom);
-  const styles = useStyles();
-  const navigate = useNavigateWithSpinner();
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalXS }}>
-      <div className={styles.flex}>
-        <Avatar size={20} />
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'baseline',
-            gap: tokens.spacingHorizontalS,
-          }}
-        >
-          <Text>{product.seller}</Text>
-          <Caption2>{product.sellerClass}</Caption2>
-        </div>
-      </div>
-      <Card
-        className={styles.card}
-        onClick={() => {
-          action({ select: { product } });
-          setTimeout(() => {
-            navigate(`/market/${product.id}/view`);
-          });
-        }}
-        selected={selected}
-      >
-        <CardPreview className={styles.grayBackground}>
-          <Image
-            alt={product.name}
-            className={styles.smallRadius}
-            fit="contain"
-            src={product.imageUrl}
-          ></Image>
-        </CardPreview>
-
-        <CardHeader
-          description={<Caption1 className={styles.caption}>{product.summary}</Caption1>}
-          header={<Text weight="semibold">{product.name}</Text>}
-        />
-
-        <footer className={mergeClasses(styles.flex, styles.footer)}>
-          <div className={styles.flex}>
-            <BsCoin fontSize={16} />
-            <Label>{product.cost}</Label>
-          </div>
-          <div className={styles.flex}>
-            <HeartRegular fontSize={16} />
-            <Label>{product.likes}</Label>
-          </div>
-        </footer>
-
-        <footer className={mergeClasses(styles.flex, styles.footer)}>
-          <div></div>
-          <RatingDisplay color="brand" size="medium" value={product.rating} />
-        </footer>
-      </Card>
-    </div>
-  );
-};
 
 export const MarketPlaceShowcase = () => {
   const styles = useStyles();
   const [state, action] = useAtom(productListAtom);
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  // const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { showSpinner, stopSpinner } = useMessage();
 
   const pageNumbers = [1, 2, 3, 4, 5]; // Example only, update dynamically as needed
 
-  const handleSelectionChange = (id: string, isSelected: boolean) => {
-    setSelected((prev) => ({ ...prev, [id]: isSelected }));
-  };
+  // const handleSelectionChange = (id: string, isSelected: boolean) => {
+  //   setSelected((prev) => ({ ...prev, [id]: isSelected }));
+  // };
 
   useEffect(() => {
     if (state instanceof ProductListStateInitial) {
@@ -287,9 +207,9 @@ export const MarketPlaceShowcase = () => {
         {(state.getResult() ?? []).map((product) => (
           <ProductCard
             key={product.id}
-            onSelect={(isSelected) => handleSelectionChange(product.id, isSelected)}
+            // onSelect={(isSelected) => handleSelectionChange(product.id, isSelected)}
             product={product}
-            selected={!!selected[product.id]}
+            // selected={!!selected[product.id]}
           />
         ))}
       </div>
