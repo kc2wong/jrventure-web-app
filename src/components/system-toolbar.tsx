@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from '@fluentui/react-components';
 import {
+  BalloonRegular,
   CheckmarkRegular,
   DismissRegular,
   DoorArrowLeftRegular,
@@ -212,9 +213,16 @@ export const SystemToolbar: React.FC<SystemToolbarProps> = ({
   const languageZhHant = t('system.language.value.zhHant');
   const themeLight = t('system.theme.value.light');
   const themeDark = t('system.theme.value.dark');
+  const themePlayful = t('system.theme.value.playful');
 
   const [isSiteMenuOpen, setIsSiteMenuOpen] = useState(false);
   const login = useAtomValue(authenticationAtom).login;
+
+  const themeIconConfigs: Record<Theme, JSX.Element> = {
+    playful: <BalloonRegular />,
+    light: <WeatherSunnyRegular />,
+    dark: <WeatherMoonRegular />,
+  };
 
   return (
     <div className={styles.item}>
@@ -247,10 +255,7 @@ export const SystemToolbar: React.FC<SystemToolbarProps> = ({
       </Menu>
       <Menu checkedValues={{ theme: [theme] }}>
         <MenuTrigger disableButtonEnhancement>
-          <Button
-            icon={theme === 'light' ? <WeatherSunnyRegular /> : <WeatherMoonRegular />}
-            onClick={handleCloseSiteMenu}
-          ></Button>
+          <Button icon={themeIconConfigs[theme]} onClick={handleCloseSiteMenu}></Button>
         </MenuTrigger>
         <MenuPopover>
           <MenuList>
@@ -259,6 +264,13 @@ export const SystemToolbar: React.FC<SystemToolbarProps> = ({
             </MenuItemRadio>
             <MenuItemRadio name="theme" onClick={() => handleChangeTheme('dark')} value="dark">
               {themeDark}
+            </MenuItemRadio>
+            <MenuItemRadio
+              name="theme"
+              onClick={() => handleChangeTheme('playful')}
+              value="playful"
+            >
+              {themePlayful}
             </MenuItemRadio>
           </MenuList>
         </MenuPopover>

@@ -59,7 +59,10 @@
       "view": "View",
       "yes": "Yes"
     },
-    "theme": { "label": "Theme", "value": { "light": "Light Theme", "dark": "Dark Theme" } },
+    "theme": {
+      "label": "Theme",
+      "value": { "light": "Light Theme", "dark": "Dark Theme", "playful": "Playful Theme" }
+    },
     "error": {
       "S9999": "System error - ${1}",
       "invalid-email-address": "Invalid email address",
