@@ -42,6 +42,18 @@ const comment: ProductApprovalComment[] = [
   {
     type: ApprovalCommentType.CONVERSATION,
     commentBy: {
+      id: '9000',
+      name: {
+        English: 'Profanity Checker',
+      },
+    },
+    commentAt: new Date().toISOString(),
+    comment:
+    'Profanity score : 41 / 100\nSensitive words : 香港加油'
+  },
+  {
+    type: ApprovalCommentType.CONVERSATION,
+    commentBy: {
       id: '9001',
       name: {
         English: 'Sharon Lee (Teacher)',

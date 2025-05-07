@@ -87,7 +87,7 @@ export const ProductApprovalDetailPage: React.FC = () => {
                   <div className={styles.col10}></div>
                   <div className={styles.col90}>
                     <div className={styles.commentWrapper}>
-                      <Text block>{comment.comment}</Text>
+                      <Text block style={{ whiteSpace: 'pre-line' }}>{comment.comment}</Text>
                     </div>
                   </div>
                 </div>
