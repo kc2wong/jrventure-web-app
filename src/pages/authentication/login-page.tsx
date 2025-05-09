@@ -4,14 +4,11 @@ import {
   Divider,
   Input,
   Link,
-  makeStyles,
-  tokens,
 } from '@fluentui/react-components';
 import { PersonPasskeyRegular } from '@fluentui/react-icons';
-import { Card, CardHeader, CardPreview } from '@fluentui/react-components';
+import { Card } from '@fluentui/react-components';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAtom } from 'jotai';
-import { ButtonPanel } from '../../components/ButtonPanel';
 import {
   authenticationAtom,
   AuthenticationStateFail,
@@ -32,25 +29,7 @@ import { FcGoogle } from 'react-icons/fc'; // Google "G" icon
 import { MessageType } from '../../models/system';
 import { zodEmail, zodString } from '../../types/zod';
 import { TimezoneContext } from '../../contexts/timezone-context';
-
-const useStyles = makeStyles({
-  container: {
-    display: 'flex',
-    justifyContent: 'center', // Centers horizontally
-    alignItems: 'center', // Centers vertically
-    height: '100vh', // Full height of the viewport
-  },
-  card: { maxWidth: '400px', width: '30%' },
-  box: { backgroundColor: tokens.colorNeutralBackground2 },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    margin: '0 20px 0 20px',
-    padding: '10px 0 0 0',
-  },
-  buttonPanel: { margin: '20px 20px 20px 0' },
-});
+import { useAuthPageStyles } from './auth-styles';
 
 const schema = z.object({
   email: zodEmail(),
@@ -85,7 +64,8 @@ function GoogleSignInButton() {
 }
 
 export const LoginPage = (props: LoginPageProps) => {
-  const styles = useStyles();
+  const styles = useAuthPageStyles();
+
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
   const { t } = useTranslation();
   const [authenticationState, action] = useAtom(authenticationAtom);
@@ -125,78 +105,71 @@ export const LoginPage = (props: LoginPageProps) => {
     await action({ signIn: { email: data.email, password: data.password } });
   };
 
+
   return (
-    <div className={styles.container}>
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '20px',
-        }}
-      >
-        <Card className={styles.card}>
-          <CardHeader
-            header={
-              <Body1>
-                {t('login.greeting')} <b>{process.env.REACT_APP_NAME}</b>
-              </Body1>
-            }
-          />
-          <CardPreview className={styles.box}>
-            <div>
-              <div className={styles.form}>
-                <div style={{ marginTop: '10px', marginBottom: '10px' }}>
-                  <GoogleSignInButton />
-                  <Divider style={{ marginTop: '20px' }}>
-                    {t('system.message.or').toUpperCase()}
-                  </Divider>
-                </div>
-                <Field
-                  label={t('login.email')}
-                  labelHint={t('login.emailHint')}
-                  required
-                  validationMessage={getErrorMessage(errors.email?.message)}
-                >
-                  <Input type="email" {...register('email')} />
-                </Field>
-                <Field
-                  label={t('login.password')}
-                  labelHint={t('login.passwordHint')}
-                  required
-                  validationMessage={getErrorMessage(errors.password?.message)}
-                >
-                  <>
-                    <Input type="password" {...register('password')} />
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <Link inline>{t('login.forgotPassword')}</Link>{' '}
-                    </div>
-                  </>
-                </Field>
+    <div className={styles.page}>
+      <Card className={styles.card}>
+        {/* Left side: Login Form */}
+        <div className={styles.formSection}>
+          <Body1>
+            {t('login.greeting')} <b>{process.env.REACT_APP_NAME}</b>
+          </Body1>
+
+          <div style={{ marginTop: '30px' }}>
+            <GoogleSignInButton />
+            <Divider style={{ marginTop: '20px', marginBottom: '20px' }}>
+              {t('system.message.or').toUpperCase()}
+            </Divider>
+          </div>
+
+          <Field
+            label={t('login.email')}
+            labelHint={t('login.emailHint')}
+            required
+            validationMessage={getErrorMessage(errors.email?.message)}
+          >
+            <Input type="email" {...register('email')} />
+          </Field>
+          <Field
+            label={t('login.password')}
+            labelHint={t('login.passwordHint')}
+            required
+            validationMessage={getErrorMessage(errors.password?.message)}
+          >
+            <>
+              <Input type="password" {...register('password')} />
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Link inline>{t('login.forgotPassword')}</Link>{' '}
               </div>
-              <ButtonPanel className={styles.buttonPanel}>
-                <Button
-                  appearance="primary"
-                  disabled={hasMissingRequiredField(formValues, schema)}
-                  icon={<PersonPasskeyRegular />}
-                  onClick={handleSubmit(handleLogin)}
-                >
-                  {t('login.signIn')}
-                </Button>
-              </ButtonPanel>
-            </div>
-          </CardPreview>
-        </Card>
-        <div style={{ textAlign: 'center' }}>
-          {`${t('login.newUser')} ?  `}
-          <Link inline onClick={props.onNavigateToSignup}>
-            {t('login.register')}
-          </Link>{' '}
-          {t('login.studentAccount')}
+            </>
+          </Field>
+          <div className={styles.buttonRow}>
+            <Button
+              appearance="primary"
+              disabled={hasMissingRequiredField(formValues, schema)}
+              icon={<PersonPasskeyRegular />}
+              onClick={handleSubmit(handleLogin)}
+            >
+              {t('login.signIn')}
+            </Button>
+          </div>
         </div>
+
+        {/* Right side: Icon */}
+        <div className={styles.icon}>
+          <img alt="Login Icon" className={styles.icon} src="/logo384.png" />
+        </div>
+      </Card>
+
+      {/* Sign up link below the card */}
+      <div className={styles.signUpText}>
+        {`${t('login.newUser')} ?  `}
+        <Link inline onClick={props.onNavigateToSignup}>
+          {t('login.register')}
+        </Link>{' '}
+        {t('login.studentAccount')}
       </div>
     </div>
   );
 };
+

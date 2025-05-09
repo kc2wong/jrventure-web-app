@@ -1,5 +1,6 @@
 {
   "name": "linkedup",
+  "description": "Jr.Venture",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -46,8 +47,8 @@
     "clean:dist": "rimraf dist",
     "clean:full": "rimraf ./node_modules src/__generated__ dist",
     "openapi:generate-client": "openapi --input ./resources/linkedup-web-api/web-api-spec.yaml --output src/__generated__/linkedup-web-api-client --client axios --name WebApiClient",
-    "start": "REACT_APP_NAME=$npm_package_name REACT_APP_VERSION=$npm_package_version react-scripts start",
-    "build": "NODE_ENV=production REACT_APP_NAME=$npm_package_name REACT_APP_VERSION=$npm_package_version node esbuild.config.mjs",
+    "start": "REACT_APP_NAME=$npm_package_description REACT_APP_VERSION=$npm_package_version react-scripts start",
+    "build": "NODE_ENV=production REACT_APP_NAME=$npm_package_description REACT_APP_VERSION=$npm_package_version node esbuild.config.mjs",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "eject": "react-scripts eject",

@@ -3,11 +3,7 @@ import {
   Button,
   Input,
   Link,
-  makeStyles,
-  tokens,
   Card,
-  CardHeader,
-  CardPreview,
 } from '@fluentui/react-components';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAtom } from 'jotai';
@@ -31,34 +27,7 @@ import {
 } from '../../states/user-registration';
 
 import { z } from 'zod';
-
-const useStyles = makeStyles({
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
-  },
-  card: { maxWidth: '400px', width: '30%' },
-  column: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '20px',
-  },
-  box: { backgroundColor: tokens.colorNeutralBackground2 },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-    margin: '0 20px',
-    paddingTop: '10px',
-  },
-  googleButtonContainer: { marginTop: '20px', marginBottom: '30px' },
-  googleButton: { width: '100%' },
-});
+import { useAuthPageStyles } from './auth-styles';
 
 const schema = z.object({
   studentId: zodString(),
@@ -72,7 +41,8 @@ type SignupPageProps = {
 };
 
 export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
-  const styles = useStyles();
+  const styles = useAuthPageStyles();
+  
   const { t } = useTranslation();
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
   const [state, action] = useAtom(userRegistrationAtom);
@@ -146,52 +116,53 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.column}>
-        <Card className={styles.card}>
-          <CardHeader
-            header={
-              <Body1>
-                {t('signup.greeting')} <b>{process.env.REACT_APP_NAME}</b>
-              </Body1>
-            }
-          />
-          <CardPreview className={styles.box}>
-            <div>
-              <form className={styles.form}>
-                <Field
-                  label={t('signup.studentId')}
-                  required
-                  validationMessage={errors.studentId?.message}
-                >
-                  <Input {...register('studentId')} />
-                </Field>
-                <Field label={t('signup.name')} required validationMessage={errors.name?.message}>
-                  <Input {...register('name')} />
-                </Field>
-                <div className={styles.googleButtonContainer}>
-                  <Button
-                    className={styles.googleButton}
-                    disabled={hasMissingRequiredField(formValues, schema)}
-                    icon={<FcGoogle size={20} />}
-                    onClick={handleSubmit(handleGoogleLogin)}
-                    type="button"
-                  >
-                    {t('signup.signUpWithGoogle')}
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </CardPreview>
-        </Card>
-        <div style={{ textAlign: 'center' }}>
-          {`${t('signup.alreadyUser')} ?  `}
-          <Link inline onClick={onNavigateToLogin}>
-            {t('signup.login')}
-          </Link>{' '}
-          {t('signup.withCredential')}
+    <div className={styles.page}>
+      <Card className={styles.card}>
+        {/* Left side: Login Form */}
+        <div className={styles.formSection}>
+          <Body1>
+            {t('signup.greeting')} <b>{process.env.REACT_APP_NAME}</b>
+          </Body1>
+
+          <Field
+            label={t('signup.studentId')}
+            required
+            validationMessage={errors.studentId?.message}
+          >
+            <Input {...register('studentId')} />
+          </Field>
+          <Field label={t('signup.name')} required validationMessage={errors.name?.message}>
+            <Input {...register('name')} />
+          </Field>
+
+          <div className={styles.buttonRow}>
+              <Button
+                className={styles.googleButton}
+                disabled={hasMissingRequiredField(formValues, schema)}
+                icon={<FcGoogle size={20} />}
+                onClick={handleSubmit(handleGoogleLogin)}
+                type="button"
+              >
+                {t('signup.signUpWithGoogle')}
+              </Button>
+          </div>
         </div>
+
+        {/* Right side: Icon */}
+        <div className={styles.icon}>
+          <img alt="Login Icon" className={styles.icon} src="/logo384.png" />
+        </div>
+      </Card>
+
+      {/* Sign up link below the card */}
+      <div className={styles.signUpText}>
+        {`${t('signup.alreadyUser')} ?  `}
+        <Link inline onClick={onNavigateToLogin}>
+          {t('signup.login')}
+        </Link>{' '}
+        {t('signup.withCredential')}
       </div>
     </div>
   );
+
 };
