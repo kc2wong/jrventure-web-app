@@ -1,12 +1,15 @@
 import React, { FC } from 'react';
-import { Caption2, makeStyles, Text, tokens } from '@fluentui/react-components';
-import { ProductDetailPage } from '../market/product-detail';
+import { Button, Caption2, makeStyles, Text, tokens } from '@fluentui/react-components';
+import { ProductDetail } from '../product/product-detail';
 import { productApprovalListAtom } from '../../states/product-approval-list';
 import { useAtom } from 'jotai';
 import { MultiLingualLabel } from '../../components/multi-lang-label';
 import { useTimezone } from '../../hooks/use-timezone';
 import { ApprovalCommentType, ApprovalStatus } from '../../__generated__/linkedup-web-api-client';
 import { ChatDismissRegular, ChatRegular, ChatSparkleRegular } from '@fluentui/react-icons';
+import { t } from 'i18next';
+// import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
+import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 
 const useStyles = makeStyles({
   row: {
@@ -49,6 +52,12 @@ export const ProductApprovalDetailPage: React.FC = () => {
   const styles = useStyles();
   const [state] = useAtom(productApprovalListAtom);
   const { formatDatetime } = useTimezone();
+  const { appendBreadcrumb } = useBreadcrumb();
+  // const { navigate } = useNavigationHelpers();
+
+  // useAppendBreadcrumb('productApproval.titleReview', []);
+  // appendBreadcrumb(navigate, 'productApproval.titleReview', []);
+  appendBreadcrumb('productApproval.titleReview', []);
 
   const comments = state.selectedResult?.comments ?? [];
 
@@ -68,8 +77,8 @@ export const ProductApprovalDetailPage: React.FC = () => {
         </Text>
         {comments.length > 0 ? (
           <ul style={{ marginTop: '1rem', paddingLeft: '1rem' }}>
-            {comments.map((comment) => (
-              <>
+            {comments.map((comment, idx) => (
+              <div key={idx}>
                 <div className={styles.row}>
                   <div className={styles.col10}>
                     {React.createElement(commentTypeComponents[comment.type])}
@@ -87,11 +96,13 @@ export const ProductApprovalDetailPage: React.FC = () => {
                   <div className={styles.col10}></div>
                   <div className={styles.col90}>
                     <div className={styles.commentWrapper}>
-                      <Text block style={{ whiteSpace: 'pre-line' }}>{comment.comment}</Text>
+                      <Text block style={{ whiteSpace: 'pre-line' }}>
+                        {comment.comment}
+                      </Text>
                     </div>
                   </div>
                 </div>
-              </>
+              </div>
             ))}
           </ul>
         ) : (
@@ -103,11 +114,28 @@ export const ProductApprovalDetailPage: React.FC = () => {
 
       {/* Right Panel - 80% width */}
       <div style={{ flex: '1', padding: '1rem', overflowY: 'auto' }}>
-        <ProductDetailPage
-          approvalStatus={ApprovalStatus.PENDING}
-          product={state.selectedResult?.product}
-          type="approval"
-        />
+        {state.selectedResult ? (
+          <ProductDetail
+            approvalStatus={ApprovalStatus.PENDING}
+            buttons={[
+              <Button key="comment" icon={<ChatRegular />}>
+                {t('productApproval.comment')}
+              </Button>,
+              <Button key="reject" icon={<ChatDismissRegular />}>
+                {t('productApproval.reject')}
+              </Button>,
+              <Button key="approve" icon={<ChatSparkleRegular />}>
+                {t('productApproval.approve')}
+              </Button>,
+            ]}
+            product={state.selectedResult.product}
+            showOrder={false}
+            showReview={false}
+            showShopLink={false}
+          />
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );

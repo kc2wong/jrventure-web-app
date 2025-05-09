@@ -8,17 +8,17 @@ import { delay } from '../utils/date-util';
 import { Product } from '../__generated__/linkedup-web-api-client';
 import { findProduct as findProductRepo } from '../repo/product-repo';
 
-type ProductListStateArgs = {
+type MarketPlaceStateArgs = {
   result?: Product[];
   selectedResult?: Product;
 };
 
-class ProductListState implements BaseState {
+class MarketPlaceState implements BaseState {
   result?: Product[];
   selectedResult?: Product;
   eventTime: number;
 
-  constructor({ result, selectedResult }: ProductListStateArgs) {
+  constructor({ result, selectedResult }: MarketPlaceStateArgs) {
     this.result = result;
     this.selectedResult = selectedResult;
     this.eventTime = Date.now();
@@ -29,19 +29,19 @@ class ProductListState implements BaseState {
   };
 }
 
-class ProductListStateInitial extends ProductListState {
+class MarketPlaceStateInitial extends MarketPlaceState {
   constructor() {
     super({});
   }
 }
 
-class ProductListStateProgress extends ProductListState {
-  constructor(args: ProductListState) {
+class MarketPlaceStateProgress extends MarketPlaceState {
+  constructor(args: MarketPlaceState) {
     super(args);
   }
 }
 
-class ProductListStateSuccess extends ProductListState {
+class MarketPlaceStateSuccess extends MarketPlaceState {
   override result: Product[];
 
   constructor(result: Product[], selectedResult?: Product) {
@@ -50,20 +50,20 @@ class ProductListStateSuccess extends ProductListState {
   }
 }
 
-class ProductListStateFail extends ProductListState {
+class MarketPlaceStateFail extends MarketPlaceState {
   failure: Message;
 
-  constructor(args: ProductListState, failure: Message) {
+  constructor(args: MarketPlaceState, failure: Message) {
     super(args);
     this.failure = failure;
   }
 }
 
-const productListBaseAtom = atomWithReset<ProductListState>(new ProductListStateInitial());
+const marketPlaceBaseAtom = atomWithReset<MarketPlaceState>(new MarketPlaceStateInitial());
 
 type SearchPayload = {};
 
-type ProductListPayload = {
+type MarketPlacePayload = {
   search: SearchPayload;
   refresh: EmptyObject;
   reset: EmptyObject;
@@ -71,11 +71,11 @@ type ProductListPayload = {
 };
 
 const searchOrRefresh = async (
-  current: ProductListState,
-  get: <ProductListState>(atom: Atom<ProductListState>) => ProductListState,
+  current: MarketPlaceState,
+  get: <MarketPlaceState>(atom: Atom<MarketPlaceState>) => MarketPlaceState,
   set: Setter,
 ) => {
-  set(productListBaseAtom, new ProductListStateProgress(current));
+  set(marketPlaceBaseAtom, new MarketPlaceStateProgress(current));
   const startTime = Date.now();
 
   const result = await findProductRepo();
@@ -92,35 +92,35 @@ const searchOrRefresh = async (
       type: MessageType.Error,
       parameters: result.parameter,
     };
-    set(productListBaseAtom, new ProductListStateFail(get(productListBaseAtom), failure));
+    set(marketPlaceBaseAtom, new MarketPlaceStateFail(get(marketPlaceBaseAtom), failure));
   } else {
-    set(productListBaseAtom, new ProductListStateSuccess(result, undefined));
+    set(marketPlaceBaseAtom, new MarketPlaceStateSuccess(result, undefined));
   }
 };
 
-export const productListAtom = atom<ProductListState, [OneOnly<ProductListPayload>], Promise<void>>(
-  (get) => get(productListBaseAtom),
-  async (get, set, { search, refresh, reset, select }: OneOnly<ProductListPayload>) => {
-    const current = get(productListBaseAtom);
+export const marketPlaceAtom = atom<MarketPlaceState, [OneOnly<MarketPlacePayload>], Promise<void>>(
+  (get) => get(marketPlaceBaseAtom),
+  async (get, set, { search, refresh, reset, select }: OneOnly<MarketPlacePayload>) => {
+    const current = get(marketPlaceBaseAtom);
     if (search) {
       searchOrRefresh(current, get, set);
     } else if (refresh) {
-      if (current instanceof ProductListStateSuccess) {
+      if (current instanceof MarketPlaceStateSuccess) {
         searchOrRefresh(current, get, set);
       }
     } else if (select) {
-      if (current instanceof ProductListStateSuccess) {
-        set(productListBaseAtom, new ProductListStateSuccess(current.result, select.product));
+      if (current instanceof MarketPlaceStateSuccess) {
+        set(marketPlaceBaseAtom, new MarketPlaceStateSuccess(current.result, select.product));
       }
     } else if (reset) {
-      set(productListBaseAtom, RESET);
+      set(marketPlaceBaseAtom, RESET);
     }
   },
 );
 
 export {
-  ProductListStateInitial,
-  ProductListStateProgress,
-  ProductListStateSuccess,
-  ProductListStateFail,
+  MarketPlaceStateInitial,
+  MarketPlaceStateProgress,
+  MarketPlaceStateSuccess,
+  MarketPlaceStateFail,
 };

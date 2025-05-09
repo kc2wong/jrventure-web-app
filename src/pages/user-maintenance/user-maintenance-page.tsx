@@ -1,6 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useMessage } from '../../hooks/use-message';
 import { useMode } from '../../hooks/use-mode';
 import {
@@ -21,14 +20,14 @@ import { UserEditPage } from './user-edit-page';
 import { Message, MessageType } from '../../models/system';
 import { constructErrorMessage } from '../../utils/string-util';
 import { useTranslation } from 'react-i18next';
+import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
 
 export const UserMaintenancePage: React.FC = () => {
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
 
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const { navigate, navigateWithSpinner } = useNavigationHelpers();
   const mode = useMode();
-  //   const readOnly = mode === 'view';
 
   const userDetailState = useAtomValue(userDetailAtom);
   const [userListState, userListAction] = useAtom(userListAtom);
@@ -73,13 +72,13 @@ export const UserMaintenancePage: React.FC = () => {
       onEditButtonClick={() => {
         const selectedUser = userListState.selectedResult;
         if (selectedUser) {
-          navigate(`/user/${selectedUser.id}/edit`, { state: { user: selectedUser } });
+          navigateWithSpinner(`/user/${selectedUser.id}/edit`, { state: { user: selectedUser } });
         }
       }}
       onViewButtonClick={() => {
         const selectedUser = userListState.selectedResult;
         if (selectedUser) {
-          navigate(`/user/${selectedUser.id}/view`, { state: { user: selectedUser } });
+          navigateWithSpinner(`/user/${selectedUser.id}/view`, { state: { user: selectedUser } });
         }
       }}
     />
@@ -93,9 +92,9 @@ export const UserMaintenancePage: React.FC = () => {
       }}
       onSave={() => {
         if (mode === 'add') {
-          const selectedUser =userDetailState.result;
+          const selectedUser = userDetailState.result;
           if (selectedUser) {
-            navigate(`/user/${selectedUser.id}/edit`, {
+            navigateWithSpinner(`/user/${selectedUser.id}/edit`, {
               replace: true,
               state: { user: selectedUser },
             });

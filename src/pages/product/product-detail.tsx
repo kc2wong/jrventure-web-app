@@ -1,7 +1,5 @@
-import React, { ReactElement } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAtom } from 'jotai';
-import { productListAtom } from '../../states/product-list';
+import React from 'react';
+import { useAtomValue } from 'jotai';
 import { Form, Root } from '../../components/Container';
 import {
   ArrowTurnUpLeftRegular,
@@ -11,11 +9,7 @@ import {
   CommentFilled,
   AppsListDetailFilled,
   AppsListDetailRegular,
-  PenRegular,
   HeartFilled,
-  ChatDismissRegular,
-  ChatRegular,
-  ChatSparkleRegular,
 } from '@fluentui/react-icons';
 import {
   Button,
@@ -41,8 +35,9 @@ import { useTimezone } from '../../hooks/use-timezone';
 import { BsCoin } from 'react-icons/bs';
 import { ImageCarousel } from '../../components/image-carousell';
 import { ButtonPanel } from '../../components/ButtonPanel';
-import { Product } from '../../__generated__/linkedup-web-api-client';
-import { useNavigateWithSpinner } from '../../hooks/use-delay-navigate';
+import { ApprovalStatus, Product } from '../../__generated__/linkedup-web-api-client';
+import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
+import { shopAtom } from '../../states/student-shop';
 
 const AppsListDetail = bundleIcon(AppsListDetailFilled, AppsListDetailRegular);
 const Comment = bundleIcon(CommentFilled, CommentRegular);
@@ -82,27 +77,26 @@ const useStyles = makeStyles({
   buttonPanel: { margin: '20px 20px 20px 0' },
 });
 
-type ProductDetailPageProps =
-  | {
-      product?: Product;
-      type: 'approval';
-      approvalStatus: string; // or your enum/type
-    }
-  | {
-      product?: Product;
-      type?: 'shop' | 'market';
-      approvalStatus?: never;
-    };
+type ProductDetailProps = {
+  product?: Product;
+  showReview: boolean;
+  showOrder: boolean;
+  showShopLink: boolean;
+  approvalStatus?: ApprovalStatus;
+  buttons: React.ReactElement<typeof Button>[];
+};
 
-export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
+export const ProductDetail: React.FC<ProductDetailProps> = ({
   product: inProduct,
-  type,
+  // type,
   approvalStatus,
-}: ProductDetailPageProps) => {
-  // useStartBreadcrumb('system.menu.0');
-  const navigate = useNavigate();
-  const navigateWithSpinner = useNavigateWithSpinner();
-  const [state] = useAtom(productListAtom);
+  showOrder,
+  showReview,
+  showShopLink,
+  buttons,
+}: ProductDetailProps) => {
+  const { navigate, navigateWithSpinner } = useNavigationHelpers();
+  const state = useAtomValue(shopAtom);
 
   const [selectedValue, setSelectedValue] = React.useState<TabValue>('tab1');
 
@@ -113,7 +107,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const { formatDatetime, formatDistanceToNow } = useTimezone();
 
   const styles = useStyles();
-  const product = inProduct ?? state.selectedResult!;
+  const product: Product | undefined = inProduct ?? state.selectedProduct;
 
   const backButton =
     window.history.length > 1 ? (
@@ -129,70 +123,75 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       <></>
     );
 
-  const ProductDetail = React.memo(() => (
-    // <div aria-labelledby="ProductDetail" role="tabpanel">
-    <Form numColumn={2} styles={{ width: '690px' }}>
-      <br />
-      <Field colSpan={2} indentChildren={true} label="Summary">
-        <Text>{product.summary}</Text>
-      </Field>
+  const ProductDetail = React.memo(() =>
+    product ? (
+      <Form numColumn={2} styles={{ width: '690px' }}>
+        <br />
+        <Field colSpan={2} indentChildren={true} label="Summary">
+          <Text>{product.summary}</Text>
+        </Field>
 
-      <Field colSpan={2} indentChildren={true} label="Description">
-        <Text block>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium accusamus voluptate
-          autem? Recusandae alias corporis dicta quisquam sequi molestias deleniti, libero
-          necessitatibus, eligendi, omnis cumque enim asperiores quasi quidem sit. Lorem ipsum dolor
-          sit amet, consectetur adipisicing elit. Possimus repellat consectetur, sed aperiam ex
-          nulla repellendus tempora vero illo aliquam autem! Impedit ipsa praesentium vero veritatis
-          unde eos, fuga magnam!
-        </Text>
-      </Field>
+        <Field colSpan={2} indentChildren={true} label="Description">
+          <Text block>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium accusamus voluptate
+            autem? Recusandae alias corporis dicta quisquam sequi molestias deleniti, libero
+            necessitatibus, eligendi, omnis cumque enim asperiores quasi quidem sit. Lorem ipsum
+            dolor sit amet, consectetur adipisicing elit. Possimus repellat consectetur, sed aperiam
+            ex nulla repellendus tempora vero illo aliquam autem! Impedit ipsa praesentium vero
+            veritatis unde eos, fuga magnam!
+          </Text>
+        </Field>
 
-      <Field indentChildren={true} label="Seller">
-        <>
-          {type === 'market' ? (
-            <Link onClick={() => navigateWithSpinner('/shop/1')}>{product.seller}</Link>
-          ) : (
-            <Text>{product.seller}</Text>
-          )}
-          <Caption1>&nbsp;&nbsp;{product.sellerClass}</Caption1>
-        </>
-      </Field>
+        <Field indentChildren={true} label="Seller">
+          <>
+            {showShopLink ? (
+              <Link onClick={() => navigateWithSpinner(`/shop/${product.sellerId}`)}>
+                {product.seller}
+              </Link>
+            ) : (
+              <Text>{product.seller}</Text>
+            )}
+            <Caption1>&nbsp;&nbsp;{product.sellerClass}</Caption1>
+          </>
+        </Field>
 
-      <Field indentChildren={true} label="Posted at">
-        <Text>{formatDatetime(new Date())}</Text>
-      </Field>
+        <Field indentChildren={true} label="Posted at">
+          <Text>{formatDatetime(new Date())}</Text>
+        </Field>
 
-      <Field indentChildren={true} label="e-Coins">
-        <div className={styles.iconText}>
-          <BsCoin />
-          <span>{product.cost}</span>
-        </div>
-      </Field>
-
-      {type !== 'approval' ? (
-        <Field indentChildren={true} label="Buyers">
+        <Field indentChildren={true} label="e-Coins">
           <div className={styles.iconText}>
-            <HeartRegular />
-            <span>{product.likes}</span>
+            <BsCoin />
+            <span>{product.cost}</span>
           </div>
         </Field>
-      ) : (
-        <EmptyCell />
-      )}
 
-      {type !== 'approval' ? (
-        <>
-          <Field indentChildren={true} label="Rating">
-            <RatingDisplay color="brand" size="medium" value={product.rating} />
+        {showOrder ? (
+          <Field indentChildren={true} label="Buyers">
+            <div className={styles.iconText}>
+              <HeartRegular />
+              <span>{product.likes}</span>
+            </div>
           </Field>
+        ) : (
           <EmptyCell />
-        </>
-      ) : (
-        <></>
-      )}
-    </Form>
-  ));
+        )}
+
+        {approvalStatus === undefined ? (
+          <>
+            <Field indentChildren={true} label="Rating">
+              <RatingDisplay color="brand" size="medium" value={product.rating} />
+            </Field>
+            <EmptyCell />
+          </>
+        ) : (
+          <></>
+        )}
+      </Form>
+    ) : (
+      <div></div>
+    ),
+  );
 
   const ProductReview = React.memo(() => (
     <div aria-labelledby="ProductReview" role="tabpanel">
@@ -314,29 +313,34 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     </div>
   ));
 
+  const productName = product?.name ?? '';
   return (
     <Root>
       <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalS }}>
         {approvalStatus ? (
           <div>
-            <Title1>{product.name}</Title1>&nbsp;&nbsp;
+            <Title1>{productName}</Title1>&nbsp;&nbsp;
             <Subtitle2 italic={true} style={{ color: tokens.colorStatusWarningForeground1 }}>
               ({approvalStatus})
             </Subtitle2>
           </div>
         ) : (
-          <Title1>{product.name}</Title1>
+          <Title1>{productName}</Title1>
         )}
-        <ImageCarousel images={[product.imageUrl, product.imageUrl, product.imageUrl]} />
-        {type !== 'approval' && (
+        <ImageCarousel
+          images={product ? [product.imageUrl, product.imageUrl, product.imageUrl] : []}
+        />
+        {(showReview || showOrder) && (
           <TabList onTabSelect={onTabSelect} selectedValue={selectedValue}>
             <Tab icon={<AppsListDetail />} value="tab1">
               Detail
             </Tab>
-            <Tab icon={<Comment />} value="tab2">
-              Review
-            </Tab>
-            {type === 'shop' && (
+            {showReview && (
+              <Tab icon={<Comment />} value="tab2">
+                Review
+              </Tab>
+            )}
+            {showOrder && (
               <Tab icon={<Heart />} value="tab3">
                 Buyers
               </Tab>
@@ -349,35 +353,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           {selectedValue === 'tab3' && <OrderHistory />}
         </div>
         <ButtonPanel className={styles.buttonPanel}>
-          {
-            [
-              backButton,
-              type === 'shop' ? (
-                <Button key="edit" icon={<PenRegular />}>
-                  Edit Product
-                </Button>
-              ) : null,
-              type === 'market' ? (
-                <Button key="order" appearance="primary" icon={<HeartRegular />}>
-                  Place Order
-                </Button>
-              ) : null,
-              ...(type === 'approval'
-                ? [
-                    <Button key="comment" icon={<ChatRegular />}>
-                      Comment
-                    </Button>,
-                    <Button key="reject" icon={<ChatDismissRegular />}>
-                      Reject
-                    </Button>,
-                    <Button key="approve" icon={<ChatSparkleRegular />}>
-                      Approve
-                    </Button>,
-                  ]
-                : []),
-            ].filter(Boolean) as ReactElement[]
-          }
-        </ButtonPanel>
+          {[backButton, ...buttons]
+            .filter(Boolean)
+            .map((button, index) => React.cloneElement(button, { key: button.key || index }))}
+        </ButtonPanel>{' '}
       </div>
     </Root>
   );

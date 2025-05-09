@@ -138,14 +138,18 @@
     "titleEdit": "${1} User"
   },
   "productApproval": {
+    "approve": "Approve",
     "classNo": "Class ID",
+    "comment": "Comment",
+    "reject": "Reject",
     "studentId": "Student ID",
     "status": {
       "label": "Status",
       "value": { "Pending": "Pending", "Approved": "Approved", "Rejected": "Rejected" }
     },
     "classId": "Class ID",
-    "title": "Product Approval"
+    "title": "Product Approval",
+    "titleReview": "Review Product"
   },
   "paymentMaintenance": {
     "account": "Account",

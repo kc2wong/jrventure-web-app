@@ -12,19 +12,18 @@ import { authenticationAtom } from './states/authentication';
 import { useAtomValue } from 'jotai';
 import { useTheme } from './contexts/Theme';
 import { Language } from './models/openapi';
-import { usePageElementNavigation } from './contexts/PageElementNavigation';
 import { PageTransitionProvider } from './contexts/PageTransition';
-import { useFormDirty } from './contexts/FormDirty';
 import HomePage from './pages/home-page';
-import { useDialog } from './hooks/use-dialog';
 import { UserMaintenancePage } from './pages/user-maintenance/user-maintenance-page';
 import { Breadcrumb } from './components/breadcrumb';
 import { SidebarMenu } from './components/sidebar-menu';
-import { ArrowLeftFilled, RowTripleFilled } from '@fluentui/react-icons';
+import { ArrowLeftFilled, HeartRegular, RowTripleFilled } from '@fluentui/react-icons';
 import { MarketPlaceShowcase } from './pages/market/market-place';
-import { ProductDetailPage } from './pages/market/product-detail';
-import { ShopPage } from './pages/market/shop';
+import { ProductDetail } from './pages/product/product-detail';
+import { StudentShopPage } from './pages/market/student-shop-page';
 import { ProductApprovalPage } from './pages/product-approval/product-approval-page';
+import { useDialog } from './hooks/use-dialog';
+import { useFormDirty } from './contexts/FormDirty';
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
@@ -66,37 +65,34 @@ export const Main: React.FC = () => {
   const styles = useStyles();
   const { i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
-  const { pageElementNavigation } = usePageElementNavigation();
+  const login = useAtomValue(authenticationAtom).login;
   const { isDirty, resetDirty } = useFormDirty();
   const { showDiscardChangeDialog } = useDialog();
-  const login = useAtomValue(authenticationAtom).login;
 
   const isLightTheme = theme === 'light';
   const selectedLanguage = i18n.language === 'en' ? Language.ENGLISH : Language.TRADITIONAL_CHINESE;
 
   const menuData = login?.menu;
 
-  const _enrichedPageElementNavigation = pageElementNavigation.map((i) => {
-    const breadcrumbAction = i.action;
-    if (breadcrumbAction) {
-      const actionWithConfirmation = () => {
-        if (isDirty()) {
-          showDiscardChangeDialog({
-            action: () => {
-              breadcrumbAction();
-              resetDirty();
-            },
-          });
-        } else {
-          breadcrumbAction();
+  const placeOrderButton = (
+    <Button key="order" appearance="primary" icon={<HeartRegular />}>
+      Place Order
+    </Button>
+  );
+
+  const confirmationPrompt = (fn: () => void) => {
+    if (isDirty()) {
+      showDiscardChangeDialog({
+        action: () => {
+          fn();
           resetDirty();
-        }
-      };
-      return { action: actionWithConfirmation, labelKey: i.labelKey, labelParams: i.labelParams };
+        },
+      });
     } else {
-      return { ...i };
+      fn();
+      resetDirty();
     }
-  });
+  };
 
   return (
     <Router>
@@ -112,7 +108,8 @@ export const Main: React.FC = () => {
               />
             )}
             {menuData && (
-              <Breadcrumb menuData={menuData} pageElements={_enrichedPageElementNavigation} />
+              // <Breadcrumb menuData={menuData} pageElements={_enrichedPageElementNavigation} />
+              <Breadcrumb confirmationPrompt={confirmationPrompt} menuData={menuData} />
             )}
           </div>
           <div className={styles.headerItem}>
@@ -142,10 +139,30 @@ export const Main: React.FC = () => {
               <Routes>
                 <Route element={<HomePage />} path="/" />
                 <Route element={<MarketPlaceShowcase />} path="/market" />
-                <Route element={<ShopPage />} path="/shop" />
-                <Route element={<ShopPage />} path="/shop/:id" />
-                <Route element={<ProductDetailPage type="market" />} path="/market/:id/view" />
-                <Route element={<ProductDetailPage type="shop" />} path="/market/:id/edit" />
+                {/* <Route element={<ShopPage />} path="/shop" /> */}
+                <Route element={<StudentShopPage />} path="/shop/:id" />
+                <Route
+                  element={
+                    <ProductDetail
+                      buttons={[placeOrderButton]}
+                      showOrder={false}
+                      showReview={true}
+                      showShopLink={true}
+                    />
+                  }
+                  path="/market/:id/view"
+                />
+                <Route
+                  element={
+                    <ProductDetail
+                      buttons={[]}
+                      showOrder={true}
+                      showReview={true}
+                      showShopLink={false}
+                    />
+                  }
+                  path="/market/:id/edit"
+                />
                 <Route element={<ProductApprovalPage />} path="/approval" />
                 <Route element={<ProductApprovalPage />} path="/approval/:id/view" />
                 <Route element={<UserMaintenancePage />} path="/user" />

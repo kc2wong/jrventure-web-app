@@ -1,8 +1,10 @@
 import React from 'react';
-import { useStartBreadcrumb } from '../contexts/PageElementNavigation';
+import { useBreadcrumb } from '../hooks/use-breadcrumb';
 
 const HomePage: React.FC = () => {
-  useStartBreadcrumb('system.menu.0');
+  const { startBreadcrumb } = useBreadcrumb();
+  startBreadcrumb('system.menu.0');
+  
   return <h1>Home Page</h1>;
 };
 

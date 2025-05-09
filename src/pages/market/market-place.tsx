@@ -10,15 +10,15 @@ import {
 import { ArrowClockwiseRegular, SearchRegular } from '@fluentui/react-icons';
 import { useAtom } from 'jotai';
 import {
-  productListAtom,
-  ProductListStateInitial,
-  ProductListStateProgress,
-  ProductListStateSuccess,
-} from '../../states/product-list';
+  marketPlaceAtom,
+  MarketPlaceStateInitial,
+  MarketPlaceStateProgress,
+  MarketPlaceStateSuccess,
+} from '../../states/market-place';
 import { useEffect, useState } from 'react';
 import { useMessage } from '../../hooks/use-message';
 import { t } from 'i18next';
-import { ProductCard } from '../product/product-card';
+import { ProductGrid } from '../product/product-grid';
 
 const useStyles = makeStyles({
   main: {
@@ -103,23 +103,18 @@ const useStyles = makeStyles({
 
 export const MarketPlaceShowcase = () => {
   const styles = useStyles();
-  const [state, action] = useAtom(productListAtom);
-  // const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [state, action] = useAtom(marketPlaceAtom);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { showSpinner, stopSpinner } = useMessage();
 
   const pageNumbers = [1, 2, 3, 4, 5]; // Example only, update dynamically as needed
 
-  // const handleSelectionChange = (id: string, isSelected: boolean) => {
-  //   setSelected((prev) => ({ ...prev, [id]: isSelected }));
-  // };
-
   useEffect(() => {
-    if (state instanceof ProductListStateInitial) {
+    if (state instanceof MarketPlaceStateInitial) {
       action({ search: {} });
-    } else if (state instanceof ProductListStateProgress) {
+    } else if (state instanceof MarketPlaceStateProgress) {
       showSpinner();
-    } else if (state instanceof ProductListStateSuccess) {
+    } else if (state instanceof MarketPlaceStateSuccess) {
       stopSpinner();
     }
   }, [state]);
@@ -204,14 +199,7 @@ export const MarketPlaceShowcase = () => {
 
       {/* Product Grid */}
       <div className={styles.main}>
-        {(state.getResult() ?? []).map((product) => (
-          <ProductCard
-            key={product.id}
-            // onSelect={(isSelected) => handleSelectionChange(product.id, isSelected)}
-            product={product}
-            // selected={!!selected[product.id]}
-          />
-        ))}
+        <ProductGrid editAction={(_p) => undefined} products={state.getResult() ?? []}/>
       </div>
     </div>
   );

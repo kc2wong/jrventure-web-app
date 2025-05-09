@@ -13,13 +13,13 @@ import {
 } from '../../states/product-approval-list';
 import { ProductApprovalSearchPage } from './product-approval-search-page';
 import { ProductApprovalDetailPage } from './product-approval-detail';
-import { useNavigateWithSpinner } from '../../hooks/use-delay-navigate';
+import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
 
 export const ProductApprovalPage: React.FC = () => {
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
 
   const { t } = useTranslation();
-  const navigate = useNavigateWithSpinner();
+  const { navigateWithSpinner } = useNavigationHelpers();
   const mode = useMode();
 
   const [productApprovalState] = useAtom(productApprovalListAtom);
@@ -49,9 +49,13 @@ export const ProductApprovalPage: React.FC = () => {
       onViewButtonClick={() => {
         const selectedResult = productApprovalState.selectedResult;
         if (selectedResult) {
-          navigate(`/approval/${selectedResult.id}/view`, 500, {
-            state: { productApproval: selectedResult },
-          });
+          navigateWithSpinner(
+            `/approval/${selectedResult.id}/view`,
+            {
+              state: { productApproval: selectedResult },
+            },
+            500,
+          );
         }
       }}
     />

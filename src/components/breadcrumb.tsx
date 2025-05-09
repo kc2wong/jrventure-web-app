@@ -1,17 +1,16 @@
 import {
   Breadcrumb as FluentUiBreadcrumb,
-  BreadcrumbItem,
+  BreadcrumbItem as FluentUiBreadcrumbItem,
   BreadcrumbDivider,
   BreadcrumbButton,
 } from '@fluentui/react-components';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { constructMessage } from '../utils/string-util';
-import { useLocation } from 'react-router-dom';
 import { MenuItem } from '../models/login';
-import { isEqual } from '../utils/object-util';
 import { getMenuItemIdByPath } from '../pages/common';
-import { PageElement } from '../contexts/PageElementNavigation';
+import { useBreadcrumb } from '../hooks/use-breadcrumb';
 
 // Recursive function to find the path
 const findPath = (
@@ -35,45 +34,40 @@ const findPath = (
 };
 
 type BreadcrumbNavigationProps = {
-  pageElements: PageElement[];
   menuData: MenuItem;
+  confirmationPrompt?: (action: () => void) => void;
 };
 
 export const Breadcrumb: React.FC<BreadcrumbNavigationProps> = ({
   menuData,
-  pageElements: pageNavigation,
+  confirmationPrompt,
 }: BreadcrumbNavigationProps) => {
-  const [menuPathIds, setMenuPathIds] = useState<string[]>([]);
-
-  const location = useLocation();
+  // const location = useLocation();
   const { t } = useTranslation();
+  const { navigate } = useNavigationHelpers();
+  const { breadcrumbNavigation: pageNavigation } = useBreadcrumb();
 
-  useEffect(() => {
-    const menuItemId = getMenuItemIdByPath(location.pathname);
-    if (menuItemId) {
-      const pathIds = (findPath(menuData, menuItemId) ?? [])
+  // Check if need to prepend extra elements
+  const rootPathElement = pageNavigation[0]?.path;
+  const menuItemId = rootPathElement ? getMenuItemIdByPath(rootPathElement) : undefined;
+  const menuPathIds = menuItemId
+    ? (findPath(menuData, menuItemId) ?? [])
         .map((e) => e.id)
         // remove 'root'
-        .slice(1);
-
-      if (!isEqual(menuPathIds, pathIds)) {
-        // navigation.reset();
-        setMenuPathIds(pathIds);
-      }
-    }
-  }, [location.pathname, menuPathIds, menuData]);
+        .slice(1)
+    : [];
 
   const lastBreadcrumbItem =
     pageNavigation.length > 0
       ? pageNavigation[pageNavigation.length - 1]
       : menuPathIds[menuPathIds.length - 1];
   return (
-    <FluentUiBreadcrumb aria-label="Breadcrumb default example">
+    <FluentUiBreadcrumb aria-label="breadcrubm">
       {menuPathIds.map((id) => {
         const label = t(`system.menu.${id}`);
         return (
           <React.Fragment key={id}>
-            <BreadcrumbItem>
+            <FluentUiBreadcrumbItem>
               {lastBreadcrumbItem === id ? (
                 <BreadcrumbButton current>
                   <span>&nbsp;{label}&nbsp;</span>
@@ -81,21 +75,32 @@ export const Breadcrumb: React.FC<BreadcrumbNavigationProps> = ({
               ) : (
                 <span>&nbsp;{label}&nbsp;</span>
               )}
-            </BreadcrumbItem>
+            </FluentUiBreadcrumbItem>
             {lastBreadcrumbItem === id ? <></> : <BreadcrumbDivider />}
           </React.Fragment>
         );
       })}
-      {pageNavigation.map((node) => (
+      {pageNavigation.map((node, idx) => (
         <React.Fragment key={node.labelKey}>
-          <BreadcrumbItem>
-            <BreadcrumbButton current={lastBreadcrumbItem === node} onClick={node.action}>
+          <FluentUiBreadcrumbItem>
+            <BreadcrumbButton
+              current={lastBreadcrumbItem === node}
+              onClick={() => {
+                const delta = -(pageNavigation.length - idx - 1);
+                const navigation = () => navigate(delta);
+                if (confirmationPrompt) {
+                  confirmationPrompt(navigation);
+                } else {
+                  navigation();
+                }
+              }}
+            >
               <span>
                 &nbsp;{constructMessage(t, node.labelKey, node.labelParams)}
                 &nbsp;
               </span>
             </BreadcrumbButton>
-          </BreadcrumbItem>
+          </FluentUiBreadcrumbItem>
           {lastBreadcrumbItem === node ? <></> : <BreadcrumbDivider />}
         </React.Fragment>
       ))}

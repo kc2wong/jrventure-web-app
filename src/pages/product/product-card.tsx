@@ -17,9 +17,9 @@ import { EditRegular, HeartRegular } from '@fluentui/react-icons';
 import { BsCoin } from 'react-icons/bs';
 import { Card, CardHeader, CardPreview } from '@fluentui/react-components';
 import { useAtom } from 'jotai';
-import { productListAtom } from '../../states/product-list';
 import { Product } from '../../__generated__/linkedup-web-api-client';
-import { useNavigateWithSpinner } from '../../hooks/use-delay-navigate';
+import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
+import { shopAtom } from '../../states/student-shop';
 
 const useStyles = makeStyles({
   main: {
@@ -105,14 +105,9 @@ export const ProductCard: React.FC<{
   product: Product;
   editAction?: () => void;
 }> = ({ product, editAction }) => {
-  // export const ProductCard: React.FC<{
-  //   product: Product;
-  //   selected: boolean;
-  //   onSelect: (selected: boolean) => void;
-  // }> = ({ product, selected }) => {
-  const [, action] = useAtom(productListAtom);
+  const [, action] = useAtom(shopAtom);
   const styles = useStyles();
-  const navigate = useNavigateWithSpinner();
+  const { navigate } = useNavigationHelpers();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalXS }}>
@@ -135,7 +130,7 @@ export const ProductCard: React.FC<{
         onClick={() => {
           action({ select: { product } });
           setTimeout(() => {
-            navigate(`/market/${product.id}/view`);
+            navigate(`/market/${product.id}/${editAction ? 'edit' : 'view'}`);
           });
         }}
         // selected={selected}
@@ -150,17 +145,6 @@ export const ProductCard: React.FC<{
         </CardPreview>
 
         <CardHeader
-          //   action={
-          //     <Button
-          //       appearance="transparent"
-          //       aria-label="More actions"
-          //       icon={<PenRegular />}
-          //       onClick={(e) => {
-          //         console.log('hih');
-          //         e.stopPropagation();
-          //       }}
-          //     />
-          //   }
           description={<Caption1 className={styles.caption}>{product.summary}</Caption1>}
           header={<Text weight="semibold">{product.name}</Text>}
         />

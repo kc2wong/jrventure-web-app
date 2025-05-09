@@ -26,27 +26,23 @@ import {
   DismissCircleRegular,
   EditRegular,
 } from '@fluentui/react-icons';
-import { useAtom } from 'jotai';
-import {
-  productListAtom,
-  ProductListStateInitial,
-  ProductListStateProgress,
-  ProductListStateSuccess,
-} from '../../states/product-list';
+import { useAtom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useMessage } from '../../hooks/use-message';
 import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
-import { ProductCard } from '../product/product-card';
+import { ProductGrid } from '../product/product-grid';
+import { authenticationAtom } from '../../states/authentication';
+import { ApprovalStatus } from '../../__generated__/linkedup-web-api-client';
+import {
+  shopAtom,
+  ShopStateInitial,
+  ShopStateProgress,
+  ShopStateSuccess,
+} from '../../states/student-shop';
+import { MultiLingualLabel } from '../../components/multi-lang-label';
 
 const useStyles = makeStyles({
-  main: {
-    gap: '16px',
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-  },
-
   container: {
     display: 'flex',
     flexDirection: 'column',
@@ -127,21 +123,18 @@ const useStyles = makeStyles({
   },
 });
 
-export const ShopPage = () => {
+export const StudentShopPage = () => {
   const styles = useStyles();
-  const [state, action] = useAtom(productListAtom);
-  // const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [state, action] = useAtom(shopAtom);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { showSpinner, stopSpinner } = useMessage();
+  const { login } = useAtomValue(authenticationAtom);
+  const studentId = login?.entitledStudents[0].id;
 
   const { id } = useParams<{ id: string }>();
-  const ownStore = id === undefined;
+  const ownShop = id === studentId;
 
   const pageNumbers = [1, 2, 3, 4, 5]; // Example only, update dynamically as needed
-
-  // const handleSelectionChange = (id: string, isSelected: boolean) => {
-  //   setSelected((prev) => ({ ...prev, [id]: isSelected }));
-  // };
 
   const [selectedValue, setSelectedValue] = useState<TabValue>('tab1');
 
@@ -150,11 +143,11 @@ export const ShopPage = () => {
   };
 
   useEffect(() => {
-    if (state instanceof ProductListStateInitial) {
+    if (state instanceof ShopStateInitial) {
       action({ search: {} });
-    } else if (state instanceof ProductListStateProgress) {
+    } else if (state instanceof ShopStateProgress) {
       showSpinner();
-    } else if (state instanceof ProductListStateSuccess) {
+    } else if (state instanceof ShopStateSuccess) {
       stopSpinner();
     }
   }, [state]);
@@ -162,58 +155,83 @@ export const ShopPage = () => {
   const CheckmarkStarburst = bundleIcon(CheckmarkStarburstFilled, CheckmarkStarburstRegular);
   const ApprovalsApp = bundleIcon(ApprovalsAppFilled, ApprovalsAppRegular);
   const DismissCircle = bundleIcon(DismissCircleFilled, DismissCircleRegular);
-  
 
   const ApprovedGrid = React.memo(() => (
     <div aria-labelledby="ProductReview" role="tabpanel">
-      <div className={styles.main}>
-        {(state.getResult() ?? [])
-          .filter((s) => s.seller === 'Dominic Kwok')
-          .map((product) => (
-            <ProductCard
-              key={product.id}
-              editAction={() => {}}
-              product={product}
-            />
-          ))}
-      </div>
+      <ProductGrid
+        editAction={(_p) => () => {}}
+        products={(state.shop?.approvedProducts ?? []).filter((s) => s.sellerId === 'S000000571')}
+      />
     </div>
   ));
 
+  const pendingItems = (state.shop?.pendingProducts ?? [])?.filter(
+    (item) => item.product.sellerId === studentId && item.status === ApprovalStatus.PENDING,
+  );
+  const rejectedItems = (state.shop?.rejectedProducts ?? [])?.filter(
+    (item) => item.product.sellerId === studentId && item.status === ApprovalStatus.REJECTED,
+  );
+
   const PendingGrid = React.memo(() => (
     <div aria-labelledby="PendingProduct" role="tabpanel">
-      <Text>No Pending Product</Text>
+      {pendingItems?.length === 0 ? (
+        <Text>No Pending Product</Text>
+      ) : (
+        <ProductGrid
+          editAction={(_p) => () => {}}
+          products={pendingItems
+            .filter((s) => s.product.sellerId === 'S000000571')
+            .map((s) => s.product)}
+        />
+      )}
     </div>
   ));
 
   const RejectedGrid = React.memo(() => (
     <div aria-labelledby="RejectedProduct" role="tabpanel">
-      <Text>No Rejected Product</Text>
+      {rejectedItems?.length === 0 ? (
+        <Text>No Rejected Product</Text>
+      ) : (
+        <ProductGrid
+          editAction={(_p) => () => {}}
+          products={rejectedItems
+            .filter((s) => s.product.sellerId === 'S000000571')
+            .map((s) => s.product)}
+        />
+      )}
     </div>
   ));
 
+  const imageUrl = state.shop?.imageUrl;
+  const student = state.shop?.student;
+  const studentInfo: Record<string, string> = student
+    ? {
+        English: `${student.classId}-${student.studentNumber} ${student.firstName.English} ${student.lastName.English}`,
+        TraditionalChinese: `${student.classId}-${student.studentNumber} ${student.firstName.TraditionalChinese} ${student.lastName.TraditionalChinese}`,
+        SimplifiedChinese: `${student.classId}-${student.studentNumber} ${student.firstName.SimplifiedChinese} ${student.lastName.SimplifiedChinese}`,
+      }
+    : {};
   return (
     <div className={styles.container}>
       {/* Toolbar */}
       <div className={styles.toolbar}>
         <div style={{ display: 'flex', alignItems: 'stretch', gap: 12 }}>
           {/* Avatar Box */}
-          <Avatar
-            image={{
-              src: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/cat_avatar.jpeg',
-            }}
-            size={64}
-          />
+          <Avatar image={imageUrl ? { src: imageUrl } : undefined} size={64} />
 
           {/* Right box, matching avatar height */}
           <div style={{ display: 'flex', alignItems: 'end' }}>
             <div
               style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
             >
-              <Title3>Welcome to my Super Store</Title3>
-              <Subtitle1>1F-18 Dominic Kwok</Subtitle1>
+              <MultiLingualLabel caption={state.shop?.description ?? {}}>
+                <Title3 />
+              </MultiLingualLabel>
+              <MultiLingualLabel caption={studentInfo}>
+                <Subtitle1 />
+              </MultiLingualLabel>
             </div>
-            {ownStore ? (
+            {ownShop ? (
               <>
                 <Tooltip content={'Add new product'} relationship="label" withArrow>
                   <Button appearance="transparent" icon={<AddCircleRegular />}></Button>
@@ -283,7 +301,7 @@ export const ShopPage = () => {
         </div>
       </div>
 
-      {ownStore ? (
+      {ownShop ? (
         <>
           <TabList onTabSelect={onTabSelect} selectedValue={selectedValue}>
             <Tab icon={<CheckmarkStarburst />} value="tab1">

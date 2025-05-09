@@ -30,7 +30,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {} from '../../models/system';
 import { SearchCriteriaDrawer } from '../../components/Drawer';
-import { useStartBreadcrumb } from '../../contexts/PageElementNavigation';
 import { Form, Root } from '../../components/Container';
 import { Field } from '../../components/Field';
 import { logger } from '../../utils/logging-util';
@@ -49,8 +48,9 @@ import {
 } from '../../states/product-approval-list';
 import { ApprovalStatus, ProductApproval } from '../../__generated__/linkedup-web-api-client';
 import { useTimezone } from '../../hooks/use-timezone';
-import { ApprovalStatusLabel } from './approval-status-label';
+import { ApprovalStatusLabel } from '../product/approval-status-label';
 import { BsCoin } from 'react-icons/bs';
+import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 
 const searchSchema = z.object({
   classNo: zodOptionalString(),
@@ -177,7 +177,8 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
   const [isDrawerOpen, setIsDrawerOpen] = useAtom(drawerOpenAtom);
   const { t } = useTranslation();
 
-  const { dispatchMessage } = useMessage();
+  const { startBreadcrumb } = useBreadcrumb();
+    const { dispatchMessage } = useMessage();
   const [state, action] = useAtom(productApprovalListAtom);
 
   const { formatDate } = useTimezone();
@@ -194,6 +195,8 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
       });
     }
   }, [state]);
+
+  startBreadcrumb('productApproval.title');
 
   const coinLabel = (value: number) => {
     return (
@@ -282,7 +285,7 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
     };
   });
 
-  useStartBreadcrumb('productApproval.title');
+  // useStartBreadcrumb('productApproval.title');
 
   const toolbarButtonRefresh = (
     <Tooltip content={t('system.message.refresh')} relationship="label" withArrow>

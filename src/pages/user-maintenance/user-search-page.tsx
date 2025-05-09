@@ -30,7 +30,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {} from '../../models/system';
 import { SearchCriteriaDrawer } from '../../components/Drawer';
-import { useStartBreadcrumb } from '../../contexts/PageElementNavigation';
 import { Form, Root } from '../../components/Container';
 import { Field } from '../../components/Field';
 import { logger } from '../../utils/logging-util';
@@ -52,6 +51,7 @@ import { useMessage } from '../../hooks/use-message';
 import { undefinedToEmptyString } from '../../utils/object-util';
 import { RoleLabel } from './role-label';
 import { StatusLabel } from './status-label';
+import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 
 const searchSchema = z.object({
   email: zodOptionalEmail(),
@@ -222,6 +222,7 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useAtom(drawerOpenAtom);
   const { t } = useTranslation();
 
+  const { startBreadcrumb } = useBreadcrumb();
   const { dispatchMessage } = useMessage();
   const [state, action] = useAtom(userListAtom);
 
@@ -239,6 +240,11 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
       });
     }
   }, [state]);
+
+  // useEffect(() => {
+  //   startBreadcrumb('userMaintenance.title');
+  // });
+  startBreadcrumb('userMaintenance.title');
 
   const columns: TableColumnDefinition<User>[] = [
     createTableColumn({
@@ -261,9 +267,7 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
       columnId: 'role',
       header: t('userMaintenance.role.label'),
       width: 16,
-      builder: (user) => (
-        <RoleLabel role={user.role}></RoleLabel>
-      ),
+      builder: (user) => <RoleLabel role={user.role}></RoleLabel>,
     }),
     createTableColumn({
       columnId: 'classIdStudentNumber',
@@ -281,9 +285,7 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
       columnId: 'status',
       header: t('userMaintenance.status.label'),
       width: 16,
-      builder: (user) => (
-        <StatusLabel status={user.status}></StatusLabel>
-      ),
+      builder: (user) => <StatusLabel status={user.status}></StatusLabel>,
     }),
   ];
 
@@ -318,7 +320,7 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
     };
   });
 
-  useStartBreadcrumb('userMaintenance.title');
+  // useStartBreadcrumb('userMaintenance.title');
 
   const toolbarButtonRefresh = (
     <Tooltip content={t('system.message.refresh')} relationship="label" withArrow>
@@ -463,4 +465,4 @@ const _filter2SearchFormData = ({ role, status, ...others }: Filter): SearchForm
 
 const _classIdStudentNumber = (student?: Student): string => {
   return student ? `${student.classId}-${student.studentNumber}` : '';
-}
+};

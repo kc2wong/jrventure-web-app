@@ -436,6 +436,9 @@ components:
       - English
       - TraditionalChinese
       - SimplifiedChinese
+    MultiLingual:
+      type: object
+      additionalProperties: true
     UserRole:
       type: string
       enum:
@@ -616,6 +619,7 @@ components:
       type: object
       required:
         - id
+        - sellerId
         - seller        
         - sellerClass        
         - name        
@@ -626,6 +630,8 @@ components:
         - likes        
       properties:
         id:
+          type: string
+        sellerId:
           type: string
         seller:
           type: string
@@ -688,3 +694,39 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProductApprovalComment"
+    Shop:
+      type: object
+      required:
+        - student
+        - description
+        - approvedProducts        
+        - pendingProducts        
+        - rejectedProducts        
+      properties:
+        description:
+          $ref: "#/components/schemas/MultiLingual"
+        imageUrl:
+          type: string
+        student:
+          $ref: "#/components/schemas/Student"
+        approvedProducts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        pendingProducts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductApproval"
+        rejectedProducts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductApproval"
+    MarketPlace:
+      type: object
+      required:
+        - products
+      properties:
+        products:
+          type: array
+          items:
+          $ref: "#/components/schemas/Product"

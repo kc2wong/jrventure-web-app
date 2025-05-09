@@ -39,9 +39,9 @@ import { MultiLangButton, MultiLangDrawer } from '../../components/multi-lang-dr
 import { hasMissingRequiredField } from '../../utils/form-util';
 import { emptyStringToUndefined } from '../../utils/object-util';
 import { MessageType } from '../../models/system';
-import { useAppendBreadcrumb } from '../../contexts/PageElementNavigation';
-import { RoleLabel, RoleReadOnlyInput } from './role-label';
-import { StatusLabel, StatusReadOnlyInput } from './status-label';
+import { RoleIcon, RoleLabel } from './role-label';
+import { StatusIcon, StatusLabel } from './status-label';
+import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 
 // form for editing user
 const maxNameLength = 50;
@@ -59,6 +59,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { i18n, t } = useTranslation();
   const { dispatchMessage } = useMessage();
+  const { appendBreadcrumb } = useBreadcrumb();
 
   const { showConfirmationDialog } = useDialog();
   const { markDirty, resetDirty } = useFormDirty();
@@ -175,7 +176,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
       if (state instanceof UserDetailStateGetSuccess) {
         reset(_user2FormData(state.result));
         const studentId = state.result.entitledStudentId;
-        if (studentId) {
+        if (studentId.length > 0) {
           studentListAction({ search: { id: studentId } });
         }
       } else if (state instanceof UserDetailStateUpdateSuccess) {
@@ -201,32 +202,20 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
             [Language.ENGLISH]: nameEn,
             [Language.TRADITIONAL_CHINESE]: nameZhHant,
             [Language.SIMPLIFIED_CHINESE]: nameZhHans,
-          });  
-        }
-        else if (`${student.classId}-${student.studentNumber}` === formValues.entitledStudentId) {
+          });
+        } else if (`${student.classId}-${student.studentNumber}` === formValues.entitledStudentId) {
           setValue('entitledStudentId', student.id);
           setValue('name', {
             [Language.ENGLISH]: nameEn,
             [Language.TRADITIONAL_CHINESE]: nameZhHant,
             [Language.SIMPLIFIED_CHINESE]: nameZhHans,
           });
-          }
+        }
       }
-      // if (mode === 'add' && student && student.id === formValues.entitledStudentId) {
-      //   // update username from student
-      //   const nameEn = `${student.firstName[Language.ENGLISH] ?? ''} ${student.lastName[Language.ENGLISH] ?? ''}`;
-      //   const nameZhHant = `${student.lastName[Language.TRADITIONAL_CHINESE] ?? ''}${student.firstName[Language.TRADITIONAL_CHINESE] ?? ''}`;
-      //   const nameZhHans = `${student.lastName[Language.SIMPLIFIED_CHINESE] ?? ''}${student.firstName[Language.SIMPLIFIED_CHINESE] ?? ''}`;
-      //   setValue('name', {
-      //     [Language.ENGLISH]: nameEn,
-      //     [Language.TRADITIONAL_CHINESE]: nameZhHant,
-      //     [Language.SIMPLIFIED_CHINESE]: nameZhHans,
-      //   });
-      // }
     }
   }, [studentListState]);
 
-  useAppendBreadcrumb('userMaintenance.titleEdit', `system.message.${mode}`, onBackButtonClick);
+  appendBreadcrumb('userMaintenance.titleEdit', `system.message.${mode}`);
 
   const handleNameFieldChange = (fieldName: 'name', langStr: string, value: string) => {
     const currentFieldValues = formValues[fieldName];
@@ -379,7 +368,11 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                 validationMessage={errors?.role?.message}
               >
                 {readOnly ? (
-                  <RoleReadOnlyInput {...others} value={value} />
+                  <Input
+                    appearance="underline"
+                    contentBefore={<RoleIcon role={value} />}
+                    value={value ? t(`userMaintenance.role.value.${value}`) : ''}
+                  />
                 ) : (
                   <Dropdown
                     {...others}
@@ -470,7 +463,11 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                 validationMessage={errors?.status?.message}
               >
                 {readOnly ? (
-                  <StatusReadOnlyInput {...others} value={value} />
+                  <Input
+                    appearance="underline"
+                    contentBefore={<StatusIcon status={value} />}
+                    value={value ? t(`userMaintenance.status.value.${value}`) : ''}
+                  />
                 ) : (
                   <Dropdown
                     {...others}

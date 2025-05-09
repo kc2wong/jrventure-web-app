@@ -1,10 +1,9 @@
 import { FC } from 'react';
-import { Body1, InputProps, makeStyles, shorthands } from '@fluentui/react-components';
+import { Body1, makeStyles, shorthands } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 import { UserRole } from '../../models/openapi';
-import { Input } from '../../components/Input';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
-import { RoleIcon } from '../../components/role-icon';
+import { BookRegular, PeopleListRegular, PersonFeedbackRegular, WrenchRegular } from '@fluentui/react-icons';
 
 interface RoleLabelProps {
   role: UserRole;
@@ -18,6 +17,28 @@ const useStyles = makeStyles({
   },
 });
 
+interface RoleIconProps {
+  role: UserRole | string;
+  size?: number;
+}
+
+const roleIconComponents: Record<UserRole, FC<{ fontSize?: number }>> = {
+  Student: BookRegular,
+  Parent: PeopleListRegular,
+  Teacher: PersonFeedbackRegular,
+  Admin: WrenchRegular,
+};
+
+export const RoleIcon: FC<RoleIconProps> = ({ role, size = 20 }) => {
+  const r = getEnumValueByRawValue(UserRole, role);
+  if (r) {
+    const IconComponent = roleIconComponents[r];
+    return <IconComponent fontSize={size} />;
+  } else {
+    return <></>;
+  }
+};
+
 export const RoleLabel: FC<RoleLabelProps> = ({ role }) => {
   const styles = useStyles();
   const { t } = useTranslation();
@@ -27,19 +48,5 @@ export const RoleLabel: FC<RoleLabelProps> = ({ role }) => {
       <RoleIcon role={role} />
       <Body1>{t(`userMaintenance.role.value.${role}`)}</Body1>
     </div>
-  );
-};
-
-export const RoleReadOnlyInput: React.FC<InputProps> = ({ value, ...others }) => {
-  const { t } = useTranslation();
-
-  const role = value ? getEnumValueByRawValue(UserRole, value) : undefined;
-  return (
-    <Input
-      {...others}
-      contentBefore={role ? <RoleIcon role={role} /> : undefined}
-      readOnly
-      value={role ? t(`userMaintenance.role.value.${role}`) : ''}
-    />
   );
 };

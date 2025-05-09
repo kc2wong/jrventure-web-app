@@ -7,7 +7,6 @@ import { initReactI18next } from 'react-i18next';
 import { Main } from './Main';
 import { useAtomValue } from 'jotai';
 import { ThemedAppProvider } from './contexts/Theme';
-import { PageElementNavigationProvider } from './contexts/PageElementNavigation';
 import { authenticationAtom } from './states/authentication';
 import { FormDirtyProvider } from './contexts/FormDirty';
 import { traceManager } from './utils/trace-manager';
@@ -16,6 +15,7 @@ import { MessageProvider } from './providers/message-provider';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthenticationContainer } from './pages/authentication/authentication-container';
 import { TimezoneProvider } from './providers/timezone-provider';
+import { BreadcrumbProvider } from './providers/breadcrumb-provider';
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
@@ -37,7 +37,7 @@ const App: React.FC = () => {
   }, [authenticationState.login]);
   return (
     <ThemedAppProvider>
-      <PageElementNavigationProvider>
+      <BreadcrumbProvider>
         <TimezoneProvider>
           <MessageProvider>
             <DialogProvider>
@@ -53,7 +53,7 @@ const App: React.FC = () => {
             </DialogProvider>
           </MessageProvider>
         </TimezoneProvider>
-      </PageElementNavigationProvider>
+      </BreadcrumbProvider>
     </ThemedAppProvider>
   );
 };

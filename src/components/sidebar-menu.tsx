@@ -8,7 +8,9 @@ import {
   WalletRegular,
   ApprovalsAppRegular,
 } from '@fluentui/react-icons';
-import { useNavigateWithSpinner } from '../hooks/use-delay-navigate';
+import { useNavigationHelpers } from '../hooks/use-delay-navigate';
+import { useAtomValue } from 'jotai';
+import { authenticationAtom } from '../states/authentication';
 
 const useStyles = makeStyles({
   sidebar: {
@@ -61,13 +63,13 @@ type MenuItemProps = {
 
 const MenuItem = ({ icon: Icon, label, collapsed, path }: MenuItemProps) => {
   const styles = useStyles();
-  const navigate = useNavigateWithSpinner();
+  const { navigateWithSpinner } = useNavigationHelpers();
 
   const content = (
     <div
       className={styles.menuItem}
       onClick={() => {
-        navigate(path);
+        navigateWithSpinner(path);
       }}
     >
       <div className={styles.iconWrapper}>
@@ -99,14 +101,30 @@ type SidebarMenuProps = {
 };
 export const SidebarMenu = ({ collapsed }: SidebarMenuProps) => {
   const styles = useStyles();
+  const authenticationAtomValue = useAtomValue(authenticationAtom);
+  const studentId = authenticationAtomValue.login?.entitledStudents[0].id;
 
   return (
     <div className={styles.sidebar} style={{ width: collapsed ? 40 : 200 }}>
       <MenuItem collapsed={collapsed} icon={WalletRegular} label="Wallet" path="/" />
-      <MenuItem collapsed={collapsed} icon={ShoppingBagRegular} label="My Shop" path="/shop" />
+      {studentId ? (
+        <MenuItem
+          collapsed={collapsed}
+          icon={ShoppingBagRegular}
+          label="My Shop"
+          path={`/shop/${studentId}`}
+        />
+      ) : (
+        <></>
+      )}
       <MenuItem collapsed={collapsed} icon={AccessibilityRegular} label="Achievement" path="/" />
       <MenuItem collapsed={collapsed} icon={PenSparkleRegular} label="Evaluation" path="/" />
-      <MenuItem collapsed={collapsed} icon={ApprovalsAppRegular} label="Approval" path="/approval" />
+      <MenuItem
+        collapsed={collapsed}
+        icon={ApprovalsAppRegular}
+        label="Approval"
+        path="/approval"
+      />
       <MenuItem collapsed={collapsed} icon={PeopleRegular} label="User" path="/user" />
     </div>
   );

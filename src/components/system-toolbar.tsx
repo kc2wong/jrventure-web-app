@@ -29,7 +29,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Language, UserRole } from '../models/openapi';
 import { Theme } from '../contexts/Theme';
-import { useNavigate } from 'react-router-dom';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useFormDirty } from '../contexts/FormDirty';
 import { Login } from '../models/login';
@@ -37,7 +36,7 @@ import { authenticationAtom } from '../states/authentication';
 import { useDialog } from '../hooks/use-dialog';
 import { useMessage } from '../hooks/use-message';
 import { MultiLingualLabel } from './multi-lang-label';
-import { useNavigateWithSpinner } from '../hooks/use-delay-navigate';
+import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 
 const useStyles = makeStyles({
   item: { display: 'flex', justifyContent: 'flex-start', gap: '10px' },
@@ -120,12 +119,12 @@ const MessageButton: React.FC = () => {
 };
 
 const MartketPlaceButton: React.FC = () => {
-  const navigate = useNavigateWithSpinner();
+  const { navigateWithSpinner } = useNavigationHelpers();
   return (
     <Button
       appearance="transparent"
       icon={<StoreMicrosoftRegular />}
-      onClick={() => navigate('/market')}
+      onClick={() => navigateWithSpinner('/market')}
     ></Button>
   );
 };
@@ -133,17 +132,17 @@ const MartketPlaceButton: React.FC = () => {
 const SignoutButton: React.FC = () => {
   const action = useSetAtom(authenticationAtom);
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { showConfirmationDialog } = useDialog();
   const { isDirty } = useFormDirty();
   const { showSpinner, stopSpinner } = useMessage();
+  const { navigateWithSpinner } = useNavigationHelpers();
 
   const signOut = () => {
     showSpinner();
     setTimeout(() => {
       stopSpinner();
       action({ signOut: {} });
-      navigate('/');
+      navigateWithSpinner('/');
     }, 500);
   };
 
