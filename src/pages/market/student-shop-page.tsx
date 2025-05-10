@@ -129,7 +129,7 @@ export const StudentShopPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { showSpinner, stopSpinner } = useMessage();
   const { login } = useAtomValue(authenticationAtom);
-  const studentId = login?.entitledStudents[0].id;
+  const studentId = login?.user.entitledStudent[0].id;
 
   const { id } = useParams<{ id: string }>();
   const ownShop = id === studentId;

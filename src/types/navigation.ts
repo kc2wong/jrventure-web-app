@@ -6,6 +6,6 @@ export type BreadcrumbItem = {
 
 export interface BreadcrumbContextType {
   breadcrumbNavigation: BreadcrumbItem[];
-  startBreadcrumb: (path: string, labelKey: string) => void;
+  startBreadcrumb: (path: string, labelKey: string, paramKey?: string | string[]) => void;
   appendBreadcrumb: (path: string, labelKey: string, paramKey?: string | string[]) => void;
 }

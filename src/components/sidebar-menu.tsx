@@ -102,7 +102,7 @@ type SidebarMenuProps = {
 export const SidebarMenu = ({ collapsed }: SidebarMenuProps) => {
   const styles = useStyles();
   const authenticationAtomValue = useAtomValue(authenticationAtom);
-  const studentId = authenticationAtomValue.login?.entitledStudents[0].id;
+  const studentId = authenticationAtomValue.login?.user.entitledStudent[0].id;
 
   return (
     <div className={styles.sidebar} style={{ width: collapsed ? 40 : 200 }}>

@@ -22,7 +22,7 @@ import {
   UserDetailStateGetSuccess,
   UserDetailStateUpdateSuccess,
 } from '../../states/user-detail';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useDialog } from '../../hooks/use-dialog';
 import { useFormDirty } from '../../contexts/FormDirty';
 import { constructMessage } from '../../utils/string-util';
@@ -42,6 +42,7 @@ import { MessageType } from '../../models/system';
 import { RoleIcon, RoleLabel } from './role-label';
 import { StatusIcon, StatusLabel } from './status-label';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
+import { authenticationAtom } from '../../states/authentication';
 
 // form for editing user
 const maxNameLength = 50;
@@ -59,7 +60,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { i18n, t } = useTranslation();
   const { dispatchMessage } = useMessage();
-  const { appendBreadcrumb } = useBreadcrumb();
+  const { startBreadcrumb, appendBreadcrumb } = useBreadcrumb();
 
   const { showConfirmationDialog } = useDialog();
   const { markDirty, resetDirty } = useFormDirty();
@@ -69,6 +70,8 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
 
   const [state, action] = useAtom(userDetailAtom);
   const [studentListState, studentListAction] = useAtom(studentListAtom);
+  const login = useAtomValue(authenticationAtom).login;
+  const isToAddParentUser = mode === 'add' && login?.user.role === UserRole.STUDENT;
 
   const readOnly = mode === 'view';
   const baselineTimestamp = useRef<number>(Date.now());
@@ -78,7 +81,23 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
       const { entitledStudentId, ...others } = user;
       return { entitledStudentId: entitledStudentId[0] ?? '', ...others };
     } else {
-      return { email: '', role: '', status: '', name: {}, entitledStudentId: '' };
+      if (isToAddParentUser) {
+        return {
+          email: '',
+          role: UserRole.PARENT,
+          status: UserStatus.ACTIVE,
+          name: {},
+          entitledStudentId: login?.user.entitledStudent[0].id,
+        };
+      } else {
+        return {
+          email: '',
+          role: '',
+          status: '',
+          name: {},
+          entitledStudentId: '',
+        };
+      }
     }
   };
 
@@ -167,6 +186,9 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
       action({ search: { id: id } });
     } else {
       action({ reset: {} });
+      if (isToAddParentUser && formValues.entitledStudentId) {
+        studentListAction({ search: { id: [formValues.entitledStudentId] } });
+      }
     }
   }, [id]);
 
@@ -193,17 +215,14 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     baselineTimestamp.current = state.eventTime;
     if (studentListState instanceof StudentListStateSuccess) {
       const student = studentListState.result[0];
-      if (mode === 'add' && student) {
+      if (mode === 'add' && !isToAddParentUser && student) {
         const nameEn = `${student.firstName[Language.ENGLISH] ?? ''} ${student.lastName[Language.ENGLISH] ?? ''}`;
         const nameZhHant = `${student.lastName[Language.TRADITIONAL_CHINESE] ?? ''}${student.firstName[Language.TRADITIONAL_CHINESE] ?? ''}`;
         const nameZhHans = `${student.lastName[Language.SIMPLIFIED_CHINESE] ?? ''}${student.firstName[Language.SIMPLIFIED_CHINESE] ?? ''}`;
-        if (student.id === formValues.entitledStudentId) {
-          setValue('name', {
-            [Language.ENGLISH]: nameEn,
-            [Language.TRADITIONAL_CHINESE]: nameZhHant,
-            [Language.SIMPLIFIED_CHINESE]: nameZhHans,
-          });
-        } else if (`${student.classId}-${student.studentNumber}` === formValues.entitledStudentId) {
+        if (
+          student.id === formValues.entitledStudentId ||
+          `${student.classId}-${student.studentNumber}` === formValues.entitledStudentId
+        ) {
           setValue('entitledStudentId', student.id);
           setValue('name', {
             [Language.ENGLISH]: nameEn,
@@ -215,7 +234,9 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     }
   }, [studentListState]);
 
-  appendBreadcrumb('userMaintenance.titleEdit', `system.message.${mode}`);
+  isToAddParentUser
+    ? startBreadcrumb('userMaintenance.titleAddParent')
+    : appendBreadcrumb('userMaintenance.titleEdit', `system.message.${mode}`);
 
   const handleNameFieldChange = (fieldName: 'name', langStr: string, value: string) => {
     const currentFieldValues = formValues[fieldName];
@@ -287,9 +308,13 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
         buttons={[backButton, resetPasswordButton, saveButton]}
         numColumn={3}
         styles={{ width: '690px' }}
-        title={constructMessage(t, 'userMaintenance.titleEdit', [
-          mode ? `system.message.${mode}` : '',
-        ])}
+        title={
+          isToAddParentUser
+            ? t('userMaintenance.titleAddParent')
+            : constructMessage(t, 'userMaintenance.titleEdit', [
+                mode ? `system.message.${mode}` : '',
+              ])
+        }
       >
         {mode !== 'add' ? (
           <>
@@ -367,7 +392,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                 required={true}
                 validationMessage={errors?.role?.message}
               >
-                {readOnly ? (
+                {readOnly || isToAddParentUser ? (
                   <Input
                     appearance="underline"
                     contentBefore={<RoleIcon role={value} />}
@@ -403,7 +428,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           }}
         />
 
-        {formValues.role == UserRole.STUDENT ? (
+        {formValues.role == UserRole.STUDENT || formValues.role == UserRole.PARENT ? (
           <>
             <Controller
               control={control}
@@ -413,7 +438,6 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                 const student = value
                   ? studentListState.result.find((s) => s.id === value)
                   : undefined;
-
                 return (
                   <Field
                     colSpan={2}
@@ -437,7 +461,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                           studentListAction({ search: { id: [entitledStudentId] } });
                         }
                       }}
-                      readOnly={readOnly}
+                      readOnly={readOnly || isToAddParentUser}
                       value={value}
                     />
                   </Field>
@@ -462,7 +486,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                 required={true}
                 validationMessage={errors?.status?.message}
               >
-                {readOnly ? (
+                {readOnly || isToAddParentUser ? (
                   <Input
                     appearance="underline"
                     contentBefore={<StatusIcon status={value} />}

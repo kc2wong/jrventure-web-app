@@ -45,6 +45,7 @@ const comment: ProductApprovalComment[] = [
     type: ApprovalCommentType.CONVERSATION,
     commentBy: {
       id: '9000',
+      email: 'system@linkedup.org',
       name: {
         English: 'Profanity Checker',
       },
@@ -57,6 +58,7 @@ const comment: ProductApprovalComment[] = [
     type: ApprovalCommentType.CONVERSATION,
     commentBy: {
       id: '9001',
+      email: '9001@linkedup.org',
       name: {
         English: 'Sharon Lee (Teacher)',
       },
@@ -69,6 +71,7 @@ const comment: ProductApprovalComment[] = [
     type: ApprovalCommentType.REJECTION,
     commentBy: {
       id: '9001',
+      email: '9001@linkedup.org',
       name: {
         English: 'Sharon Lee (Teacher)',
       },
@@ -81,6 +84,7 @@ const comment: ProductApprovalComment[] = [
     type: ApprovalCommentType.CONVERSATION,
     commentBy: {
       id: '9002',
+      email: '9002@linkedup.org',
       name: {
         English: 'Connor Chu',
       },

@@ -5,8 +5,6 @@ import { createSystemError } from './error-util';
 import { Error as ErrorModel } from '../__generated__/linkedup-web-api-client/models/Error';
 import { entity2Model as menuEntity2Model } from '../mapper/menu-item-mapper';
 import { User } from '../models/openapi';
-// import { entity2Model as userEntity2Model } from '../mapper/user-mapper';
-// import { User } from '../__generated__/linkedup-web-api-client/models/User';
 
 export const authenticateUser = async (
   email: string,
@@ -15,7 +13,11 @@ export const authenticateUser = async (
   try {
     const resp = await webApiClient.userAuthentication.postUserAuthentications({ email, password });
     const { user } = jwtDecode<{ user: User }>(resp.token);
-    const login: Login = { user, entitledStudents: [], menu: menuEntity2Model(resp.menu) };
+    const login: Login = {
+      user,
+      menu: menuEntity2Model(resp.menu),
+      parentUser: resp.parentUser,
+    };
     return login;
   } catch (error: any) {
     return createSystemError(error);
@@ -25,10 +27,11 @@ export const authenticateUser = async (
 export const googleAuthenticate = async (accessToken: string): Promise<Login | ErrorModel> => {
   try {
     const resp = await webApiClient.userAuthentication.authenticateGoogleUser({ accessToken });
+    const { user } = jwtDecode<{ user: User }>(resp.token);
     const login: Login = {
-      user: resp.user,
-      entitledStudents: resp.user.entitledStudent,
+      user: user,
       menu: menuEntity2Model(resp.menu),
+      parentUser: resp.parentUser,
     };
     return login;
   } catch (error: any) {

@@ -1,10 +1,4 @@
-import {
-  Body1,
-  Button,
-  Divider,
-  Input,
-  Link,
-} from '@fluentui/react-components';
+import { Body1, Button, Divider, Input, Image, Link } from '@fluentui/react-components';
 import { PersonPasskeyRegular } from '@fluentui/react-icons';
 import { Card } from '@fluentui/react-components';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -105,7 +99,6 @@ export const LoginPage = (props: LoginPageProps) => {
     await action({ signIn: { email: data.email, password: data.password } });
   };
 
-
   return (
     <div className={styles.page}>
       <Card className={styles.card}>
@@ -157,7 +150,11 @@ export const LoginPage = (props: LoginPageProps) => {
 
         {/* Right side: Icon */}
         <div className={styles.icon}>
-          <img alt="Login Icon" className={styles.icon} src="/logo384.png" />
+          <Image
+            alt="Login Icon"
+            className={styles.icon}
+            src="https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/logo384.png"
+          />
         </div>
       </Card>
 
@@ -172,4 +169,3 @@ export const LoginPage = (props: LoginPageProps) => {
     </div>
   );
 };
-

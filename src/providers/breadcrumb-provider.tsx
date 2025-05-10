@@ -46,32 +46,25 @@ export const BreadcrumbProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     labelKey: string,
     labelParams?: string[],
   ) => {
-    
     if (breadcrumbPath[breadcrumbPath.length - 1]?.labelKey !== labelKey) {
       const newPageElement = [...breadcrumbPath];
-      // for (let i = 0; i < newPageElement.length; i++) {
-      //   const delta = newPageElement.length - i - 2;
-      //   newPageElement[i].action = () => navigate(delta);
-      // }
       newPageElement.push({ path, labelKey, labelParams });
       setBreadcrumbPath(newPageElement);
     }
   };
 
-  const startBreadcrumb = (path: string, labelKey: string): void => {
+  const startBreadcrumb = (path: string, labelKey: string, paramKey?: string | string[]): void => {
     if (!popPageNavigationTill(labelKey)) {
-      startPageNavigation(path, labelKey);
+      const paramKeyArray = paramKey ? asArray(paramKey)! : emptyArray;
+      startPageNavigation(path, labelKey, paramKeyArray);
     }
   };
 
-  // const appendBreadcrumb = (navigate: NavigateFunction, path: string, labelKey: string, paramKey?: string | string[]): void => {
   const appendBreadcrumb = (path: string, labelKey: string, paramKey?: string | string[]): void => {
     const paramKeyArray = paramKey ? asArray(paramKey)! : emptyArray;
-    const filteredParamKeyArray = paramKeyArray.filter((key): key is string => key !== undefined);
-
-    if (!popPageNavigationTill(labelKey, filteredParamKeyArray)) {
+    if (!popPageNavigationTill(labelKey, paramKeyArray)) {
       // appendPageNavigation(navigate, path, labelKey, filteredParamKeyArray);
-      appendPageNavigation(path, labelKey, filteredParamKeyArray);
+      appendPageNavigation(path, labelKey, paramKeyArray);
     }
   };
 

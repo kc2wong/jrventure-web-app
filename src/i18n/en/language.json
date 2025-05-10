@@ -99,10 +99,13 @@
     "success": "Sucessfully registered user ${1}"
   },
   "userProfile": {
+    "addParentUser": "Add parent user",
     "doYouWantToSignOut": "Do you want to sign out",
     "discardChangeAndSignOut": "Are you sure to discard unsaved changes and sign out",
     "lastLogin": "Last login",
     "name": "Name",
+    "noParentUser": "No parent user",
+    "parentUser": "Parent user(s)",
     "signOut": "Sign Out"
   },
   "currencyMaintenance": {
@@ -139,6 +142,7 @@
       "value": { "Active": "Active", "Inactive": "Inactive", "Suspend": "Suspend" }
     },
     "title": "User List",
+    "titleAddParent": "Add Parent User",
     "titleEdit": "${1} User"
   },
   "productApproval": {

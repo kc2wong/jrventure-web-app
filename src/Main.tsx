@@ -69,7 +69,7 @@ export const Main: React.FC = () => {
   const { isDirty, resetDirty } = useFormDirty();
   const { showDiscardChangeDialog } = useDialog();
 
-  const isLightTheme = theme === 'light';
+  
   const selectedLanguage = i18n.language === 'en' ? Language.ENGLISH : Language.TRADITIONAL_CHINESE;
 
   const menuData = login?.menu;
@@ -108,7 +108,6 @@ export const Main: React.FC = () => {
               />
             )}
             {menuData && (
-              // <Breadcrumb menuData={menuData} pageElements={_enrichedPageElementNavigation} />
               <Breadcrumb confirmationPrompt={confirmationPrompt} menuData={menuData} />
             )}
           </div>
@@ -126,7 +125,7 @@ export const Main: React.FC = () => {
               onSetTheme={(theme) => {
                 setTheme(theme);
               }}
-              theme={isLightTheme ? 'light' : 'dark'}
+              theme={['light', 'dark', 'playful'].includes(theme) ? theme : 'light'}
             />
           </div>
         </header>
@@ -139,7 +138,6 @@ export const Main: React.FC = () => {
               <Routes>
                 <Route element={<HomePage />} path="/" />
                 <Route element={<MarketPlaceShowcase />} path="/market" />
-                {/* <Route element={<ShopPage />} path="/shop" /> */}
                 <Route element={<StudentShopPage />} path="/shop/:id" />
                 <Route
                   element={

@@ -10,6 +10,7 @@ import {
   googleAuthenticate as googleAuthenticateRepo,
 } from '../repo/user-authentication-repo';
 import { delay } from '../utils/date-util';
+import { Student } from '../models/openapi';
 
 type OptionalLogin = Login | undefined;
 
@@ -17,6 +18,7 @@ abstract class AuthenticationState implements BaseState {
   constructor(
     public eventTime: number,
     public login: OptionalLogin,
+    public selectedStudent?: Student,
   ) {}
 }
 
@@ -33,8 +35,8 @@ class AuthenticationStateProgress extends AuthenticationState {
 }
 
 class AuthenticationStateSuccess extends AuthenticationState {
-  constructor(current: AuthenticationState, login?: Login) {
-    super(current.eventTime + 1, login);
+  constructor(current: AuthenticationState, login?: Login, selectedStudent?: Student) {
+    super(current.eventTime + 1, login, selectedStudent);
   }
 }
 
@@ -55,6 +57,7 @@ type AuthenticationPayload = {
   signIn: SignInPayload;
   googleAuthenticate: GoogleAuthenticatePayload;
   signOut: EmptyObject;
+  selectEntitledStudent: { student: Student };
   reset: EmptyObject;
 };
 
@@ -73,12 +76,16 @@ const handleAuthResult = async (
     set(authenticationBaseAtom, new AuthenticationStateFail(current, failure));
   } else {
     const newLogin = result as Login;
-    set(authenticationBaseAtom, new AuthenticationStateSuccess(current, undefined));
     const delayMs = Math.max(0, 1000 - (Date.now() - elapsed));
     if (delayMs > 0) {
       await delay(delayMs);
     }
-    set(authenticationBaseAtom, new AuthenticationStateSuccess(current, newLogin));
+    set(authenticationBaseAtom, new AuthenticationStateSuccess(current, undefined));
+    await delay(500);
+    set(
+      authenticationBaseAtom,
+      new AuthenticationStateSuccess(current, newLogin, newLogin.user.entitledStudent[0]),
+    );
   }
 };
 
@@ -101,6 +108,17 @@ export const authenticationAtom = atom<
       set(authenticationBaseAtom, new AuthenticationStateProgress(current));
       const result = await googleAuthenticateRepo(action.googleAuthenticate.idToken);
       await handleAuthResult(result, get(authenticationBaseAtom), set);
+    }
+
+    if (action.selectEntitledStudent) {
+      set(
+        authenticationBaseAtom,
+        new AuthenticationStateSuccess(
+          current,
+          current.login,
+          action.selectEntitledStudent.student,
+        ),
+      );
     }
 
     if (action.signOut) {

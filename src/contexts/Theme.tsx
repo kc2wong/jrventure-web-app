@@ -63,7 +63,6 @@ export const ThemedAppProvider: React.FC<{
 
   return (
     <ThemedAppContext.Provider value={{ theme, setTheme }}>
-      {/* <FluentProvider theme={theme === 'light' ? webLightTheme : webDarkTheme}> */}
       <FluentProvider theme={themeConfigs[theme]}>{children}</FluentProvider>
     </ThemedAppContext.Provider>
   );

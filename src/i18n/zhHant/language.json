@@ -99,10 +99,13 @@
     "success": "成功註冊用戶 ${1}"
   },
   "userProfile": {
+    "addParentUser": "新增家長用戶",
     "doYouWantToSignOut": "確定登出嗎",
     "discardChangeAndSignOut": "確定放棄變更並登出嗎",
     "lastLogin": "上次登入",
     "name": "名稱",
+    "noParentUser": "沒有家長用戶",
+    "parentUser": "家長用戶",
     "signOut": "登出"
   },
   "currencyMaintenance": {
@@ -135,6 +138,7 @@
       "value": { "Active": "有效", "Inactive": "無效", "Suspend": "暫停" }
     },
     "title": "User List",
+    "titleAddParent": "新增家長用戶",
     "titleEdit": "${1} User"
   },
   "productApproval": {

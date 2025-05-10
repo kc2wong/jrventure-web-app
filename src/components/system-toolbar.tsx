@@ -12,6 +12,11 @@ import {
   Popover,
   PopoverSurface,
   PopoverTrigger,
+  tokens,
+  List,
+  ListItem,
+  Persona,
+  Body1Strong,
 } from '@fluentui/react-components';
 import {
   BalloonRegular,
@@ -25,20 +30,35 @@ import {
   WeatherMoonRegular,
   WeatherSunnyRegular,
 } from '@fluentui/react-icons';
-import React, { useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Language, UserRole } from '../models/openapi';
+import { Language, Student, UserRole } from '../models/openapi';
 import { Theme } from '../contexts/Theme';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useFormDirty } from '../contexts/FormDirty';
-import { Login } from '../models/login';
 import { authenticationAtom } from '../states/authentication';
 import { useDialog } from '../hooks/use-dialog';
 import { useMessage } from '../hooks/use-message';
 import { MultiLingualLabel } from './multi-lang-label';
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
+import { RoleBaseComponent } from './role-based-component';
+import { SimpleUser } from '../__generated__/linkedup-web-api-client';
+import { usePreferredLanguageLabel } from '../hooks/use-preferred-language';
 
 const useStyles = makeStyles({
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: tokens.spacingHorizontalS,
+  },
+  toolbar: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    gap: '10px',
+  },
+  nameLabel: { width: '40px' },
+
   item: { display: 'flex', justifyContent: 'flex-start', gap: '10px' },
   button: { justifyContent: 'flex-start', width: '110px' },
   siteButtonText: {
@@ -63,19 +83,15 @@ const Spacer: React.FC = () => {
   return <Divider className={styles.divider} vertical />;
 };
 
-const StudentRoleInfo: React.FC<{ login?: Login }> = ({ login }) => {
-  if (!login) {
-    return <></>;
-  }
+interface AvatarInfoProps {
+  student: Student;
+}
 
-  const user = login.user;
-  const { role, entitledStudent } = user;
-
-  if (role !== UserRole.STUDENT || !entitledStudent || entitledStudent.length === 0) {
-    return <></>;
-  }
-
-  const student = entitledStudent[0];
+// 👇 Forward the ref and spread props so MenuTrigger can handle events
+export const AvatarInfo = forwardRef<
+  HTMLDivElement,
+  AvatarInfoProps & React.HTMLAttributes<HTMLDivElement>
+>(({ student, ...rest }, ref) => {
   const name = {
     [Language.ENGLISH]: `${student.firstName[Language.ENGLISH]} ${student.lastName[Language.ENGLISH]}`,
     [Language.TRADITIONAL_CHINESE]: `${student.lastName[Language.TRADITIONAL_CHINESE]}${student.firstName[Language.TRADITIONAL_CHINESE]}`,
@@ -83,31 +99,131 @@ const StudentRoleInfo: React.FC<{ login?: Login }> = ({ login }) => {
   };
 
   return (
-    <Popover withArrow>
+    <div
+      ref={ref}
+      {...rest} // 👈 Spread the interaction props
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'start',
+        margin: '4px',
+        gap: tokens.spacingHorizontalS,
+        width: '180px',
+        cursor: 'pointer', // 👈 Optional but helpful
+      }}
+    >
+      <Avatar color="brand" size={24} />
+      <Label style={{ width: 40 }}>{`${student.classId}-${student.studentNumber}`}</Label>
+      <MultiLingualLabel caption={name}>
+        <Label />
+      </MultiLingualLabel>
+    </div>
+  );
+});
+
+const ParentRoleInfo: React.FC<{ entitledStudent: Student[]; selectedStudent?: Student }> = ({
+  entitledStudent,
+  selectedStudent,
+}) => {
+  const [, authAction] = useAtom(authenticationAtom);
+  const handleChange = (id: string) => {
+    const student = entitledStudent.find((s) => s.id === id);
+    student && authAction({ selectEntitledStudent: { student } });
+  };
+
+  if (entitledStudent.length === 0 || !selectedStudent) {
+    return <></>;
+  }
+
+  return (
+    <Menu checkedValues={{ studentId: [selectedStudent.id] }}>
+      <MenuTrigger disableButtonEnhancement>
+        <AvatarInfo student={selectedStudent} />
+      </MenuTrigger>
+      <MenuPopover>
+        <MenuList>
+          {entitledStudent.map((s) => {
+            const name = {
+              [Language.ENGLISH]: `${s.firstName[Language.ENGLISH]} ${s.lastName[Language.ENGLISH]}`,
+              [Language.TRADITIONAL_CHINESE]: `${s.lastName[Language.TRADITIONAL_CHINESE]}${s.firstName[Language.TRADITIONAL_CHINESE]}`,
+              [Language.SIMPLIFIED_CHINESE]: `${s.lastName[Language.SIMPLIFIED_CHINESE]}${s.firstName[Language.SIMPLIFIED_CHINESE]}`,
+            };
+            return (
+              <MenuItemRadio
+                key={s.id}
+                name="studentId"
+                onClick={() => handleChange(s.id)}
+                value={`${s.id}`}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'start',
+                    gap: tokens.spacingHorizontalS,
+                  }}
+                >
+                  <Label style={{ width: 40 }}>{`${s.classId}-${s.studentNumber}`}</Label>
+                  <MultiLingualLabel caption={name}>
+                    <Label />
+                  </MultiLingualLabel>
+                </div>
+              </MenuItemRadio>
+            );
+          })}
+        </MenuList>
+      </MenuPopover>
+    </Menu>
+  );
+};
+
+const StudentRoleInfo: React.FC<{ parentUser: SimpleUser[]; student?: Student }> = ({
+  parentUser,
+  student,
+}) => {
+  const { t } = useTranslation();
+  const { navigateWithSpinner } = useNavigationHelpers();
+  const [isPopupOpen, setPopupOpen] = useState(false);
+
+  if (!student) {
+    return <></>;
+  }
+
+  const parentUserList = (
+    <div>
+      <Body1Strong>
+        {parentUser.length > 0 ? t('userProfile.parentUser') : t('userProfile.noParentUser')}
+      </Body1Strong>
+      <List navigationMode="items" style={{ marginTop: tokens.spacingHorizontalS }}>
+        {parentUser.map((u) => (
+          <ListItem key={u.id}>
+            <Persona name={usePreferredLanguageLabel(u.name)} secondaryText={u.email} />
+          </ListItem>
+        ))}
+      </List>
+    </div>
+  );
+
+  return (
+    <Popover onOpenChange={(_e, data) => setPopupOpen(data.open)} open={isPopupOpen} withArrow>
       <PopoverTrigger disableButtonEnhancement>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'end',
-            margin: '4px',
-            gap: '8px',
-            width: '150px',
-          }}
-        >
-          <Avatar color="brand" size={24} />
-          <Label>{`${student.classId}-${student.studentNumber}`}</Label>
-          <MultiLingualLabel caption={name}>
-            <Label />
-          </MultiLingualLabel>
-        </div>
+        <AvatarInfo student={student} />
       </PopoverTrigger>
 
       <PopoverSurface tabIndex={-1}>
-        <div>
-          <p>No parent account</p>
-          <Button icon={<PeopleAddRegular />}>Create parent account</Button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalXL }}>
+          {parentUserList}
+          <Button
+            icon={<PeopleAddRegular />}
+            onClick={() => {
+              setPopupOpen(false);
+              navigateWithSpinner('/user/add');
+            }}
+          >
+            {t('userProfile.addParentUser')}
+          </Button>
         </div>
       </PopoverSurface>
     </Popover>
@@ -137,7 +253,7 @@ const SignoutButton: React.FC = () => {
   const { showSpinner, stopSpinner } = useMessage();
   const { navigateWithSpinner } = useNavigationHelpers();
 
-  const signOut = () => {
+  const confirmAndSignOut = () => {
     showSpinner();
     setTimeout(() => {
       stopSpinner();
@@ -146,134 +262,102 @@ const SignoutButton: React.FC = () => {
     }, 500);
   };
 
+  const confirmMessage = isDirty()
+    ? t('userProfile.discardChangeAndSignOut')
+    : t('userProfile.doYouWantToSignOut');
+
   return (
     <Button
       icon={<DoorArrowLeftRegular />}
-      onClick={() => {
-        if (isDirty()) {
-          showConfirmationDialog({
-            confirmType: t('system.message.signOut'),
-            message: t('userProfile.discardChangeAndSignOut'),
-            primaryButton: {
-              label: t('userProfile.signOut'),
-              icon: <CheckmarkRegular />,
-              action: signOut,
-            },
-            secondaryButton: { label: t('system.message.cancel'), icon: <DismissRegular /> },
-          });
-        } else {
-          showConfirmationDialog({
-            confirmType: t('system.message.signOut'),
-            message: t('userProfile.doYouWantToSignOut'),
-            primaryButton: {
-              label: t('userProfile.signOut'),
-              icon: <CheckmarkRegular />,
-              action: signOut,
-            },
-            secondaryButton: { label: t('system.message.cancel'), icon: <DismissRegular /> },
-          });
-        }
-      }}
-    ></Button>
+      onClick={() =>
+        showConfirmationDialog({
+          confirmType: t('system.message.signOut'),
+          message: confirmMessage,
+          primaryButton: {
+            label: t('userProfile.signOut'),
+            icon: <CheckmarkRegular />,
+            action: confirmAndSignOut,
+          },
+          secondaryButton: {
+            label: t('system.message.cancel'),
+            icon: <DismissRegular />,
+          },
+        })
+      }
+    />
   );
 };
 
-interface SystemToolbarProps {
+export const SystemToolbar: React.FC<{
   theme: Theme;
-  onSetTheme: (theme: Theme) => void;
+  onSetTheme: (t: Theme) => void;
   language: Language;
-  onSetLanguage: (language: Language) => void;
-}
-
-export const SystemToolbar: React.FC<SystemToolbarProps> = ({
-  language,
-  onSetLanguage,
-  theme,
-  onSetTheme,
-}) => {
+  onSetLanguage: (l: Language) => void;
+}> = ({ theme, onSetTheme, language, onSetLanguage }) => {
   const styles = useStyles();
   const { t } = useTranslation();
+  const [, setMenuOpen] = useState(false);
+  const { login, selectedStudent } = useAtomValue(authenticationAtom);
 
-  const handleChangeTheme = (value: Theme) => {
-    onSetTheme(value);
-  };
-
-  const handleChangeLanguage = (value: Language) => {
-    onSetLanguage(value);
-  };
-
-  const handleCloseSiteMenu = () => {
-    if (isSiteMenuOpen) {
-      setIsSiteMenuOpen(false);
-    }
-  };
-
-  const languageEn = t('system.language.value.en');
-  const languageZhHant = t('system.language.value.zhHant');
-  const themeLight = t('system.theme.value.light');
-  const themeDark = t('system.theme.value.dark');
-  const themePlayful = t('system.theme.value.playful');
-
-  const [isSiteMenuOpen, setIsSiteMenuOpen] = useState(false);
-  const login = useAtomValue(authenticationAtom).login;
-
-  const themeIconConfigs: Record<Theme, JSX.Element> = {
-    playful: <BalloonRegular />,
+  const themeIcons = {
     light: <WeatherSunnyRegular />,
     dark: <WeatherMoonRegular />,
+    playful: <BalloonRegular />,
   };
 
   return (
-    <div className={styles.item}>
+    <div className={styles.toolbar}>
       <MartketPlaceButton />
       <Spacer />
-      <StudentRoleInfo login={login} />
+      <RoleBaseComponent entitledRole={UserRole.STUDENT}>
+        <StudentRoleInfo
+          parentUser={login?.parentUser ?? []}
+          student={login?.user.entitledStudent[0]}
+        />
+      </RoleBaseComponent>
+      <RoleBaseComponent entitledRole={UserRole.PARENT}>
+        <ParentRoleInfo
+          entitledStudent={login?.user.entitledStudent ?? []}
+          selectedStudent={selectedStudent}
+        />
+      </RoleBaseComponent>
       <Spacer />
+
       <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
         <MenuTrigger disableButtonEnhancement>
-          <Button icon={<GlobeRegular />} onClick={handleCloseSiteMenu}></Button>
+          <Button icon={<GlobeRegular />} onClick={() => setMenuOpen(false)} />
         </MenuTrigger>
         <MenuPopover>
           <MenuList>
-            <MenuItemRadio
-              name="lang"
-              onClick={() => handleChangeLanguage(Language.ENGLISH)}
-              value="en"
-            >
-              {languageEn}
+            <MenuItemRadio name="lang" onClick={() => onSetLanguage(Language.ENGLISH)} value="en">
+              {t('system.language.value.en')}
             </MenuItemRadio>
             <MenuItemRadio
               name="lang"
-              onClick={() => handleChangeLanguage(Language.TRADITIONAL_CHINESE)}
+              onClick={() => onSetLanguage(Language.TRADITIONAL_CHINESE)}
               value="zhHant"
             >
-              {languageZhHant}
+              {t('system.language.value.zhHant')}
             </MenuItemRadio>
           </MenuList>
         </MenuPopover>
       </Menu>
+
       <Menu checkedValues={{ theme: [theme] }}>
         <MenuTrigger disableButtonEnhancement>
-          <Button icon={themeIconConfigs[theme]} onClick={handleCloseSiteMenu}></Button>
+          <Button icon={themeIcons[theme]} onClick={() => setMenuOpen(false)} />
         </MenuTrigger>
         <MenuPopover>
           <MenuList>
-            <MenuItemRadio name="theme" onClick={() => handleChangeTheme('light')} value="light">
-              {themeLight}
-            </MenuItemRadio>
-            <MenuItemRadio name="theme" onClick={() => handleChangeTheme('dark')} value="dark">
-              {themeDark}
-            </MenuItemRadio>
-            <MenuItemRadio
-              name="theme"
-              onClick={() => handleChangeTheme('playful')}
-              value="playful"
-            >
-              {themePlayful}
-            </MenuItemRadio>
+            {(['light', 'dark', 'playful'] as Theme[]).map((th) => (
+              <MenuItemRadio key={th} name="theme" onClick={() => onSetTheme(th)} value={th}>
+                {t(`system.theme.value.${th}`)}
+              </MenuItemRadio>
+            ))}
           </MenuList>
         </MenuPopover>
       </Menu>
+
       <MessageButton />
       <SignoutButton />
     </div>

@@ -2,6 +2,7 @@ import {
   Body1,
   Button,
   Input,
+  Image,
   Link,
   Card,
 } from '@fluentui/react-components';
@@ -150,7 +151,7 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
 
         {/* Right side: Icon */}
         <div className={styles.icon}>
-          <img alt="Login Icon" className={styles.icon} src="/logo384.png" />
+          <Image alt="Login Icon" className={styles.icon} src="https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/logo384.png" />
         </div>
       </Card>
 

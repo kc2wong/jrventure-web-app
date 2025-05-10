@@ -352,18 +352,19 @@ paths:
                 required:
                   - token
                   - menu
-                  - entitledStudents                  
+                  - parentUser                  
                 properties:
                   token:
                     type: string
                     description: JWT token
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                  entitledStudents:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Student"
                   menu:
                     $ref: "#/components/schemas/MenuItem"
+                  parentUser:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SimpleUser"
+                    description: Parent users if this user is a student
         '401':
           description: Unauthorized - Invalid userId or password
           content:
@@ -396,13 +397,21 @@ paths:
               schema:
                 type: object
                 required:
-                  - user
+                  - token
                   - menu
+                  - parentUser
                 properties:
-                  user:
-                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+                    description: JWT token
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                   menu:
                     $ref: "#/components/schemas/MenuItem"
+                  parentUser:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SimpleUser"
+                    description: Parent users if this user is a student
         '401':
           description: Unauthorized - Invalid user
           content:
@@ -544,10 +553,14 @@ components:
       type: object
       required:
         - id
+        - email
         - name
       properties:
         id:
           type: string
+        email:
+          type: string
+          format: email
         name:
           type: object
           additionalProperties: true

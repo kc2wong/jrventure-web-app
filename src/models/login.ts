@@ -1,8 +1,9 @@
-import { Student, User } from './openapi';
+import { SimpleUser } from '../__generated__/linkedup-web-api-client';
+import { User } from './openapi';
 
 interface Login {
   user: User;
-  entitledStudents: Student[],
+  parentUser: SimpleUser[];
   menu: MenuItem;
 }
 
