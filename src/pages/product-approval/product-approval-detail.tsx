@@ -3,13 +3,12 @@ import { Button, Caption2, makeStyles, Text, tokens } from '@fluentui/react-comp
 import { ProductDetail } from '../product/product-detail';
 import { productApprovalListAtom } from '../../states/product-approval-list';
 import { useAtom } from 'jotai';
-import { MultiLingualLabel } from '../../components/multi-lang-label';
 import { useTimezone } from '../../hooks/use-timezone';
 import { ApprovalCommentType, ApprovalStatus } from '../../__generated__/linkedup-web-api-client';
 import { ChatDismissRegular, ChatRegular, ChatSparkleRegular } from '@fluentui/react-icons';
 import { t } from 'i18next';
-// import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
+import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 
 const useStyles = makeStyles({
   row: {
@@ -84,9 +83,7 @@ export const ProductApprovalDetailPage: React.FC = () => {
                     {React.createElement(commentTypeComponents[comment.type])}
                   </div>
                   <div className={styles.col40}>
-                    <MultiLingualLabel caption={comment.commentBy.name}>
-                      <Text />
-                    </MultiLingualLabel>
+                    <Text>{useNameInPreferredLanguage(comment.commentBy)}</Text>
                   </div>
                   <div className={styles.col50Right}>
                     <Caption2>{formatDatetime(new Date(comment.commentAt))}</Caption2>

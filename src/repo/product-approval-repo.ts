@@ -38,6 +38,18 @@ const products: Product[] = [
     seller: 'Connor Chu',
     sellerClass: '4E-1',
   },
+  {
+    id: '103',
+    name: 'Soft tissue',
+    summary: 'For cleaning ass 抹屎忽專用',
+    imageUrl: 'https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/product_017.jpeg',
+    rating: randomRating(),
+    cost: randomPrice(),
+    likes: randomLikes(),
+    sellerId: 'S000000571',
+    seller: 'Connor Chu',
+    sellerClass: '4E-1',
+  },
 ];
 
 const comment: ProductApprovalComment[] = [
@@ -52,7 +64,7 @@ const comment: ProductApprovalComment[] = [
     },
     commentAt: new Date().toISOString(),
     comment:
-    'Profanity score : 41 / 100\nSensitive words : 香港加油'
+    'Profanity score : 72 / 100\nSensitive words : ass, 屎忽'
   },
   {
     type: ApprovalCommentType.CONVERSATION,
@@ -101,7 +113,7 @@ export const findProductApproval = async (): Promise<ProductApproval[] | Error> 
       id: `9${p.id}`,
       product: p,
       status: ApprovalStatus.PENDING,
-      comments: comment,
+      comments: p.id === '103' ? comment : comment.filter(c => c.commentBy.id !== '9000'),
     }));
   } catch (error: any) {
     return createSystemError(error);

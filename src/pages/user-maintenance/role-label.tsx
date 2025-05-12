@@ -3,7 +3,13 @@ import { Body1, makeStyles, shorthands } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 import { UserRole } from '../../models/openapi';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
-import { BookRegular, PeopleListRegular, PersonFeedbackRegular, WrenchRegular } from '@fluentui/react-icons';
+import {
+  BookRegular,
+  HatGraduationRegular,
+  PeopleListRegular,
+  PersonFeedbackRegular,
+  WrenchRegular,
+} from '@fluentui/react-icons';
 
 interface RoleLabelProps {
   role: UserRole;
@@ -27,6 +33,7 @@ const roleIconComponents: Record<UserRole, FC<{ fontSize?: number }>> = {
   Parent: PeopleListRegular,
   Teacher: PersonFeedbackRegular,
   Admin: WrenchRegular,
+  Alumni: HatGraduationRegular,
 };
 
 export const RoleIcon: FC<RoleIconProps> = ({ role, size = 20 }) => {

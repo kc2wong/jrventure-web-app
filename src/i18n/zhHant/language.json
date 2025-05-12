@@ -129,7 +129,7 @@
     "name": "姓名",
     "role": {
       "label": "角色",
-      "value": { "Student": "學生", "Parent": "家長", "Teacher": "導師", "Admin": "管理員" }
+      "value": { "Student": "學生", "Parent": "家長", "Teacher": "導師", "Admin": "管理員", "Alumni": "校友" }
     },
     "classId": "班別",
     "studentId": "學生編號",

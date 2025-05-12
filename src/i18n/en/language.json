@@ -133,7 +133,7 @@
     "name": "Name",
     "role": {
       "label": "Role",
-      "value": { "Student": "Student", "Parent": "Parent", "Teacher": "Teacher", "Admin": "Admin" }
+      "value": { "Student": "Student", "Parent": "Parent", "Teacher": "Teacher", "Admin": "Admin", "Alumni": "Alumni" }
     },
     "classId": "Class ID",
     "studentId": "Student ID",

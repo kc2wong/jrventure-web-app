@@ -20,13 +20,13 @@ import {
 } from '@fluentui/react-components';
 import {
   BalloonRegular,
+  BookRegular,
   CheckmarkRegular,
   DismissRegular,
   DoorArrowLeftRegular,
   GlobeRegular,
   MailUnreadRegular,
   PeopleAddRegular,
-  StoreMicrosoftRegular,
   WeatherMoonRegular,
   WeatherSunnyRegular,
 } from '@fluentui/react-icons';
@@ -39,11 +39,14 @@ import { useFormDirty } from '../contexts/FormDirty';
 import { authenticationAtom } from '../states/authentication';
 import { useDialog } from '../hooks/use-dialog';
 import { useMessage } from '../hooks/use-message';
-import { MultiLingualLabel } from './multi-lang-label';
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
-import { RoleBaseComponent } from './role-based-component';
 import { SimpleUser } from '../__generated__/linkedup-web-api-client';
-import { usePreferredLanguageLabel } from '../hooks/use-preferred-language';
+import {
+  useNameInPreferredLanguage,
+} from '../hooks/use-preferred-language';
+import { Login } from '../models/login';
+import { useTimezone } from '../hooks/use-timezone';
+import { RoleIcon } from '../pages/user-maintenance/role-label';
 
 const useStyles = makeStyles({
   row: {
@@ -88,16 +91,10 @@ interface AvatarInfoProps {
 }
 
 // 👇 Forward the ref and spread props so MenuTrigger can handle events
-export const AvatarInfo = forwardRef<
+const AvatarInfo = forwardRef<
   HTMLDivElement,
   AvatarInfoProps & React.HTMLAttributes<HTMLDivElement>
 >(({ student, ...rest }, ref) => {
-  const name = {
-    [Language.ENGLISH]: `${student.firstName[Language.ENGLISH]} ${student.lastName[Language.ENGLISH]}`,
-    [Language.TRADITIONAL_CHINESE]: `${student.lastName[Language.TRADITIONAL_CHINESE]}${student.firstName[Language.TRADITIONAL_CHINESE]}`,
-    [Language.SIMPLIFIED_CHINESE]: `${student.lastName[Language.SIMPLIFIED_CHINESE]}${student.firstName[Language.SIMPLIFIED_CHINESE]}`,
-  };
-
   return (
     <div
       ref={ref}
@@ -113,11 +110,9 @@ export const AvatarInfo = forwardRef<
         cursor: 'pointer', // 👈 Optional but helpful
       }}
     >
-      <Avatar color="brand" size={24} />
-      <Label style={{ width: 40 }}>{`${student.classId}-${student.studentNumber}`}</Label>
-      <MultiLingualLabel caption={name}>
-        <Label />
-      </MultiLingualLabel>
+      <BookRegular fontSize={24} />
+      <Label style={{ width: 50 }}>{`${student.classId}-${student.studentNumber}`}</Label>
+      <Label>{useNameInPreferredLanguage(student)}</Label>
     </div>
   );
 });
@@ -144,11 +139,6 @@ const ParentRoleInfo: React.FC<{ entitledStudent: Student[]; selectedStudent?: S
       <MenuPopover>
         <MenuList>
           {entitledStudent.map((s) => {
-            const name = {
-              [Language.ENGLISH]: `${s.firstName[Language.ENGLISH]} ${s.lastName[Language.ENGLISH]}`,
-              [Language.TRADITIONAL_CHINESE]: `${s.lastName[Language.TRADITIONAL_CHINESE]}${s.firstName[Language.TRADITIONAL_CHINESE]}`,
-              [Language.SIMPLIFIED_CHINESE]: `${s.lastName[Language.SIMPLIFIED_CHINESE]}${s.firstName[Language.SIMPLIFIED_CHINESE]}`,
-            };
             return (
               <MenuItemRadio
                 key={s.id}
@@ -166,9 +156,7 @@ const ParentRoleInfo: React.FC<{ entitledStudent: Student[]; selectedStudent?: S
                   }}
                 >
                   <Label style={{ width: 40 }}>{`${s.classId}-${s.studentNumber}`}</Label>
-                  <MultiLingualLabel caption={name}>
-                    <Label />
-                  </MultiLingualLabel>
+                  <Label>{useNameInPreferredLanguage(s)}</Label>
                 </div>
               </MenuItemRadio>
             );
@@ -199,7 +187,7 @@ const StudentRoleInfo: React.FC<{ parentUser: SimpleUser[]; student?: Student }>
       <List navigationMode="items" style={{ marginTop: tokens.spacingHorizontalS }}>
         {parentUser.map((u) => (
           <ListItem key={u.id}>
-            <Persona name={usePreferredLanguageLabel(u.name)} secondaryText={u.email} />
+            <Persona name={useNameInPreferredLanguage(u)} secondaryText={u.email} />
           </ListItem>
         ))}
       </List>
@@ -219,7 +207,7 @@ const StudentRoleInfo: React.FC<{ parentUser: SimpleUser[]; student?: Student }>
             icon={<PeopleAddRegular />}
             onClick={() => {
               setPopupOpen(false);
-              navigateWithSpinner('/user/add');
+              navigateWithSpinner('/user/add-parent');
             }}
           >
             {t('userProfile.addParentUser')}
@@ -234,14 +222,30 @@ const MessageButton: React.FC = () => {
   return <Button icon={<MailUnreadRegular />}></Button>;
 };
 
-const MartketPlaceButton: React.FC = () => {
-  const { navigateWithSpinner } = useNavigationHelpers();
+export const ProfileButton: React.FC<{ login: Login }> = ({ login }) => {
+  const { t } = useTranslation();
+  const { formatDatetime } = useTimezone();
+  const { user } = login;
+  const name = useNameInPreferredLanguage(user);
+
   return (
-    <Button
-      appearance="transparent"
-      icon={<StoreMicrosoftRegular />}
-      onClick={() => navigateWithSpinner('/market')}
-    ></Button>
+    <Popover withArrow>
+      <PopoverTrigger disableButtonEnhancement>
+        <Avatar color="brand" name={name} shape="square" size={32}></Avatar>
+      </PopoverTrigger>
+
+      <PopoverSurface tabIndex={-1}>
+        <Persona
+          avatar={{
+            icon: <RoleIcon role={user.role} size={40}/>,
+          }}
+          primaryText={name}
+          secondaryText={user.email}
+          size="huge"
+          tertiaryText={`${t('userProfile.lastLogin')}: ${user.lastLoginDatetime ? formatDatetime(new Date(user.lastLoginDatetime)) : ''}`}
+        />
+      </PopoverSurface>
+    </Popover>
   );
 };
 
@@ -307,22 +311,27 @@ export const SystemToolbar: React.FC<{
 
   return (
     <div className={styles.toolbar}>
-      <MartketPlaceButton />
       <Spacer />
-      <RoleBaseComponent entitledRole={UserRole.STUDENT}>
-        <StudentRoleInfo
-          parentUser={login?.parentUser ?? []}
-          student={login?.user.entitledStudent[0]}
-        />
-      </RoleBaseComponent>
-      <RoleBaseComponent entitledRole={UserRole.PARENT}>
-        <ParentRoleInfo
-          entitledStudent={login?.user.entitledStudent ?? []}
-          selectedStudent={selectedStudent}
-        />
-      </RoleBaseComponent>
-      <Spacer />
-
+      {login?.user.role === UserRole.STUDENT ? (
+        <>
+          <StudentRoleInfo
+            parentUser={login?.parentUser ?? []}
+            student={login?.user.entitledStudent[0]}
+          />
+          <Spacer />
+        </>
+      ) : login?.user.role === UserRole.PARENT ? (
+        <>
+          <ParentRoleInfo
+            entitledStudent={login?.user.entitledStudent ?? []}
+            selectedStudent={selectedStudent}
+          />
+          <Spacer />
+        </>
+      ) : (
+        <></>
+      )}
+      {login ? <ProfileButton login={login} /> : <></>}
       <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
         <MenuTrigger disableButtonEnhancement>
           <Button icon={<GlobeRegular />} onClick={() => setMenuOpen(false)} />

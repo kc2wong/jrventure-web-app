@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Language, Student, User, UserCreation, UserRole, UserStatus } from '../../models/openapi';
+import { Language, User, UserCreation, UserRole, UserStatus } from '../../models/openapi';
 import { Button, Dropdown, Option, Spinner } from '@fluentui/react-components';
 import { Field } from '../../components/Field';
 import { Input } from '../../components/Input';
@@ -43,12 +43,13 @@ import { RoleIcon, RoleLabel } from './role-label';
 import { StatusIcon, StatusLabel } from './status-label';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { authenticationAtom } from '../../states/authentication';
+import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 
 // form for editing user
 const maxNameLength = 50;
 
-const statusList = [UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.SUSPEND];
-const roleList = [UserRole.STUDENT, UserRole.PARENT, UserRole.TEACHER, UserRole.ADMIN];
+const statusList = Object.values(UserStatus) as UserStatus[];
+const roleList = Object.values(UserRole) as UserRole[];
 
 type UserEditPageProps = { mode: string; onBackButtonClick: () => void; onSave: () => void };
 
@@ -58,7 +59,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
   onSave,
 }: UserEditPageProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
   const { dispatchMessage } = useMessage();
   const { startBreadcrumb, appendBreadcrumb } = useBreadcrumb();
 
@@ -79,7 +80,11 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
   const _user2FormData = (user?: User): FormData => {
     if (user) {
       const { entitledStudentId, ...others } = user;
-      return { entitledStudentId: entitledStudentId[0] ?? '', ...others };
+      return {
+        entitledStudentId: entitledStudentId[0] ?? '',
+        entitledStudentId2: entitledStudentId[1] ?? '',
+        ...others,
+      };
     } else {
       if (isToAddParentUser) {
         return {
@@ -88,6 +93,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           status: UserStatus.ACTIVE,
           name: {},
           entitledStudentId: login?.user.entitledStudent[0].id,
+          entitledStudentId2: '',
         };
       } else {
         return {
@@ -96,38 +102,20 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           status: '',
           name: {},
           entitledStudentId: '',
+          entitledStudentId2: '',
         };
       }
     }
   };
 
   const _formData2UserCreation = (formData: FormData): UserCreation => {
-    const { role, status, entitledStudentId, ...others } = formData;
+    const { role, status, entitledStudentId, entitledStudentId2, ...others } = formData;
     return {
       role: getEnumValueByRawValue(UserRole, role)!,
       status: getEnumValueByRawValue(UserStatus, status)!,
-      entitledStudentId: asArray(emptyStringToUndefined(entitledStudentId)) ?? [],
+      entitledStudentId: [entitledStudentId, entitledStudentId2].map(s => emptyStringToUndefined(s)).filter(s => s !== undefined),
       ...others,
     };
-  };
-
-  const _constructStudentName = (student?: Student): string | undefined => {
-    if (student) {
-      const languagePreference =
-        i18n.language === 'en'
-          ? [Language.ENGLISH, Language.TRADITIONAL_CHINESE]
-          : [Language.TRADITIONAL_CHINESE, Language.ENGLISH];
-
-      const firstName =
-        languagePreference.map((lang) => student.firstName[lang]).find((n) => n !== undefined) ??
-        '';
-      const lastName =
-        languagePreference.map((lang) => student.lastName[lang]).find((n) => n !== undefined) ?? '';
-
-      return ` ${lastName} ${firstName}`;
-    } else {
-      return '\u00A0';
-    }
   };
 
   const schema = z
@@ -142,21 +130,55 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
         }),
       role: zodString(),
       entitledStudentId: zodOptionalString(),
+      entitledStudentId2: zodOptionalString(),
       status: zodString(),
     })
+    // Rule 1: If STUDENT, then entitledStudentId must exist
+    .refine(
+      (data) => data.role !== UserRole.STUDENT || (data.entitledStudentId?.trim().length ?? 0) > 0,
+      {
+        message: 'zod.error.Required',
+        path: ['entitledStudentId'],
+      },
+    )
+    // Rule 1: If STUDENT, then entitledStudentId2 must be empty
+    .refine((data) => data.role !== UserRole.STUDENT || !data.entitledStudentId2?.trim().length, {
+      message: 'zod.error.NotRequired',
+      path: ['entitledStudentId2'],
+    })
+    // Rule 2: If PARENT, at least one of the IDs must be present
     .refine(
       (data) =>
-        data.role !== UserRole.STUDENT ||
-        (data.role === UserRole.STUDENT &&
-          data.entitledStudentId &&
-          data.entitledStudentId.trim().length > 0),
-      { message: 'zod.error.Required', path: ['entitledStudentId'] },
+        data.role !== UserRole.PARENT ||
+        data.entitledStudentId?.trim() ||
+        data.entitledStudentId2?.trim(),
+      {
+        message: 'zod.error.Required',
+        path: ['entitledStudentId'], // picking one arbitrarily for error
+      },
+    )
+    // Rule 3: If not STUDENT or PARENT, both IDs must be empty
+    .refine(
+      (data) =>
+        data.role === UserRole.STUDENT ||
+        data.role === UserRole.PARENT ||
+        (!data.entitledStudentId?.trim() && !data.entitledStudentId2?.trim()),
+      {
+        message: 'zod.error.NotRequired',
+        path: ['entitledStudentId'],
+      },
     )
     .refine(
       (data) =>
         emptyStringToUndefined(data.entitledStudentId) === undefined ||
         studentListState.result.find((s) => s.id === data.entitledStudentId),
       { message: 'zod.error.user.invalidStudentId', path: ['entitledStudentId'] },
+    )
+    .refine(
+      (data) =>
+        emptyStringToUndefined(data.entitledStudentId2) === undefined ||
+        studentListState.result.find((s) => s.id === data.entitledStudentId2),
+      { message: 'zod.error.user.invalidStudentId', path: ['entitledStudentId2'] },
     );
   type FormData = z.infer<typeof schema>;
 
@@ -213,24 +235,45 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
 
   useEffect(() => {
     baselineTimestamp.current = state.eventTime;
-    if (studentListState instanceof StudentListStateSuccess) {
-      const student = studentListState.result[0];
-      if (mode === 'add' && !isToAddParentUser && student) {
-        const nameEn = `${student.firstName[Language.ENGLISH] ?? ''} ${student.lastName[Language.ENGLISH] ?? ''}`;
-        const nameZhHant = `${student.lastName[Language.TRADITIONAL_CHINESE] ?? ''}${student.firstName[Language.TRADITIONAL_CHINESE] ?? ''}`;
-        const nameZhHans = `${student.lastName[Language.SIMPLIFIED_CHINESE] ?? ''}${student.firstName[Language.SIMPLIFIED_CHINESE] ?? ''}`;
-        if (
-          student.id === formValues.entitledStudentId ||
-          `${student.classId}-${student.studentNumber}` === formValues.entitledStudentId
-        ) {
-          setValue('entitledStudentId', student.id);
-          setValue('name', {
-            [Language.ENGLISH]: nameEn,
-            [Language.TRADITIONAL_CHINESE]: nameZhHant,
-            [Language.SIMPLIFIED_CHINESE]: nameZhHans,
-          });
-        }
+
+    if (!(studentListState instanceof StudentListStateSuccess)) {
+      return;
+    }
+    if (mode !== 'add' || isToAddParentUser) {
+      return;
+    }
+
+    const [student, student2] = studentListState.result;
+    if (!student) {
+      return;
+    }
+
+    const isMatchingStudent1 =
+      student.id === formValues.entitledStudentId ||
+      `${student.classId}-${student.studentNumber}` === formValues.entitledStudentId;
+
+    if (isMatchingStudent1) {
+      setValue('entitledStudentId', student.id);
+
+      if (formValues.role === UserRole.STUDENT) {
+        setValue('name', {
+          [Language.ENGLISH]: `${student.firstName[Language.ENGLISH] ?? ''} ${student.lastName[Language.ENGLISH] ?? ''}`,
+          [Language.TRADITIONAL_CHINESE]: `${student.lastName[Language.TRADITIONAL_CHINESE] ?? ''}${student.firstName[Language.TRADITIONAL_CHINESE] ?? ''}`,
+          [Language.SIMPLIFIED_CHINESE]: `${student.lastName[Language.SIMPLIFIED_CHINESE] ?? ''}${student.firstName[Language.SIMPLIFIED_CHINESE] ?? ''}`,
+        });
       }
+    }
+
+    if (!student2) {
+      return;
+    }
+
+    const isMatchingStudent2 =
+      student2.id === formValues.entitledStudentId2 ||
+      `${student2.classId}-${student2.studentNumber}` === formValues.entitledStudentId2;
+
+    if (isMatchingStudent2) {
+      setValue('entitledStudentId2', student2.id);
     }
   }, [studentListState]);
 
@@ -404,9 +447,13 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                     multiselect={false}
                     onOptionSelect={(_ev, data) => {
                       field.onChange(data.selectedOptions[0] ?? '');
-                      // clear entitledStudentId if role is not Student
-                      if (data.optionValue != UserRole.STUDENT) {
+                      // clear entitledStudentId if role is not Student / Parent
+                      if (
+                        data.optionValue !== UserRole.STUDENT &&
+                        data.optionValue !== UserRole.PARENT
+                      ) {
                         setValue('entitledStudentId', '');
+                        setValue('entitledStudentId2', '');
                       }
                     }}
                     selectedOptions={asArray(selectedValue)}
@@ -415,6 +462,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                     {roleList.map((role) => (
                       <Option
                         key={role.toString()}
+                        disabled={role === UserRole.ALUMNI}
                         text={t(`userMaintenance.role.value.${role}`)}
                         value={`${role}`}
                       >
@@ -441,7 +489,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                 return (
                   <Field
                     colSpan={2}
-                    infoMessage={_constructStudentName(student)}
+                    infoMessage={useNameInPreferredLanguage(student)}
                     label={t('userMaintenance.studentId')}
                     labelHint="P[1 to 6]-[1 to 30] e.g. P1A-1, P1A-2, .... P6E-30"
                     orientation="horizontal"
@@ -456,9 +504,12 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                         ) : undefined
                       }
                       onBlur={() => {
-                        const entitledStudentId = formValues.entitledStudentId;
-                        if (entitledStudentId) {
-                          studentListAction({ search: { id: [entitledStudentId] } });
+                        const entitledStudentIds = [
+                          formValues.entitledStudentId,
+                          formValues.entitledStudentId2,
+                        ].filter((s) => s !== undefined);
+                        if (entitledStudentIds.length > 0) {
+                          studentListAction({ search: { id: entitledStudentIds } });
                         }
                       }}
                       readOnly={readOnly || isToAddParentUser}
@@ -471,6 +522,53 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           </>
         ) : (
           <EmptyCell colSpan={2} />
+        )}
+
+        {formValues.role == UserRole.PARENT  && !isToAddParentUser ? (
+          <>
+            <EmptyCell />
+            <Controller
+              control={control}
+              name="entitledStudentId2"
+              render={({ field }) => {
+                const { value, ...others } = field;
+                const student = value
+                  ? studentListState.result.find((s) => s.id === value)
+                  : undefined;
+                return (
+                  <Field
+                    colSpan={2}
+                    infoMessage={useNameInPreferredLanguage(student)}
+                    label={t('userMaintenance.studentId')}
+                    orientation="horizontal"
+                    validationMessage={errors?.entitledStudentId2?.message}
+                  >
+                    <Input
+                      {...others}
+                      contentAfter={
+                        studentListState instanceof StudentListStateProgress ? (
+                          <Spinner size="extra-tiny" />
+                        ) : undefined
+                      }
+                      onBlur={() => {
+                        const entitledStudentIds = [
+                          formValues.entitledStudentId,
+                          formValues.entitledStudentId2,
+                        ].filter((s) => s !== undefined);
+                        if (entitledStudentIds.length > 0) {
+                          studentListAction({ search: { id: entitledStudentIds } });
+                        }
+                      }}
+                      readOnly={readOnly || isToAddParentUser}
+                      value={value}
+                    />
+                  </Field>
+                );
+              }}
+            />
+          </>
+        ) : (
+          <></>
         )}
 
         <Controller

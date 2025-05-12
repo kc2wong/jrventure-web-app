@@ -27,7 +27,7 @@ export const UserMaintenancePage: React.FC = () => {
 
   const { t } = useTranslation();
   const { navigate, navigateWithSpinner } = useNavigationHelpers();
-  const mode = useMode();
+  const mode = useMode(['add-parent']);
 
   const userDetailState = useAtomValue(userDetailAtom);
   const [userListState, userListAction] = useAtom(userListAtom);
@@ -86,7 +86,7 @@ export const UserMaintenancePage: React.FC = () => {
 
   const editPage = (mode: string) => (
     <UserEditPage
-      mode={mode}
+      mode={mode === 'add-parent' ? 'add' : mode}
       onBackButtonClick={() => {
         navigate(-1);
       }}
@@ -99,6 +99,10 @@ export const UserMaintenancePage: React.FC = () => {
               state: { user: selectedUser },
             });
           }
+        } else if (mode === 'add-parent') {
+          navigateWithSpinner('/', {
+            replace: true,
+          });
         }
       }}
     />
@@ -108,6 +112,7 @@ export const UserMaintenancePage: React.FC = () => {
     case 'list': {
       return searchPage;
     }
+    case 'add-parent':
     case 'add':
     case 'view':
     case 'edit': {

@@ -455,6 +455,7 @@ components:
       - Parent
       - Teacher
       - Admin
+      - Alumni
     UserStatus:
       type: string
       enum:

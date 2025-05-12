@@ -29,6 +29,7 @@ import {
 import { useAtom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useMessage } from '../../hooks/use-message';
+import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
 import { ProductGrid } from '../product/product-grid';
@@ -40,7 +41,6 @@ import {
   ShopStateProgress,
   ShopStateSuccess,
 } from '../../states/student-shop';
-import { MultiLingualLabel } from '../../components/multi-lang-label';
 
 const useStyles = makeStyles({
   container: {
@@ -204,13 +204,6 @@ export const StudentShopPage = () => {
 
   const imageUrl = state.shop?.imageUrl;
   const student = state.shop?.student;
-  const studentInfo: Record<string, string> = student
-    ? {
-        English: `${student.classId}-${student.studentNumber} ${student.firstName.English} ${student.lastName.English}`,
-        TraditionalChinese: `${student.classId}-${student.studentNumber} ${student.firstName.TraditionalChinese} ${student.lastName.TraditionalChinese}`,
-        SimplifiedChinese: `${student.classId}-${student.studentNumber} ${student.firstName.SimplifiedChinese} ${student.lastName.SimplifiedChinese}`,
-      }
-    : {};
   return (
     <div className={styles.container}>
       {/* Toolbar */}
@@ -224,12 +217,8 @@ export const StudentShopPage = () => {
             <div
               style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
             >
-              <MultiLingualLabel caption={state.shop?.description ?? {}}>
-                <Title3 />
-              </MultiLingualLabel>
-              <MultiLingualLabel caption={studentInfo}>
-                <Subtitle1 />
-              </MultiLingualLabel>
+              <Title3>{useNameInPreferredLanguage(state.shop)}</Title3>
+              <Subtitle1>{useNameInPreferredLanguage(student)}</Subtitle1>
             </div>
             {ownShop ? (
               <>

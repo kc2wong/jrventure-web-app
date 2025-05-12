@@ -167,6 +167,7 @@ export const Main: React.FC = () => {
                 <Route element={<UserMaintenancePage />} path="/user/:id/view" />
                 <Route element={<UserMaintenancePage />} path="/user/:id/edit" />
                 <Route element={<UserMaintenancePage />} path="/user/add" />
+                <Route element={<UserMaintenancePage />} path="/user/add-parent" />
               </Routes>
             </PageTransitionProvider>
           </main>

@@ -1,16 +1,20 @@
 import React from 'react';
-import { makeStyles, shorthands, tokens, Tooltip } from '@fluentui/react-components';
+import { Caption1, makeStyles, shorthands, tokens, Tooltip } from '@fluentui/react-components';
 import {
   AccessibilityRegular,
   ShoppingBagRegular,
   PenSparkleRegular,
   PeopleRegular,
   WalletRegular,
-  ApprovalsAppRegular,
+  BoxCheckmarkRegular,
+  StoreMicrosoftRegular,
+  PeopleCheckmarkRegular,
 } from '@fluentui/react-icons';
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { useAtomValue } from 'jotai';
 import { authenticationAtom } from '../states/authentication';
+import { RoleBaseComponent } from './role-based-component';
+import { UserRole } from '../models/openapi';
 
 const useStyles = makeStyles({
   sidebar: {
@@ -52,7 +56,47 @@ const useStyles = makeStyles({
     overflow: 'hidden',
     transition: 'opacity 0.2s ease, width 0.2s ease',
   },
+
+  dividerRoot: {
+    display: 'flex',
+    alignItems: 'center',
+    ...shorthands.margin(tokens.spacingVerticalM, 0),
+    width: '100%',
+    height: '1px',
+  },
+  dividerLine: {
+    height: '1px',
+    backgroundColor: tokens.colorNeutralStroke1,
+    flexGrow: 1,
+  },
+  dividerTitle: {
+    color: tokens.colorNeutralForeground2,
+    // fontStyle: 'italic',
+    marginLeft: tokens.spacingHorizontalM,
+    marginRight: tokens.spacingHorizontalM,
+  },
 });
+
+type SidebarDividerProps = {
+  title?: string;
+  collapsed: boolean;
+};
+
+const SidebarDivider = ({ title, collapsed }: SidebarDividerProps) => {
+  const styles = useStyles();
+
+  return (
+    <div className={styles.dividerRoot}>
+      <div className={styles.dividerLine} />
+      {!collapsed && title && (
+        <Caption1 className={styles.dividerTitle} italic>
+          {title}
+        </Caption1>
+      )}
+      <div className={styles.dividerLine} />
+    </div>
+  );
+};
 
 type MenuItemProps = {
   icon: React.ElementType;
@@ -102,30 +146,47 @@ type SidebarMenuProps = {
 export const SidebarMenu = ({ collapsed }: SidebarMenuProps) => {
   const styles = useStyles();
   const authenticationAtomValue = useAtomValue(authenticationAtom);
-  const studentId = authenticationAtomValue.login?.user.entitledStudent[0].id;
+  const studentId = authenticationAtomValue.login?.user.entitledStudent[0]?.id;
 
   return (
     <div className={styles.sidebar} style={{ width: collapsed ? 40 : 200 }}>
       <MenuItem collapsed={collapsed} icon={WalletRegular} label="Wallet" path="/" />
-      {studentId ? (
+      <SidebarDivider collapsed={collapsed} title="Entrepreneur" />
+      <MenuItem
+        collapsed={collapsed}
+        icon={StoreMicrosoftRegular}
+        label="Market Place"
+        path={'/market'}
+      />
+      <RoleBaseComponent entitledRole={[UserRole.STUDENT, UserRole.PARENT]}>
         <MenuItem
           collapsed={collapsed}
           icon={ShoppingBagRegular}
           label="My Shop"
           path={`/shop/${studentId}`}
         />
-      ) : (
-        <></>
-      )}
-      <MenuItem collapsed={collapsed} icon={AccessibilityRegular} label="Achievement" path="/" />
+      </RoleBaseComponent>
+      <SidebarDivider collapsed={collapsed} title="Achievement" />
+      <MenuItem collapsed={collapsed} icon={AccessibilityRegular} label="Activity" path="/" />
       <MenuItem collapsed={collapsed} icon={PenSparkleRegular} label="Evaluation" path="/" />
-      <MenuItem
-        collapsed={collapsed}
-        icon={ApprovalsAppRegular}
-        label="Approval"
-        path="/approval"
-      />
-      <MenuItem collapsed={collapsed} icon={PeopleRegular} label="User" path="/user" />
+      <RoleBaseComponent entitledRole={UserRole.TEACHER}>
+        <SidebarDivider collapsed={collapsed} title="Approval" />
+        <MenuItem
+          collapsed={collapsed}
+          icon={BoxCheckmarkRegular}
+          label="Product Approval"
+          path="/approval"
+        />
+        <MenuItem
+          collapsed={collapsed}
+          icon={PeopleCheckmarkRegular}
+          label="Banner Approval"
+          path="/approval"
+        />
+      </RoleBaseComponent>
+      <RoleBaseComponent entitledRole={UserRole.ADMIN}>
+        <MenuItem collapsed={collapsed} icon={PeopleRegular} label="User" path="/user" />
+      </RoleBaseComponent>
     </div>
   );
 };

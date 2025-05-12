@@ -46,12 +46,12 @@ import { constructErrorMessage } from '../../utils/string-util';
 import { zodOptionalEmail, zodOptionalString } from '../../types/zod';
 import { Input } from '../../components/Input';
 import { createTableColumn } from '../../components/table/create-table-column-definition';
-import { MultiLingualLabel } from '../../components/multi-lang-label';
 import { useMessage } from '../../hooks/use-message';
 import { undefinedToEmptyString } from '../../utils/object-util';
 import { RoleLabel } from './role-label';
 import { StatusLabel } from './status-label';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
+import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 
 const searchSchema = z.object({
   email: zodOptionalEmail(),
@@ -241,21 +241,18 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
     }
   }, [state]);
 
-  // useEffect(() => {
-  //   startBreadcrumb('userMaintenance.title');
-  // });
   startBreadcrumb('userMaintenance.title');
+
+  const NameInPreferredLanguage = ({ user }: { user: User }) => {
+    return <Body1>{useNameInPreferredLanguage(user)}</Body1>;
+  };
 
   const columns: TableColumnDefinition<User>[] = [
     createTableColumn({
       columnId: 'name',
       header: t('userMaintenance.name'),
       width: 26,
-      builder: (user) => (
-        <MultiLingualLabel caption={user.name}>
-          <Body1 />
-        </MultiLingualLabel>
-      ),
+      builder: (user) => <NameInPreferredLanguage user={user} />,
     }),
     createTableColumn({
       columnId: 'email',

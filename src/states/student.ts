@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { getStudentById as getStudentByIdEntity } from '../repo/student-repo';
+import { getStudentById as getStudentEntityById } from '../repo/student-repo';
 import { BaseState } from './base-state';
 import { Student } from '../models/openapi';
 import { isError, Message, MessageType } from '../models/system';
@@ -54,28 +54,41 @@ export const studentListAtom = atom<StudentListState, [OneOnly<StudentListPayloa
   async (get, set, { search, reset }: OneOnly<StudentListPayload>) => {
     const current = get(studentListBaseAtom);
     if (search) {
+      const currentStudentIds = current.result.map(s => s.id);
+      // dont search if existing students matchs id to search
+      if (search.id.filter(id => !currentStudentIds.includes(id)).length === 0) {
+        return;
+      }
+
       const stateProgress = new StudentListStateProgress([], current.eventTime);
       set(studentListBaseAtom, stateProgress);
 
       const startTime = Date.now();
-      const result = await getStudentByIdEntity(search.id[0]);
+      const result = await Promise.all(search.id.map(async (id) => {
+        return await getStudentEntityById(id);
+      }));
+
       const endTime = Date.now();
       if (endTime - startTime < 1000) {
         await delay(1000 - (endTime - startTime));
       }
-      const isFailed = isError(result);
-      if (isFailed) {
+
+      const error = result.filter((r) => isError(r))[0];
+      if (error) {
         const failure: Message = {
-          key: result.code,
+          key: error.code,
           type: MessageType.Error,
-          parameters: result.parameter,
+          parameters: error.parameter,
         };
         set(
           studentListBaseAtom,
           new StudentListStateFail(stateProgress.result, stateProgress.eventTime, failure),
         );
       } else {
-        set(studentListBaseAtom, new StudentListStateSuccess(result ? [result] : [], stateProgress.eventTime));
+        const students = result.filter(
+          (item): item is Student => item !== undefined && !(item instanceof Error)
+        );
+        set(studentListBaseAtom, new StudentListStateSuccess(students, stateProgress.eventTime));
       }
     } else if (reset) {
       set(studentListBaseAtom, RESET);
