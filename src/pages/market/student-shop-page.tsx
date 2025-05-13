@@ -34,13 +34,13 @@ import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
 import { ProductGrid } from '../product/product-grid';
 import { authenticationAtom } from '../../states/authentication';
+import { ApprovalStatus } from '../../__generated__/linkedup-web-api-client';
 import {
   shopAtom,
   ShopStateInitial,
   ShopStateProgress,
   ShopStateSuccess,
 } from '../../states/student-shop';
-import { ApprovalStatusEnum } from '../../models/openapi';
 
 const useStyles = makeStyles({
   container: {
@@ -166,10 +166,10 @@ export const StudentShopPage = () => {
   ));
 
   const pendingItems = (state.shop?.pendingProducts ?? [])?.filter(
-    (item) => item.product.sellerId === studentId && item.status === ApprovalStatusEnum.Pending,
+    (item) => item.product.sellerId === studentId && item.status === ApprovalStatus.PENDING,
   );
   const rejectedItems = (state.shop?.rejectedProducts ?? [])?.filter(
-    (item) => item.product.sellerId === studentId && item.status === ApprovalStatusEnum.Rejected,
+    (item) => item.product.sellerId === studentId && item.status === ApprovalStatus.REJECTED,
   );
 
   const PendingGrid = React.memo(() => (

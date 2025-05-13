@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Body1, makeStyles, shorthands } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
-import { UserRoleEnum } from '../../models/openapi';
+import { UserRole } from '../../models/openapi';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
 import {
   BookRegular,
@@ -12,7 +12,7 @@ import {
 } from '@fluentui/react-icons';
 
 interface RoleLabelProps {
-  role: UserRoleEnum;
+  role: UserRole;
 }
 
 const useStyles = makeStyles({
@@ -24,11 +24,11 @@ const useStyles = makeStyles({
 });
 
 interface RoleIconProps {
-  role: UserRoleEnum | string;
+  role: UserRole | string;
   size?: number;
 }
 
-const roleIconComponents: Record<UserRoleEnum, FC<{ fontSize?: number }>> = {
+const roleIconComponents: Record<UserRole, FC<{ fontSize?: number }>> = {
   Student: BookRegular,
   Parent: PeopleListRegular,
   Teacher: PersonFeedbackRegular,
@@ -37,7 +37,7 @@ const roleIconComponents: Record<UserRoleEnum, FC<{ fontSize?: number }>> = {
 };
 
 export const RoleIcon: FC<RoleIconProps> = ({ role, size = 20 }) => {
-  const r = getEnumValueByRawValue(UserRoleEnum, role);
+  const r = getEnumValueByRawValue(UserRole, role);
   if (r) {
     const IconComponent = roleIconComponents[r];
     return <IconComponent fontSize={size} />;

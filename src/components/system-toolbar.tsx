@@ -32,7 +32,7 @@ import {
 } from '@fluentui/react-icons';
 import React, { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LanguageEnum, Student, UserRoleEnum } from '../models/openapi';
+import { Language, Student, UserRole } from '../models/openapi';
 import { Theme } from '../contexts/Theme';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useFormDirty } from '../contexts/FormDirty';
@@ -106,7 +106,7 @@ const AvatarInfo = forwardRef<
         justifyContent: 'start',
         margin: '4px',
         gap: tokens.spacingHorizontalS,
-        minWidth: '150px',
+        width: '180px',
         cursor: 'pointer', // 👈 Optional but helpful
       }}
     >
@@ -295,8 +295,8 @@ const SignoutButton: React.FC = () => {
 export const SystemToolbar: React.FC<{
   theme: Theme;
   onSetTheme: (t: Theme) => void;
-  language: LanguageEnum;
-  onSetLanguage: (l: LanguageEnum) => void;
+  language: Language;
+  onSetLanguage: (l: Language) => void;
 }> = ({ theme, onSetTheme, language, onSetLanguage }) => {
   const styles = useStyles();
   const { t } = useTranslation();
@@ -312,7 +312,7 @@ export const SystemToolbar: React.FC<{
   return (
     <div className={styles.toolbar}>
       <Spacer />
-      {login?.user.role === UserRoleEnum.Student ? (
+      {login?.user.role === UserRole.STUDENT ? (
         <>
           <StudentRoleInfo
             parentUser={login?.parentUser ?? []}
@@ -320,7 +320,7 @@ export const SystemToolbar: React.FC<{
           />
           <Spacer />
         </>
-      ) : login?.user.role === UserRoleEnum.Parent ? (
+      ) : login?.user.role === UserRole.PARENT ? (
         <>
           <ParentRoleInfo
             entitledStudent={login?.user.entitledStudent ?? []}
@@ -332,18 +332,18 @@ export const SystemToolbar: React.FC<{
         <></>
       )}
       {login ? <ProfileButton login={login} /> : <></>}
-      <Menu checkedValues={{ lang: [language === LanguageEnum.English ? 'en' : 'zhHant'] }}>
+      <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
         <MenuTrigger disableButtonEnhancement>
           <Button icon={<GlobeRegular />} onClick={() => setMenuOpen(false)} />
         </MenuTrigger>
         <MenuPopover>
           <MenuList>
-            <MenuItemRadio name="lang" onClick={() => onSetLanguage(LanguageEnum.English)} value="en">
+            <MenuItemRadio name="lang" onClick={() => onSetLanguage(Language.ENGLISH)} value="en">
               {t('system.language.value.en')}
             </MenuItemRadio>
             <MenuItemRadio
               name="lang"
-              onClick={() => onSetLanguage(LanguageEnum.TraditionalChinese)}
+              onClick={() => onSetLanguage(Language.TRADITIONAL_CHINESE)}
               value="zhHant"
             >
               {t('system.language.value.zhHant')}

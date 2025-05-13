@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { LanguageEnum } from '../models/openapi';
+import { Language } from '../models/openapi';
 import { zodOptionalString } from '../types/zod';
 import { DetailEditingDrawer } from './Drawer';
 import { Button } from '@fluentui/react-components';
@@ -26,7 +26,7 @@ export const MultiLangButton: React.FC<MultiLangButtonProps> = (props: MultiLang
 };
 
 const nameMultiLangSchema = z.object(
-  Object.values(LanguageEnum).reduce(
+  Object.values(Language).reduce(
     (acc, lang) => {
       acc[lang] = zodOptionalString();
       return acc;
@@ -63,11 +63,11 @@ export const MultiLangDrawer = ({
   return (
     <DetailEditingDrawer isOpen={isOpen} onCloseDrawer={onDrawerClose} t={t} title={title}>
       <Form numColumn={1}>
-        {Object.values([LanguageEnum.English, LanguageEnum.TraditionalChinese]).map((lang) => (
+        {Object.values([Language.ENGLISH, Language.TRADITIONAL_CHINESE]).map((lang) => (
           <Field
             key={lang}
             label={t(`system.language.value.${lang}`)}
-            required={lang === LanguageEnum.English}
+            required={lang === Language.ENGLISH}
           >
             <Input
               name={lang}

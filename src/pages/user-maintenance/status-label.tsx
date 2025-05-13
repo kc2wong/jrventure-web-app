@@ -6,11 +6,11 @@ import {
   ProhibitedRegular,
 } from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { UserStatusEnum } from '../../models/openapi';
+import { UserStatus } from '../../models/openapi';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
 
 interface StatusLabelProps {
-  status: UserStatusEnum;
+  status: UserStatus;
 }
 
 const useStyles = makeStyles({
@@ -22,18 +22,18 @@ const useStyles = makeStyles({
 });
 
 interface StatusIconProps {
-  status: UserStatusEnum | string;
+  status: UserStatus | string;
   size?: number;
 }
 
-const statusIcons: Record<UserStatusEnum, FC<{ fontSize?: number }>> = {
+const statusIcons: Record<UserStatus, FC<{ fontSize?: number }>> = {
   Active: CheckmarkCircleRegular,
   Inactive: DismissCircleRegular,
   Suspend: ProhibitedRegular,
 };
 
 export const StatusIcon: FC<StatusIconProps> = ({ status, size = 20 }) => {
-  const r = getEnumValueByRawValue(UserStatusEnum, status);
+  const r = getEnumValueByRawValue(UserStatus, status);
   if (r) {
     const IconComponent = statusIcons[r];
     return <IconComponent fontSize={size} />;

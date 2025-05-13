@@ -1,43 +1,42 @@
-import { UserCreation } from '../models/openapi';
-import { UserRoleEnum, UserStatusEnum, User } from '../models/openapi';
-import {
-  findUser as findUserRepo,
-  getUserbyId as getUserbyIdRepo,
-  createUser as createUserRepo,
-  updateUser as updateUserRepo,
-} from '../__generated__/linkedup-web-api-client';
-import { callRepo } from './repo-util';
+import { Error, UserCreation } from '../models/openapi';
+import { webApiClient } from './backend-api-client';
+import { createSystemError } from './error-util';
+import { UserRole, UserStatus, User } from '../models/openapi';
 
 export const findUser = async (
   email?: string,
   name?: string,
   studentId?: string,
-  role?: UserRoleEnum[],
-  status?: UserStatusEnum[],
-): Promise<User[]> => {
-  return await callRepo(() => {
-    return findUserRepo({ query: { email, name, studentId, status, role } });
-  });
+  role?: UserRole[],
+  status?: UserStatus[],
+): Promise<User[] | Error> => {
+  try {
+    return await webApiClient.userMaintenance.findUser(email, name, undefined, undefined, studentId, status, role);
+  } catch (error: any) {
+    return createSystemError(error);
+  }
 };
 
-export const getUserById = async (id: string): Promise<User> => {
-  return await callRepo(() => {
-    return getUserbyIdRepo({ path: { id } });
-  });
+export const getUserById = async (id: string): Promise<User | Error> => {
+  try {
+    return await webApiClient.userMaintenance.getUserbyId(id);
+  } catch (error: any) {
+    return createSystemError(error);
+  }
 };
 
-export const createUser = async (args: UserCreation): Promise<User> => {
-  return await callRepo(() => {
-    return createUserRepo({ body: args });
-  });
+export const createUser = async (args: UserCreation): Promise<User | Error> => {
+  try {
+    return await webApiClient.userMaintenance.createUser(args);
+  } catch (error: any) {
+    return createSystemError(error);
+  }
 };
 
-export const updateUser = async (
-  userId: string,
-  version: number,
-  user: UserCreation,
-): Promise<User> => {
-  return await callRepo(() => {
-    return updateUserRepo({ path: { id: userId }, body: { ...user, version } });
-  });
+export const updateUser = async (userId: string, version: number, user: UserCreation): Promise<User | Error> => {
+  try {
+    return await webApiClient.userMaintenance.updateUser(userId, {...user, version});
+  } catch (error: any) {
+    return createSystemError(error);
+  }
 };

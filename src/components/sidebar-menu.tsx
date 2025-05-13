@@ -14,7 +14,7 @@ import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { useAtomValue } from 'jotai';
 import { authenticationAtom } from '../states/authentication';
 import { RoleBaseComponent } from './role-based-component';
-import { UserRoleEnum } from '../models/openapi';
+import { UserRole } from '../models/openapi';
 
 const useStyles = makeStyles({
   sidebar: {
@@ -158,7 +158,7 @@ export const SidebarMenu = ({ collapsed }: SidebarMenuProps) => {
         label="Market Place"
         path={'/market'}
       />
-      <RoleBaseComponent entitledRole={[UserRoleEnum.Student, UserRoleEnum.Parent]}>
+      <RoleBaseComponent entitledRole={[UserRole.STUDENT, UserRole.PARENT]}>
         <MenuItem
           collapsed={collapsed}
           icon={ShoppingBagRegular}
@@ -169,7 +169,7 @@ export const SidebarMenu = ({ collapsed }: SidebarMenuProps) => {
       <SidebarDivider collapsed={collapsed} title="Achievement" />
       <MenuItem collapsed={collapsed} icon={AccessibilityRegular} label="Activity" path="/" />
       <MenuItem collapsed={collapsed} icon={PenSparkleRegular} label="Evaluation" path="/" />
-      <RoleBaseComponent entitledRole={UserRoleEnum.Teacher}>
+      <RoleBaseComponent entitledRole={UserRole.TEACHER}>
         <SidebarDivider collapsed={collapsed} title="Approval" />
         <MenuItem
           collapsed={collapsed}
@@ -184,7 +184,7 @@ export const SidebarMenu = ({ collapsed }: SidebarMenuProps) => {
           path="/approval"
         />
       </RoleBaseComponent>
-      <RoleBaseComponent entitledRole={UserRoleEnum.Admin}>
+      <RoleBaseComponent entitledRole={UserRole.ADMIN}>
         <MenuItem collapsed={collapsed} icon={PeopleRegular} label="User" path="/user" />
       </RoleBaseComponent>
     </div>

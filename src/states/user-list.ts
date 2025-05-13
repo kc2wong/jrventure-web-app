@@ -6,7 +6,7 @@ import { EmptyObject } from '../models/common';
 import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
 import { delay } from '../utils/date-util';
-import { UserRoleEnum, UserStatusEnum } from '../models/openapi';
+import { UserRole, UserStatus } from '../models/openapi';
 import { findUser } from '../repo/user-repo';
 
 enum UserOrdering {
@@ -21,8 +21,8 @@ export type Filter = {
   email?: string;
   name?: string;
   studentId?: string;
-  role?: UserRoleEnum[];
-  status?: UserStatusEnum[];
+  role?: UserRole[];
+  status?: UserStatus[];
 };
 
 type UserListStateArgs = {

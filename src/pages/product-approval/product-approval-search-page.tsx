@@ -17,7 +17,11 @@ import {
   shorthands,
   makeStyles,
 } from '@fluentui/react-components';
-import { AppsListDetailRegular, ArrowClockwiseRegular, FilterRegular } from '@fluentui/react-icons';
+import {
+  AppsListDetailRegular,
+  ArrowClockwiseRegular,
+  FilterRegular,
+} from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { TFunction } from 'i18next';
@@ -42,12 +46,11 @@ import {
   ProductApprovalListStateInitial,
   ProductApprovalListStateSuccess,
 } from '../../states/product-approval-list';
-import { ProductApproval } from '../../__generated__/linkedup-web-api-client';
+import { ApprovalStatus, ProductApproval } from '../../__generated__/linkedup-web-api-client';
 import { useTimezone } from '../../hooks/use-timezone';
 import { ApprovalStatusLabel } from '../product/approval-status-label';
 import { BsCoin } from 'react-icons/bs';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
-import { ApprovalStatusEnum } from '../../models/openapi';
 
 const searchSchema = z.object({
   classNo: zodOptionalString(),
@@ -55,11 +58,7 @@ const searchSchema = z.object({
   status: z.array(z.string()).optional(),
 });
 
-const statusList = [
-  ApprovalStatusEnum.Pending,
-  ApprovalStatusEnum.Rejected,
-  ApprovalStatusEnum.Approved,
-];
+const statusList = [ApprovalStatus.PENDING, ApprovalStatus.REJECTED, ApprovalStatus.APPROVED];
 
 type SearchFormData = z.infer<typeof searchSchema>;
 
@@ -76,7 +75,13 @@ type SearchDrawerProps = { isOpen: boolean; onOpenChange: (isOpen: boolean) => v
 const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
   const [state, action] = useAtom(productApprovalListAtom);
 
-  const { control, getValues, setValue, handleSubmit, reset } = useForm<SearchFormData>({
+  const {
+    control,
+    getValues,
+    setValue,
+    handleSubmit,
+    reset,
+  } = useForm<SearchFormData>({
     defaultValues: { ..._filter2SearchFormData(state.filter) },
     resolver: zodResolver(searchSchema),
   });
@@ -173,7 +178,7 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
   const { t } = useTranslation();
 
   const { startBreadcrumb } = useBreadcrumb();
-  const { dispatchMessage } = useMessage();
+    const { dispatchMessage } = useMessage();
   const [state, action] = useAtom(productApprovalListAtom);
 
   const { formatDate } = useTimezone();
@@ -196,11 +201,11 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
   const coinLabel = (value: number) => {
     return (
       <div className={styles.label}>
-        {<BsCoin />}
+        {<BsCoin/>}
         <Body1>{value.toString()}</Body1>
       </div>
-    );
-  };
+    );  
+  }
 
   const columns: TableColumnDefinition<ProductApproval>[] = [
     createTableColumn({
@@ -244,9 +249,7 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
       header: t('productApproval.status.label'),
       width: 8,
       builder: (pa) => (
-        <ApprovalStatusLabel
-          status={getEnumValueByRawValue(ApprovalStatusEnum, pa.status)!}
-        ></ApprovalStatusLabel>
+        <ApprovalStatusLabel status={pa.status}></ApprovalStatusLabel>
       ),
     }),
   ];
@@ -325,7 +328,11 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
       <Form
         numColumn={1}
         title={t('productApproval.title')}
-        toolbarSlot={[toolbarButtonFilter, toolbarButtonRefresh, toolbarButtonView]}
+        toolbarSlot={[
+          toolbarButtonFilter,
+          toolbarButtonRefresh,
+          toolbarButtonView,
+        ]}
       >
         <Table
           style={{ width: '100%', tableLayout: 'fixed', minWidth: '500px', maxWidth: '1200px' }}
@@ -378,17 +385,22 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
   );
 };
 
-const _searchFormData2Filter = ({ classNo, studentId, status }: SearchFormData): Filter => {
+const _searchFormData2Filter = ({
+  classNo,
+  studentId,
+  status,
+}: SearchFormData): Filter => {
   return {
     classNo,
     studentId,
-    status: status?.map((s) => getEnumValueByRawValue(ApprovalStatusEnum, s)!) ?? [],
+    status: status?.map((s) => getEnumValueByRawValue(ApprovalStatus, s)!) ?? [],
   };
 };
 
 const _filter2SearchFormData = ({ status, ...others }: Filter): SearchFormData => {
   return {
     ...others,
-    status: status?.map((s) => getRawValueByEnumValue(ApprovalStatusEnum, s)!) ?? [],
+    status: status?.map((s) => getRawValueByEnumValue(ApprovalStatus, s)!) ?? [],
   };
 };
+
