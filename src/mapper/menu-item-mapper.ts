@@ -1,4 +1,4 @@
-import { MenuItem as EntityMenuItem } from '../__generated__/linkedup-web-api-client/models/MenuItem';
+import { MenuItem as EntityMenuItem } from '../__generated__/linkedup-web-api-client';
 import { MenuItem } from '../models/login';
 
 export const entity2Model = (src: EntityMenuItem): MenuItem => {

@@ -7,6 +7,7 @@
     "@aws-cdk/aws-s3-deployment": "^1.204.0",
     "@fluentui/react-components": "^9.61.6",
     "@fluentui/react-datepicker-compat": "^0.5.5",
+    "@hey-api/client-axios": "^0.7.0",
     "@hookform/resolvers": "^5.0.1",
     "@react-oauth/google": "^0.12.1",
     "@sentry/react": "^9.13.0",
@@ -46,7 +47,7 @@
   "scripts": {
     "clean:dist": "rimraf dist",
     "clean:full": "rimraf ./node_modules src/__generated__ dist",
-    "openapi:generate-client": "openapi --input ./resources/linkedup-web-api/web-api-spec.yaml --output src/__generated__/linkedup-web-api-client --client axios --name WebApiClient",
+    "openapi:generate-client": "openapi-ts -i ./resources/linkedup-web-api/web-api-spec.yaml -o src/__generated__/linkedup-web-api-client -c @hey-api/client-axios --name BackendApiClient",
     "start": "REACT_APP_NAME=$npm_package_description REACT_APP_VERSION=$npm_package_version react-scripts start",
     "build": "NODE_ENV=production REACT_APP_NAME=$npm_package_description REACT_APP_VERSION=$npm_package_version node esbuild.config.mjs",
     "test": "vitest",
@@ -71,6 +72,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.24.0",
+    "@hey-api/openapi-ts": "^0.67.3",
     "@testing-library/dom": "^10.4.0",
     "@types/fs-extra": "^11.0.4",
     "@types/luxon": "^3.6.2",
@@ -88,7 +90,6 @@
     "gh-pages": "^6.3.0",
     "globals": "^16.0.0",
     "jsdom": "^26.1.0",
-    "openapi-typescript-codegen": "^0.29.0",
     "typescript-eslint": "^8.30.1",
     "vitest": "^3.1.1"
   }

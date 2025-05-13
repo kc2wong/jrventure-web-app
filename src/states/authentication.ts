@@ -67,6 +67,7 @@ const handleAuthResult = async (
   set: (atom: any, value: any) => void,
 ) => {
   const elapsed = Date.now();
+  console.log(`result = ${JSON.stringify(result)} ${isError(result)}`)
   if (isError(result)) {
     const failure: Message = {
       key: result.code,

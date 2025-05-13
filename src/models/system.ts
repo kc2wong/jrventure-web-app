@@ -1,3 +1,5 @@
+import { Error as ErrorModel } from '../models/openapi';
+
 export type UiMode = 'administrator' | 'operator';
 
 export enum MessageType {
@@ -28,7 +30,7 @@ export class NotFound implements Error {
   }
 }
 
-export const isError = (object: any): object is Error => {
+export const isError = (object: any): object is ErrorModel => {
   const numOfAttribute = Object.keys(object).length;
   if (numOfAttribute === 3) {
     return 'code' in object && 'parameter' in object && 'message' in object;

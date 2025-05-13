@@ -1,8 +1,6 @@
-import { Error } from '../models/openapi';
+import { ApprovalCommentType, ApprovalStatusEnum, Error } from '../models/openapi';
 import { createSystemError } from './error-util';
 import {
-  ApprovalCommentType,
-  ApprovalStatus,
   Product,
   ProductApproval,
   ProductApprovalComment,
@@ -112,7 +110,7 @@ export const findProductApproval = async (): Promise<ProductApproval[] | Error> 
     return products.map((p) => ({
       id: `9${p.id}`,
       product: p,
-      status: ApprovalStatus.PENDING,
+      status: ApprovalStatusEnum.Pending,
       comments: p.id === '103' ? comment : comment.filter(c => c.commentBy.id !== '9000'),
     }));
   } catch (error: any) {

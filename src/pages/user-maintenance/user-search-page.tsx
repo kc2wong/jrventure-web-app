@@ -40,7 +40,7 @@ import {
   UserListStateInitial,
   UserListStateSuccess,
 } from '../../states/user-list';
-import { Student, User, UserRole, UserStatus } from '../../models/openapi';
+import { Student, User, UserRoleEnum, UserStatusEnum } from '../../models/openapi';
 import { getRawValueByEnumValue, getEnumValueByRawValue } from '../../utils/enum-util';
 import { constructErrorMessage } from '../../utils/string-util';
 import { zodOptionalEmail, zodOptionalString } from '../../types/zod';
@@ -61,8 +61,13 @@ const searchSchema = z.object({
   status: z.array(z.string()).optional(),
 });
 
-const statusList = [UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.SUSPEND];
-const roleList = [UserRole.STUDENT, UserRole.PARENT, UserRole.TEACHER, UserRole.ADMIN];
+const statusList = [UserStatusEnum.Active, UserStatusEnum.Inactive, UserStatusEnum.Suspend];
+const roleList = [
+  UserRoleEnum.Student,
+  UserRoleEnum.Parent,
+  UserRoleEnum.Teacher,
+  UserRoleEnum.Admin,
+];
 
 type SearchFormData = z.infer<typeof searchSchema>;
 
@@ -264,7 +269,11 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
       columnId: 'role',
       header: t('userMaintenance.role.label'),
       width: 16,
-      builder: (user) => <RoleLabel role={user.role}></RoleLabel>,
+      builder: (user) => (
+        <RoleLabel
+          role={getEnumValueByRawValue(UserRoleEnum, user.role) as UserRoleEnum}
+        ></RoleLabel>
+      ),
     }),
     createTableColumn({
       columnId: 'classIdStudentNumber',
@@ -282,7 +291,11 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
       columnId: 'status',
       header: t('userMaintenance.status.label'),
       width: 16,
-      builder: (user) => <StatusLabel status={user.status}></StatusLabel>,
+      builder: (user) => (
+        <StatusLabel
+          status={getEnumValueByRawValue(UserStatusEnum, user.status) as UserStatusEnum}
+        />
+      ),
     }),
   ];
 
@@ -447,16 +460,16 @@ const _searchFormData2Filter = ({
     email: email,
     name: name,
     studentId: studentId,
-    role: role?.map((r) => getEnumValueByRawValue(UserRole, r)!) ?? [],
-    status: status?.map((s) => getEnumValueByRawValue(UserStatus, s)!) ?? [],
+    role: role?.map((r) => getEnumValueByRawValue(UserRoleEnum, r)!) ?? [],
+    status: status?.map((s) => getEnumValueByRawValue(UserStatusEnum, s)!) ?? [],
   };
 };
 
 const _filter2SearchFormData = ({ role, status, ...others }: Filter): SearchFormData => {
   return {
     ...others,
-    role: role?.map((r) => getRawValueByEnumValue(UserRole, r)!) ?? [],
-    status: status?.map((s) => getRawValueByEnumValue(UserStatus, s)!) ?? [],
+    role: role?.map((r) => getRawValueByEnumValue(UserRoleEnum, r)!) ?? [],
+    status: status?.map((s) => getRawValueByEnumValue(UserStatusEnum, s)!) ?? [],
   };
 };
 

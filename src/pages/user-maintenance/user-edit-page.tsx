@@ -1,5 +1,11 @@
 import { z } from 'zod';
-import { Language, User, UserCreation, UserRole, UserStatus } from '../../models/openapi';
+import {
+  LanguageEnum,
+  User,
+  UserCreation,
+  UserRoleEnum,
+  UserStatusEnum,
+} from '../../models/openapi';
 import { Button, Dropdown, Option, Spinner } from '@fluentui/react-components';
 import { Field } from '../../components/Field';
 import { Input } from '../../components/Input';
@@ -48,8 +54,8 @@ import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 // form for editing user
 const maxNameLength = 50;
 
-const statusList = Object.values(UserStatus) as UserStatus[];
-const roleList = Object.values(UserRole) as UserRole[];
+const statusList = Object.values(UserStatusEnum) as UserStatusEnum[];
+const roleList = Object.values(UserRoleEnum) as UserRoleEnum[];
 
 type UserEditPageProps = { mode: string; onBackButtonClick: () => void; onSave: () => void };
 
@@ -72,7 +78,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
   const [state, action] = useAtom(userDetailAtom);
   const [studentListState, studentListAction] = useAtom(studentListAtom);
   const login = useAtomValue(authenticationAtom).login;
-  const isToAddParentUser = mode === 'add' && login?.user.role === UserRole.STUDENT;
+  const isToAddParentUser = mode === 'add' && login?.user.role === UserRoleEnum.Student;
 
   const readOnly = mode === 'view';
   const baselineTimestamp = useRef<number>(Date.now());
@@ -84,13 +90,14 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
         entitledStudentId: entitledStudentId[0] ?? '',
         entitledStudentId2: entitledStudentId[1] ?? '',
         ...others,
+        name: others.name as Record<string, string | undefined>, // Ensure correct type
       };
     } else {
       if (isToAddParentUser) {
         return {
           email: '',
-          role: UserRole.PARENT,
-          status: UserStatus.ACTIVE,
+          role: UserRoleEnum.Parent,
+          status: UserStatusEnum.Active,
           name: {},
           entitledStudentId: login?.user.entitledStudent[0].id,
           entitledStudentId2: '',
@@ -111,9 +118,11 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
   const _formData2UserCreation = (formData: FormData): UserCreation => {
     const { role, status, entitledStudentId, entitledStudentId2, ...others } = formData;
     return {
-      role: getEnumValueByRawValue(UserRole, role)!,
-      status: getEnumValueByRawValue(UserStatus, status)!,
-      entitledStudentId: [entitledStudentId, entitledStudentId2].map(s => emptyStringToUndefined(s)).filter(s => s !== undefined),
+      role: getEnumValueByRawValue(UserRoleEnum, role)!,
+      status: getEnumValueByRawValue(UserStatusEnum, status)!,
+      entitledStudentId: [entitledStudentId, entitledStudentId2]
+        .map((s) => emptyStringToUndefined(s))
+        .filter((s) => s !== undefined),
       ...others,
     };
   };
@@ -124,10 +133,13 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
       email: zodEmail(),
       name: z
         .record(zodOptionalString({ maxLength: maxNameLength }))
-        .refine((data) => data[Language.ENGLISH] && data[Language.ENGLISH].trim().length > 0, {
-          message: 'Required',
-          path: ['en'], // path of error
-        }),
+        .refine(
+          (data) => data[LanguageEnum.English] && data[LanguageEnum.English].trim().length > 0,
+          {
+            message: 'Required',
+            path: ['en'], // path of error
+          },
+        ),
       role: zodString(),
       entitledStudentId: zodOptionalString(),
       entitledStudentId2: zodOptionalString(),
@@ -135,21 +147,25 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     })
     // Rule 1: If STUDENT, then entitledStudentId must exist
     .refine(
-      (data) => data.role !== UserRole.STUDENT || (data.entitledStudentId?.trim().length ?? 0) > 0,
+      (data) =>
+        data.role !== UserRoleEnum.Student || (data.entitledStudentId?.trim().length ?? 0) > 0,
       {
         message: 'zod.error.Required',
         path: ['entitledStudentId'],
       },
     )
     // Rule 1: If STUDENT, then entitledStudentId2 must be empty
-    .refine((data) => data.role !== UserRole.STUDENT || !data.entitledStudentId2?.trim().length, {
-      message: 'zod.error.NotRequired',
-      path: ['entitledStudentId2'],
-    })
+    .refine(
+      (data) => data.role !== UserRoleEnum.Student || !data.entitledStudentId2?.trim().length,
+      {
+        message: 'zod.error.NotRequired',
+        path: ['entitledStudentId2'],
+      },
+    )
     // Rule 2: If PARENT, at least one of the IDs must be present
     .refine(
       (data) =>
-        data.role !== UserRole.PARENT ||
+        data.role !== UserRoleEnum.Parent ||
         data.entitledStudentId?.trim() ||
         data.entitledStudentId2?.trim(),
       {
@@ -160,8 +176,8 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     // Rule 3: If not STUDENT or PARENT, both IDs must be empty
     .refine(
       (data) =>
-        data.role === UserRole.STUDENT ||
-        data.role === UserRole.PARENT ||
+        data.role === UserRoleEnum.Student ||
+        data.role === UserRoleEnum.Parent ||
         (!data.entitledStudentId?.trim() && !data.entitledStudentId2?.trim()),
       {
         message: 'zod.error.NotRequired',
@@ -255,11 +271,11 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     if (isMatchingStudent1) {
       setValue('entitledStudentId', student.id);
 
-      if (formValues.role === UserRole.STUDENT) {
+      if (formValues.role === UserRoleEnum.Student) {
         setValue('name', {
-          [Language.ENGLISH]: `${student.firstName[Language.ENGLISH] ?? ''} ${student.lastName[Language.ENGLISH] ?? ''}`,
-          [Language.TRADITIONAL_CHINESE]: `${student.lastName[Language.TRADITIONAL_CHINESE] ?? ''}${student.firstName[Language.TRADITIONAL_CHINESE] ?? ''}`,
-          [Language.SIMPLIFIED_CHINESE]: `${student.lastName[Language.SIMPLIFIED_CHINESE] ?? ''}${student.firstName[Language.SIMPLIFIED_CHINESE] ?? ''}`,
+          [LanguageEnum.English]: `${student.firstName[LanguageEnum.English] ?? ''} ${student.lastName[LanguageEnum.English] ?? ''}`,
+          [LanguageEnum.TraditionalChinese]: `${student.lastName[LanguageEnum.TraditionalChinese] ?? ''}${student.firstName[LanguageEnum.TraditionalChinese] ?? ''}`,
+          // [Language.SIMPLIFIED_CHINESE]: `${student.lastName[Language.SIMPLIFIED_CHINESE] ?? ''}${student.firstName[Language.SIMPLIFIED_CHINESE] ?? ''}`,
         });
       }
     }
@@ -285,7 +301,9 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     const currentFieldValues = formValues[fieldName];
 
     currentFieldValues[
-      langStr === Language.TRADITIONAL_CHINESE ? Language.TRADITIONAL_CHINESE : Language.ENGLISH
+      langStr === LanguageEnum.TraditionalChinese
+        ? LanguageEnum.TraditionalChinese
+        : LanguageEnum.English
     ] = value;
 
     setValue(fieldName, currentFieldValues, { shouldDirty: true });
@@ -415,7 +433,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                     handleNameFieldChange(field.name, evt.target.name, data.value);
                   }}
                   readOnly={readOnly}
-                  value={field.value[Language.ENGLISH]}
+                  value={field.value[LanguageEnum.English]}
                 />
               </Field>
             );
@@ -449,8 +467,8 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                       field.onChange(data.selectedOptions[0] ?? '');
                       // clear entitledStudentId if role is not Student / Parent
                       if (
-                        data.optionValue !== UserRole.STUDENT &&
-                        data.optionValue !== UserRole.PARENT
+                        data.optionValue !== UserRoleEnum.Student &&
+                        data.optionValue !== UserRoleEnum.Parent
                       ) {
                         setValue('entitledStudentId', '');
                         setValue('entitledStudentId2', '');
@@ -462,7 +480,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                     {roleList.map((role) => (
                       <Option
                         key={role.toString()}
-                        disabled={role === UserRole.ALUMNI}
+                        disabled={role === UserRoleEnum.Alumni}
                         text={t(`userMaintenance.role.value.${role}`)}
                         value={`${role}`}
                       >
@@ -476,7 +494,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           }}
         />
 
-        {formValues.role == UserRole.STUDENT || formValues.role == UserRole.PARENT ? (
+        {formValues.role == UserRoleEnum.Student || formValues.role == UserRoleEnum.Parent ? (
           <>
             <Controller
               control={control}
@@ -524,7 +542,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           <EmptyCell colSpan={2} />
         )}
 
-        {formValues.role == UserRole.PARENT  && !isToAddParentUser ? (
+        {formValues.role == UserRoleEnum.Parent && !isToAddParentUser ? (
           <>
             <EmptyCell />
             <Controller

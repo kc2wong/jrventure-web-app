@@ -4,11 +4,12 @@ import { ProductDetail } from '../product/product-detail';
 import { productApprovalListAtom } from '../../states/product-approval-list';
 import { useAtom } from 'jotai';
 import { useTimezone } from '../../hooks/use-timezone';
-import { ApprovalCommentType, ApprovalStatus } from '../../__generated__/linkedup-web-api-client';
+import { ApprovalCommentType } from '../../__generated__/linkedup-web-api-client';
 import { ChatDismissRegular, ChatRegular, ChatSparkleRegular } from '@fluentui/react-icons';
 import { t } from 'i18next';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
+import { ApprovalStatusEnum } from '../../models/openapi';
 
 const useStyles = makeStyles({
   row: {
@@ -113,7 +114,7 @@ export const ProductApprovalDetailPage: React.FC = () => {
       <div style={{ flex: '1', padding: '1rem', overflowY: 'auto' }}>
         {state.selectedResult ? (
           <ProductDetail
-            approvalStatus={ApprovalStatus.PENDING}
+            approvalStatus={ApprovalStatusEnum.Pending}
             buttons={[
               <Button key="comment" icon={<ChatRegular />}>
                 {t('productApproval.comment')}

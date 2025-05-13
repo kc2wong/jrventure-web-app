@@ -1,11 +1,12 @@
 import { ReactElement } from 'react';
-import { UserRole } from '../models/openapi';
+import { UserRoleEnum } from '../models/openapi';
 import { useAtomValue } from 'jotai';
 import { authenticationAtom } from '../states/authentication';
 import { asArray } from '../utils/array-util';
+import { getEnumValueByRawValue } from '../utils/enum-util';
 
 type RoleBaseComponentProps = {
-  entitledRole: UserRole[] | UserRole;
+  entitledRole: UserRoleEnum[] | UserRoleEnum;
   children: ReactElement | ReactElement[];
 };
 
@@ -14,5 +15,10 @@ export const RoleBaseComponent: React.FC<RoleBaseComponentProps> = ({ entitledRo
   const userRole = state.login?.user.role;
   const entitledRoleArray = asArray(entitledRole);
 
-  return userRole && entitledRoleArray?.includes(userRole) ? children : <></>;
+  return userRole &&
+    entitledRoleArray?.includes(getEnumValueByRawValue(UserRoleEnum, userRole)!) ? (
+    children
+  ) : (
+    <></>
+  );
 };

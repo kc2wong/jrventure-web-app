@@ -11,7 +11,7 @@ import { initReactI18next, useTranslation } from 'react-i18next';
 import { authenticationAtom } from './states/authentication';
 import { useAtomValue } from 'jotai';
 import { useTheme } from './contexts/Theme';
-import { Language } from './models/openapi';
+import { LanguageEnum } from './models/openapi';
 import { PageTransitionProvider } from './contexts/PageTransition';
 import HomePage from './pages/home-page';
 import { UserMaintenancePage } from './pages/user-maintenance/user-maintenance-page';
@@ -70,7 +70,7 @@ export const Main: React.FC = () => {
   const { showDiscardChangeDialog } = useDialog();
 
   
-  const selectedLanguage = i18n.language === 'en' ? Language.ENGLISH : Language.TRADITIONAL_CHINESE;
+  const selectedLanguage = i18n.language === 'en' ? LanguageEnum.English : LanguageEnum.TraditionalChinese;
 
   const menuData = login?.menu;
 
@@ -114,13 +114,13 @@ export const Main: React.FC = () => {
           <div className={styles.headerItem}>
             <SystemToolbar
               language={
-                selectedLanguage === Language.ENGLISH
-                  ? Language.ENGLISH
-                  : Language.TRADITIONAL_CHINESE
+                selectedLanguage === LanguageEnum.English
+                  ? LanguageEnum.English
+                  : LanguageEnum.TraditionalChinese
               }
               onSetLanguage={(value) => {
                 // i18n.changeLanguage(value === 'zhHant' ? 'zhHant' : 'en');
-                i18n.changeLanguage(value === Language.TRADITIONAL_CHINESE ? 'zhHant' : 'en');
+                i18n.changeLanguage(value === LanguageEnum.TraditionalChinese ? 'zhHant' : 'en');
               }}
               onSetTheme={(theme) => {
                 setTheme(theme);
