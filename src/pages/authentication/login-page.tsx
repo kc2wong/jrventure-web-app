@@ -110,7 +110,7 @@ export const LoginPage = (props: LoginPageProps) => {
 
           <div style={{ marginTop: '30px' }}>
             <GoogleSignInButton />
-            <Divider style={{ marginTop: '20px', marginBottom: '20px' }}>
+            <Divider style={{ marginTop: '20px', marginBottom: '10px' }}>
               {t('system.message.or').toUpperCase()}
             </Divider>
           </div>
@@ -139,6 +139,7 @@ export const LoginPage = (props: LoginPageProps) => {
           <div className={styles.buttonRow}>
             <Button
               appearance="primary"
+              className={styles.signInButton}
               disabled={hasMissingRequiredField(formValues, schema)}
               icon={<PersonPasskeyRegular />}
               onClick={handleSubmit(handleLogin)}

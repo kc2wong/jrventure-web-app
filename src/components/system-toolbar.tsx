@@ -27,7 +27,8 @@ import {
   GlobeRegular,
   MailUnreadRegular,
   PeopleAddRegular,
-  WeatherMoonRegular,
+  SettingsRegular,
+  DarkThemeRegular,
   WeatherSunnyRegular,
 } from '@fluentui/react-icons';
 import React, { forwardRef, useState } from 'react';
@@ -41,44 +42,21 @@ import { useDialog } from '../hooks/use-dialog';
 import { useMessage } from '../hooks/use-message';
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { SimpleUser } from '../__generated__/linkedup-web-api-client';
-import {
-  useNameInPreferredLanguage,
-} from '../hooks/use-preferred-language';
+import { useNameInPreferredLanguage } from '../hooks/use-preferred-language';
 import { Login } from '../models/login';
 import { useTimezone } from '../hooks/use-timezone';
 import { RoleIcon } from '../pages/user-maintenance/role-label';
+import { DeviceComponent } from './device-component';
 
 const useStyles = makeStyles({
-  row: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: tokens.spacingHorizontalS,
-  },
   toolbar: {
     display: 'flex',
     justifyContent: 'flex-start',
+    alignItems: 'center',
     gap: '10px',
-  },
-  nameLabel: { width: '40px' },
-
-  item: { display: 'flex', justifyContent: 'flex-start', gap: '10px' },
-  button: { justifyContent: 'flex-start', width: '110px' },
-  siteButtonText: {
-    display: 'block',
-    justifyContent: 'flex-start',
-    overflow: 'hidden',
-    width: '80px',
-  },
-  dialogButtonPanel: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    margin: '4px',
-    gap: '8px',
+    minHeight: '32px',
   },
   divider: { width: '8px' },
-  profileContentHeader: { marginTop: '0' },
 });
 
 const Spacer: React.FC = () => {
@@ -86,49 +64,45 @@ const Spacer: React.FC = () => {
   return <Divider className={styles.divider} vertical />;
 };
 
-interface AvatarInfoProps {
-  student: Student;
-}
-
-// 👇 Forward the ref and spread props so MenuTrigger can handle events
 const AvatarInfo = forwardRef<
   HTMLDivElement,
-  AvatarInfoProps & React.HTMLAttributes<HTMLDivElement>
->(({ student, ...rest }, ref) => {
-  return (
-    <div
-      ref={ref}
-      {...rest} // 👈 Spread the interaction props
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'start',
-        margin: '4px',
-        gap: tokens.spacingHorizontalS,
-        width: '180px',
-        cursor: 'pointer', // 👈 Optional but helpful
-      }}
-    >
-      <BookRegular fontSize={24} />
-      <Label style={{ width: 50 }}>{`${student.classId}-${student.studentNumber}`}</Label>
-      <Label>{useNameInPreferredLanguage(student)}</Label>
-    </div>
-  );
-});
+  { student: Student } & React.HTMLAttributes<HTMLDivElement>
+>(({ student, ...rest }, ref) => (
+  <div
+    ref={ref}
+    {...rest}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: tokens.spacingHorizontalS,
+      minWidth: '150px',
+      cursor: 'pointer',
+      margin: '4px',
+    }}
+  >
+    <BookRegular fontSize={24} />
+    <Label style={{ width: 50 }}>{`${student.classId}-${student.studentNumber}`}</Label>
+    <Label>{useNameInPreferredLanguage(student)}</Label>
+  </div>
+));
 
-const ParentRoleInfo: React.FC<{ entitledStudent: Student[]; selectedStudent?: Student }> = ({
+const ParentRoleInfo = ({
   entitledStudent,
   selectedStudent,
+}: {
+  entitledStudent: Student[];
+  selectedStudent?: Student;
 }) => {
   const [, authAction] = useAtom(authenticationAtom);
   const handleChange = (id: string) => {
     const student = entitledStudent.find((s) => s.id === id);
-    student && authAction({ selectEntitledStudent: { student } });
+    if (student) {
+      authAction({ selectEntitledStudent: { student } });
+    }
   };
 
-  if (entitledStudent.length === 0 || !selectedStudent) {
-    return <></>;
+  if (!selectedStudent || entitledStudent.length === 0) {
+    return null;
   }
 
   return (
@@ -138,118 +112,96 @@ const ParentRoleInfo: React.FC<{ entitledStudent: Student[]; selectedStudent?: S
       </MenuTrigger>
       <MenuPopover>
         <MenuList>
-          {entitledStudent.map((s) => {
-            return (
-              <MenuItemRadio
-                key={s.id}
-                name="studentId"
-                onClick={() => handleChange(s.id)}
-                value={`${s.id}`}
+          {entitledStudent.map((s) => (
+            <MenuItemRadio
+              key={s.id}
+              name="studentId"
+              onClick={() => handleChange(s.id)}
+              value={s.id}
+            >
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: tokens.spacingHorizontalS }}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'start',
-                    gap: tokens.spacingHorizontalS,
-                  }}
-                >
-                  <Label style={{ width: 40 }}>{`${s.classId}-${s.studentNumber}`}</Label>
-                  <Label>{useNameInPreferredLanguage(s)}</Label>
-                </div>
-              </MenuItemRadio>
-            );
-          })}
+                <Label style={{ width: 40 }}>{`${s.classId}-${s.studentNumber}`}</Label>
+                <Label>{useNameInPreferredLanguage(s)}</Label>
+              </div>
+            </MenuItemRadio>
+          ))}
         </MenuList>
       </MenuPopover>
     </Menu>
   );
 };
 
-const StudentRoleInfo: React.FC<{ parentUser: SimpleUser[]; student?: Student }> = ({
+const StudentRoleInfo = ({
   parentUser,
   student,
+}: {
+  parentUser: SimpleUser[];
+  student?: Student;
 }) => {
   const { t } = useTranslation();
   const { navigateWithSpinner } = useNavigationHelpers();
   const [isPopupOpen, setPopupOpen] = useState(false);
-
   if (!student) {
-    return <></>;
+    return null;
   }
 
-  const parentUserList = (
-    <div>
-      <Body1Strong>
-        {parentUser.length > 0 ? t('userProfile.parentUser') : t('userProfile.noParentUser')}
-      </Body1Strong>
-      <List navigationMode="items" style={{ marginTop: tokens.spacingHorizontalS }}>
-        {parentUser.map((u) => (
-          <ListItem key={u.id}>
-            <Persona name={useNameInPreferredLanguage(u)} secondaryText={u.email} />
-          </ListItem>
-        ))}
-      </List>
-    </div>
-  );
-
   return (
-    <Popover onOpenChange={(_e, data) => setPopupOpen(data.open)} open={isPopupOpen} withArrow>
+    <Popover onOpenChange={(_, data) => setPopupOpen(data.open)} open={isPopupOpen} withArrow>
       <PopoverTrigger disableButtonEnhancement>
         <AvatarInfo student={student} />
       </PopoverTrigger>
-
       <PopoverSurface tabIndex={-1}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalXL }}>
-          {parentUserList}
-          <Button
-            icon={<PeopleAddRegular />}
-            onClick={() => {
-              setPopupOpen(false);
-              navigateWithSpinner('/user/add-parent');
-            }}
-          >
-            {t('userProfile.addParentUser')}
-          </Button>
-        </div>
+        <Body1Strong>
+          {parentUser.length > 0 ? t('userProfile.parentUser') : t('userProfile.noParentUser')}
+        </Body1Strong>
+        <List style={{ marginTop: tokens.spacingHorizontalS }}>
+          {parentUser.map((u) => (
+            <ListItem key={u.id}>
+              <Persona name={useNameInPreferredLanguage(u)} secondaryText={u.email} />
+            </ListItem>
+          ))}
+        </List>
+        <Button
+          icon={<PeopleAddRegular />}
+          onClick={() => {
+            setPopupOpen(false);
+            navigateWithSpinner('/user/add-parent');
+          }}
+        >
+          {t('userProfile.addParentUser')}
+        </Button>
       </PopoverSurface>
     </Popover>
   );
 };
 
-const MessageButton: React.FC = () => {
-  return <Button icon={<MailUnreadRegular />}></Button>;
-};
+const MessageButton = () => <Button icon={<MailUnreadRegular />} />;
 
-export const ProfileButton: React.FC<{ login: Login }> = ({ login }) => {
+const ProfileButton = ({ login }: { login: Login }) => {
   const { t } = useTranslation();
   const { formatDatetime } = useTimezone();
-  const { user } = login;
-  const name = useNameInPreferredLanguage(user);
-
+  const name = useNameInPreferredLanguage(login.user);
   return (
     <Popover withArrow>
       <PopoverTrigger disableButtonEnhancement>
-        <Avatar color="brand" name={name} shape="square" size={32}></Avatar>
+        <Avatar color="brand" name={name} shape="square" size={32} />
       </PopoverTrigger>
-
       <PopoverSurface tabIndex={-1}>
         <Persona
-          avatar={{
-            icon: <RoleIcon role={user.role} size={40}/>,
-          }}
+          avatar={{ icon: <RoleIcon role={login.user.role} size={40} /> }}
           primaryText={name}
-          secondaryText={user.email}
+          secondaryText={login.user.email}
           size="huge"
-          tertiaryText={`${t('userProfile.lastLogin')}: ${user.lastLoginDatetime ? formatDatetime(new Date(user.lastLoginDatetime)) : ''}`}
+          tertiaryText={`${t('userProfile.lastLogin')}: ${login.user.lastLoginDatetime ? formatDatetime(new Date(login.user.lastLoginDatetime)) : ''}`}
         />
       </PopoverSurface>
     </Popover>
   );
 };
 
-const SignoutButton: React.FC = () => {
+const SignoutButton = () => {
   const action = useSetAtom(authenticationAtom);
   const { t } = useTranslation();
   const { showConfirmationDialog } = useDialog();
@@ -266,17 +218,15 @@ const SignoutButton: React.FC = () => {
     }, 500);
   };
 
-  const confirmMessage = isDirty()
-    ? t('userProfile.discardChangeAndSignOut')
-    : t('userProfile.doYouWantToSignOut');
-
   return (
     <Button
       icon={<DoorArrowLeftRegular />}
       onClick={() =>
         showConfirmationDialog({
           confirmType: t('system.message.signOut'),
-          message: confirmMessage,
+          message: isDirty()
+            ? t('userProfile.discardChangeAndSignOut')
+            : t('userProfile.doYouWantToSignOut'),
           primaryButton: {
             label: t('userProfile.signOut'),
             icon: <CheckmarkRegular />,
@@ -292,20 +242,39 @@ const SignoutButton: React.FC = () => {
   );
 };
 
-export const SystemToolbar: React.FC<{
+export const SystemToolbar = ({
+  theme,
+  onSetTheme,
+  language,
+  onSetLanguage,
+  setShowBackButton,
+}: {
   theme: Theme;
   onSetTheme: (t: Theme) => void;
   language: Language;
   onSetLanguage: (l: Language) => void;
-}> = ({ theme, onSetTheme, language, onSetLanguage }) => {
+  setShowBackButton: (toShow: boolean) => void;
+}) => {
   const styles = useStyles();
   const { t } = useTranslation();
-  const [, setMenuOpen] = useState(false);
   const { login, selectedStudent } = useAtomValue(authenticationAtom);
+  const { navigate } = useNavigationHelpers();
+
+  const SettingButton = () => {
+    return (
+      <Button
+        icon={<SettingsRegular />}
+        onClick={() => {
+          navigate('/setting');
+          setShowBackButton(true);
+        }}
+      />
+    );
+  };
 
   const themeIcons = {
     light: <WeatherSunnyRegular />,
-    dark: <WeatherMoonRegular />,
+    dark: <DarkThemeRegular />,
     playful: <BalloonRegular />,
   };
 
@@ -328,47 +297,55 @@ export const SystemToolbar: React.FC<{
           />
           <Spacer />
         </>
-      ) : (
-        <></>
-      )}
-      {login ? <ProfileButton login={login} /> : <></>}
-      <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
-        <MenuTrigger disableButtonEnhancement>
-          <Button icon={<GlobeRegular />} onClick={() => setMenuOpen(false)} />
-        </MenuTrigger>
-        <MenuPopover>
-          <MenuList>
-            <MenuItemRadio name="lang" onClick={() => onSetLanguage(Language.ENGLISH)} value="en">
-              {t('system.language.value.en')}
-            </MenuItemRadio>
-            <MenuItemRadio
-              name="lang"
-              onClick={() => onSetLanguage(Language.TRADITIONAL_CHINESE)}
-              value="zhHant"
-            >
-              {t('system.language.value.zhHant')}
-            </MenuItemRadio>
-          </MenuList>
-        </MenuPopover>
-      </Menu>
+      ) : null}
 
-      <Menu checkedValues={{ theme: [theme] }}>
-        <MenuTrigger disableButtonEnhancement>
-          <Button icon={themeIcons[theme]} onClick={() => setMenuOpen(false)} />
-        </MenuTrigger>
-        <MenuPopover>
-          <MenuList>
-            {(['light', 'dark', 'playful'] as Theme[]).map((th) => (
-              <MenuItemRadio key={th} name="theme" onClick={() => onSetTheme(th)} value={th}>
-                {t(`system.theme.value.${th}`)}
+      <DeviceComponent forMobile={false}>
+        {login ? <ProfileButton login={login} /> : <></>}
+        <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
+          <MenuTrigger disableButtonEnhancement>
+            <Button icon={<GlobeRegular />} />
+          </MenuTrigger>
+          <MenuPopover>
+            <MenuList>
+              <MenuItemRadio name="lang" onClick={() => onSetLanguage(Language.ENGLISH)} value="en">
+                {t('system.language.value.en')}
               </MenuItemRadio>
-            ))}
-          </MenuList>
-        </MenuPopover>
-      </Menu>
+              <MenuItemRadio
+                name="lang"
+                onClick={() => onSetLanguage(Language.TRADITIONAL_CHINESE)}
+                value="zhHant"
+              >
+                {t('system.language.value.zhHant')}
+              </MenuItemRadio>
+            </MenuList>
+          </MenuPopover>
+        </Menu>
+
+        <Menu checkedValues={{ theme: [theme] }}>
+          <MenuTrigger disableButtonEnhancement>
+            <Button icon={themeIcons[theme]} />
+          </MenuTrigger>
+          <MenuPopover>
+            <MenuList>
+              {(['light', 'dark', 'playful'] as Theme[]).map((th) => (
+                <MenuItemRadio key={th} name="theme" onClick={() => onSetTheme(th)} value={th}>
+                  {t(`system.theme.value.${th}`)}
+                </MenuItemRadio>
+              ))}
+            </MenuList>
+          </MenuPopover>
+        </Menu>
+      </DeviceComponent>
+
+      <DeviceComponent forMobile={true}>
+        <SettingButton />
+      </DeviceComponent>
 
       <MessageButton />
-      <SignoutButton />
+
+      <DeviceComponent forMobile={false}>
+        <SignoutButton />
+      </DeviceComponent>
     </div>
   );
 };

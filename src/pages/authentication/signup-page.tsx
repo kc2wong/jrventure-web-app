@@ -1,11 +1,4 @@
-import {
-  Body1,
-  Button,
-  Input,
-  Image,
-  Link,
-  Card,
-} from '@fluentui/react-components';
+import { Body1, Button, Input, Image, Link, Card } from '@fluentui/react-components';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +36,7 @@ type SignupPageProps = {
 
 export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
   const styles = useAuthPageStyles();
-  
+
   const { t } = useTranslation();
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
   const [state, action] = useAtom(userRegistrationAtom);
@@ -137,21 +130,27 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
           </Field>
 
           <div className={styles.buttonRow}>
-              <Button
-                className={styles.googleButton}
-                disabled={hasMissingRequiredField(formValues, schema)}
-                icon={<FcGoogle size={20} />}
-                onClick={handleSubmit(handleGoogleLogin)}
-                type="button"
-              >
-                {t('signup.signUpWithGoogle')}
-              </Button>
+            <Button
+              className={styles.googleButton}
+              disabled={hasMissingRequiredField(formValues, schema)}
+              icon={<FcGoogle size={20} />}
+              onClick={handleSubmit(handleGoogleLogin)}
+              type="button"
+            >
+              {t('signup.signUpWithGoogle')}
+            </Button>
           </div>
+
+          {/* Spacer to visually match login form height */}
+          <div className={styles.formSpacer} />
         </div>
 
-        {/* Right side: Icon */}
         <div className={styles.icon}>
-          <Image alt="Login Icon" className={styles.icon} src="https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/logo384.png" />
+          <Image
+            alt="Login Icon"
+            className={styles.icon}
+            src="https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/logo384.png"
+          />
         </div>
       </Card>
 
@@ -165,5 +164,4 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
       </div>
     </div>
   );
-
 };
