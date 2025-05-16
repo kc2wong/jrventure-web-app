@@ -182,7 +182,6 @@ const useStyles = makeStyles({
   },
   dividerTitle: {
     color: tokens.colorNeutralForeground2,
-    // fontStyle: 'italic',
     marginLeft: tokens.spacingHorizontalM,
     marginRight: tokens.spacingHorizontalM,
   },
@@ -193,7 +192,6 @@ const useStyles = makeStyles({
       bottom: 0,
       left: 0,
       right: 0,
-      height: '56px', // fixed height
       backgroundColor: tokens.colorNeutralBackground1,
       borderTop: `1px solid ${tokens.colorNeutralStroke1}`,
       zIndex: 100,

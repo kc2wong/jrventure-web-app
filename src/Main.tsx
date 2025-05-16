@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { Body2, Button, makeStyles, shorthands, tokens } from '@fluentui/react-components';
@@ -32,6 +32,7 @@ import { useFormDirty } from './contexts/FormDirty';
 import { DeviceComponent } from './components/device-component';
 import { MobileSettingsPage } from './pages/setting';
 import { useNavigationHelpers } from './hooks/use-delay-navigate';
+import { useScrollDirection } from './hooks/use-scroll-direction';
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
@@ -40,8 +41,10 @@ i18next.use(initReactI18next).init({
   resources: { en: { global: languageEn }, zhHant: { global: languageZhHant } },
 });
 
+const bottomBarHeight = '56px';
+
 const useStyles = makeStyles({
-  app: { height: '100vh', display: 'flex', flexDirection: 'column' },
+  app: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
   header: {
     position: 'sticky',
     top: 0,
@@ -69,8 +72,39 @@ const useStyles = makeStyles({
   content: {
     flex: 1,
     overflowY: 'auto',
-    paddingBottom: '56px', // Give space for the bottom bar  [must be same as the height in bottom bar]    
+    height: '100vh',
+    // paddingBottom: '56px', // Give space for the bottom bar  [must be same as the height in bottom bar]
   },
+
+  spacer: {
+    height: bottomBarHeight,
+    flexShrink: 0,
+  },
+
+  bottomBarVisible: {
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: bottomBarHeight,
+    backgroundColor: tokens.colorNeutralBackground1,
+    borderTop: `1px solid ${tokens.colorNeutralStroke1}`,
+    zIndex: 100,
+    transition: 'transform 0.3s ease-in-out',
+    transform: 'translateY(0%)',
+  },
+  bottomBarHidden: {
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: bottomBarHeight,
+    backgroundColor: tokens.colorNeutralBackground1,
+    borderTop: `1px solid ${tokens.colorNeutralStroke1}`,
+    zIndex: 100,
+    transition: 'transform 0.3s ease-in-out',
+    transform: 'translateY(100%)',
+  },  
 });
 
 // TODO : Move to breadcrumb
@@ -100,6 +134,10 @@ export const BackButton = ({ onClick }: BackButtonProps) => {
 };
 
 export const Main: React.FC = () => {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const scrollDirection = useScrollDirection(contentRef);
+  const [showBottomBar, setShowBottomBar] = useState(true);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isShowBackButton, setShowBackButton] = useState(false);
 
@@ -133,6 +171,18 @@ export const Main: React.FC = () => {
       resetDirty();
     }
   };
+
+  useEffect(() => {
+    if (window.innerWidth > 600) {
+      return;
+    } // only apply on mobile
+    if (scrollDirection === 'down') {
+      setShowBottomBar(false);
+    }
+    if (scrollDirection === 'up') {
+      setShowBottomBar(true);
+    }
+  }, [scrollDirection]);
 
   return (
     <Router>
@@ -186,7 +236,7 @@ export const Main: React.FC = () => {
             <SidebarMenu collapsed={!isMenuOpen} />
           </DeviceComponent>
 
-          <main className={styles.content}>
+          <main ref={contentRef} className={styles.content}>
             <PageTransitionProvider>
               <Routes>
                 <Route element={<HomePage />} path="/" />
@@ -244,11 +294,15 @@ export const Main: React.FC = () => {
                 />
               </Routes>
             </PageTransitionProvider>
+            <div className={styles.spacer} /> {/* Reserve space for bottom bar */}
           </main>
         </div>
 
         <DeviceComponent forMobile={true}>
-          <ButtombarMenu />
+          <div className={showBottomBar ? styles.bottomBarVisible : styles.bottomBarHidden}>
+            <ButtombarMenu />
+          </div>
+          {/* <ButtombarMenu /> */}
         </DeviceComponent>
       </div>
     </Router>
