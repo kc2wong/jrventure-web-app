@@ -60,7 +60,6 @@ const useStyles = makeStyles({
   },
   headerItem: { display: 'flex', justifyContent: 'flex-start', gap: '10px' },
   // hamburger icon and breadcrumb, margeLeft needs to changed with iconWrapper and width in sidebar menu
-  headerMenu: { display: 'flex', flexDirection: 'row', gap: '20px', marginLeft: '6px' },
   headerMenu: {
     display: 'flex',
     flexDirection: 'row',
