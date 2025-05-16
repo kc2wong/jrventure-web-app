@@ -61,7 +61,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { t } = useTranslation();
   const { dispatchMessage } = useMessage();
-  const { startBreadcrumb, appendBreadcrumb } = useBreadcrumb();
+  const { useStartBreadcrumb, useAppendBreadcrumb } = useBreadcrumb();
 
   const { showConfirmationDialog } = useDialog();
   const { markDirty, resetDirty } = useFormDirty();
@@ -113,7 +113,9 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     return {
       role: getEnumValueByRawValue(UserRole, role)!,
       status: getEnumValueByRawValue(UserStatus, status)!,
-      entitledStudentId: [entitledStudentId, entitledStudentId2].map(s => emptyStringToUndefined(s)).filter(s => s !== undefined),
+      entitledStudentId: [entitledStudentId, entitledStudentId2]
+        .map((s) => emptyStringToUndefined(s))
+        .filter((s) => s !== undefined),
       ...others,
     };
   };
@@ -277,9 +279,11 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     }
   }, [studentListState]);
 
-  isToAddParentUser
-    ? startBreadcrumb('userMaintenance.titleAddParent')
-    : appendBreadcrumb('userMaintenance.titleEdit', `system.message.${mode}`);
+  useEffect(() => {
+    isToAddParentUser
+      ? useStartBreadcrumb('userMaintenance.titleAddParent')
+      : useAppendBreadcrumb('userMaintenance.titleEdit', `system.message.${mode}`);
+  }, [isToAddParentUser]);
 
   const handleNameFieldChange = (fieldName: 'name', langStr: string, value: string) => {
     const currentFieldValues = formValues[fieldName];
@@ -524,7 +528,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           <EmptyCell colSpan={2} />
         )}
 
-        {formValues.role == UserRole.PARENT  && !isToAddParentUser ? (
+        {formValues.role == UserRole.PARENT && !isToAddParentUser ? (
           <>
             <EmptyCell />
             <Controller

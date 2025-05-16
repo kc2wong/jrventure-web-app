@@ -27,7 +27,10 @@ type SettingsSection<T> = {
 const useStyles = makeStyles({
   page: {
     backgroundColor: tokens.colorNeutralBackground4,
-    minHeight: '100vh',
+    minHeight: 'calc(100vh - 56px)',
+    overflowY: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
   },
   headerTitle: {
     textAlign: 'center',

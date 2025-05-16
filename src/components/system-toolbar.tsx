@@ -47,6 +47,7 @@ import { Login } from '../models/login';
 import { useTimezone } from '../hooks/use-timezone';
 import { RoleIcon } from '../pages/user-maintenance/role-label';
 import { DeviceComponent } from './device-component';
+import { useBreadcrumb } from '../hooks/use-breadcrumb';
 
 const useStyles = makeStyles({
   toolbar: {
@@ -247,7 +248,6 @@ export const SystemToolbar = ({
   onSetTheme,
   language,
   onSetLanguage,
-  setShowBackButton,
 }: {
   theme: Theme;
   onSetTheme: (t: Theme) => void;
@@ -259,6 +259,7 @@ export const SystemToolbar = ({
   const { t } = useTranslation();
   const { login, selectedStudent } = useAtomValue(authenticationAtom);
   const { navigate } = useNavigationHelpers();
+  const { isNavgiateToParentOnly, setNavgiateToParentOnly } = useBreadcrumb();
 
   const SettingButton = () => {
     return (
@@ -266,7 +267,7 @@ export const SystemToolbar = ({
         icon={<SettingsRegular />}
         onClick={() => {
           navigate('/setting');
-          setShowBackButton(true);
+          setNavgiateToParentOnly(true);
         }}
       />
     );
@@ -280,72 +281,82 @@ export const SystemToolbar = ({
 
   return (
     <div className={styles.toolbar}>
-      <Spacer />
-      {login?.user.role === UserRole.STUDENT ? (
+      {isNavgiateToParentOnly ? (
+        <></>
+      ) : (
         <>
-          <StudentRoleInfo
-            parentUser={login?.parentUser ?? []}
-            student={login?.user.entitledStudent[0]}
-          />
           <Spacer />
+          {login?.user.role === UserRole.STUDENT ? (
+            <>
+              <StudentRoleInfo
+                parentUser={login?.parentUser ?? []}
+                student={login?.user.entitledStudent[0]}
+              />
+              <Spacer />
+            </>
+          ) : login?.user.role === UserRole.PARENT ? (
+            <>
+              <ParentRoleInfo
+                entitledStudent={login?.user.entitledStudent ?? []}
+                selectedStudent={selectedStudent}
+              />
+              <Spacer />
+            </>
+          ) : null}
+
+          <DeviceComponent forMobile={false}>
+            {login ? <ProfileButton login={login} /> : <></>}
+            <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
+              <MenuTrigger disableButtonEnhancement>
+                <Button icon={<GlobeRegular />} />
+              </MenuTrigger>
+              <MenuPopover>
+                <MenuList>
+                  <MenuItemRadio
+                    name="lang"
+                    onClick={() => onSetLanguage(Language.ENGLISH)}
+                    value="en"
+                  >
+                    {t('system.language.value.en')}
+                  </MenuItemRadio>
+                  <MenuItemRadio
+                    name="lang"
+                    onClick={() => onSetLanguage(Language.TRADITIONAL_CHINESE)}
+                    value="zhHant"
+                  >
+                    {t('system.language.value.zhHant')}
+                  </MenuItemRadio>
+                </MenuList>
+              </MenuPopover>
+            </Menu>
+
+            <Menu checkedValues={{ theme: [theme] }}>
+              <MenuTrigger disableButtonEnhancement>
+                <Button icon={themeIcons[theme]} />
+              </MenuTrigger>
+              <MenuPopover>
+                <MenuList>
+                  {(['light', 'dark', 'playful'] as Theme[]).map((th) => (
+                    <MenuItemRadio key={th} name="theme" onClick={() => onSetTheme(th)} value={th}>
+                      {t(`system.theme.value.${th}`)}
+                    </MenuItemRadio>
+                  ))}
+                </MenuList>
+              </MenuPopover>
+            </Menu>
+          </DeviceComponent>
+
+          <DeviceComponent forMobile={true}>
+            <SettingButton />
+          </DeviceComponent>
+
+          <MessageButton />
+
+          <DeviceComponent forMobile={false}>
+            <SignoutButton />
+          </DeviceComponent>
         </>
-      ) : login?.user.role === UserRole.PARENT ? (
-        <>
-          <ParentRoleInfo
-            entitledStudent={login?.user.entitledStudent ?? []}
-            selectedStudent={selectedStudent}
-          />
-          <Spacer />
-        </>
-      ) : null}
-
-      <DeviceComponent forMobile={false}>
-        {login ? <ProfileButton login={login} /> : <></>}
-        <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
-          <MenuTrigger disableButtonEnhancement>
-            <Button icon={<GlobeRegular />} />
-          </MenuTrigger>
-          <MenuPopover>
-            <MenuList>
-              <MenuItemRadio name="lang" onClick={() => onSetLanguage(Language.ENGLISH)} value="en">
-                {t('system.language.value.en')}
-              </MenuItemRadio>
-              <MenuItemRadio
-                name="lang"
-                onClick={() => onSetLanguage(Language.TRADITIONAL_CHINESE)}
-                value="zhHant"
-              >
-                {t('system.language.value.zhHant')}
-              </MenuItemRadio>
-            </MenuList>
-          </MenuPopover>
-        </Menu>
-
-        <Menu checkedValues={{ theme: [theme] }}>
-          <MenuTrigger disableButtonEnhancement>
-            <Button icon={themeIcons[theme]} />
-          </MenuTrigger>
-          <MenuPopover>
-            <MenuList>
-              {(['light', 'dark', 'playful'] as Theme[]).map((th) => (
-                <MenuItemRadio key={th} name="theme" onClick={() => onSetTheme(th)} value={th}>
-                  {t(`system.theme.value.${th}`)}
-                </MenuItemRadio>
-              ))}
-            </MenuList>
-          </MenuPopover>
-        </Menu>
-      </DeviceComponent>
-
-      <DeviceComponent forMobile={true}>
-        <SettingButton />
-      </DeviceComponent>
-
-      <MessageButton />
-
-      <DeviceComponent forMobile={false}>
-        <SignoutButton />
-      </DeviceComponent>
+      )}
     </div>
   );
 };

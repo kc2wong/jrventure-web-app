@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { cloneElement } from 'react';
 import { useAtomValue } from 'jotai';
 import { Form, Root } from '../../components/Container';
 import {
@@ -355,7 +355,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
         <ButtonPanel className={styles.buttonPanel}>
           {[backButton, ...buttons]
             .filter(Boolean)
-            .map((button, index) => React.cloneElement(button, { key: button.key || index }))}
+            .map((button, index) => cloneElement(button, { key: button.key || index }))}
         </ButtonPanel>{' '}
       </div>
     </Root>

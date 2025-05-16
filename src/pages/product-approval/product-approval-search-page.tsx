@@ -177,7 +177,7 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
   const [isDrawerOpen, setIsDrawerOpen] = useAtom(drawerOpenAtom);
   const { t } = useTranslation();
 
-  const { startBreadcrumb } = useBreadcrumb();
+  const { useStartBreadcrumb } = useBreadcrumb();
     const { dispatchMessage } = useMessage();
   const [state, action] = useAtom(productApprovalListAtom);
 
@@ -196,7 +196,9 @@ export const ProductApprovalSearchPage: React.FC<ProductApprovalSearchPageProps>
     }
   }, [state]);
 
-  startBreadcrumb('productApproval.title');
+  useEffect(() => {
+    useStartBreadcrumb('productApproval.title');
+  })
 
   const coinLabel = (value: number) => {
     return (

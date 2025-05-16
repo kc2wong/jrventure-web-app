@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Button, Caption2, makeStyles, Text, tokens } from '@fluentui/react-components';
 import { ProductDetail } from '../product/product-detail';
 import { productApprovalListAtom } from '../../states/product-approval-list';
@@ -51,12 +51,11 @@ export const ProductApprovalDetailPage: React.FC = () => {
   const styles = useStyles();
   const [state] = useAtom(productApprovalListAtom);
   const { formatDatetime } = useTimezone();
-  const { appendBreadcrumb } = useBreadcrumb();
-  // const { navigate } = useNavigationHelpers();
+  const { useAppendBreadcrumb } = useBreadcrumb();
 
-  // useAppendBreadcrumb('productApproval.titleReview', []);
-  // appendBreadcrumb(navigate, 'productApproval.titleReview', []);
-  appendBreadcrumb('productApproval.titleReview', []);
+  useEffect(() => {
+    useAppendBreadcrumb('productApproval.titleReview', []);
+  })
 
   const comments = state.selectedResult?.comments ?? [];
 

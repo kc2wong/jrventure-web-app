@@ -5,4 +5,6 @@ export const BreadcrumbContext = createContext<BreadcrumbContextType>({
   breadcrumbNavigation: [],
   startBreadcrumb: () => {},
   appendBreadcrumb: () => {},
+  isNavgiateToParentOnly: false,
+  setNavgiateToParentOnly: () => {},
 });

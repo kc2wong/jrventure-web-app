@@ -222,7 +222,7 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
   const [isDrawerOpen, setIsDrawerOpen] = useAtom(drawerOpenAtom);
   const { t } = useTranslation();
 
-  const { startBreadcrumb } = useBreadcrumb();
+  const { useStartBreadcrumb } = useBreadcrumb();
   const { dispatchMessage } = useMessage();
   const [state, action] = useAtom(userListAtom);
 
@@ -241,7 +241,9 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
     }
   }, [state]);
 
-  startBreadcrumb('userMaintenance.title');
+  useEffect(() => {
+    useStartBreadcrumb('userMaintenance.title');
+  });
 
   const NameInPreferredLanguage = ({ user }: { user: User }) => {
     return <Body1>{useNameInPreferredLanguage(user)}</Body1>;

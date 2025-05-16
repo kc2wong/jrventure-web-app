@@ -10,6 +10,7 @@ const emptyArray: string[] = [];
 
 export const BreadcrumbProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [breadcrumbPath, setBreadcrumbPath] = useState<BreadcrumbItem[]>([]);
+  const [isNavgiateToParentOnly, setNavgiateToParentOnly] = useState(false);
 
   const popPageNavigationTill = (labelKey: string, labelParam?: string[]): boolean => {
     let newPageElement: BreadcrumbItem[];
@@ -63,7 +64,6 @@ export const BreadcrumbProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const appendBreadcrumb = (path: string, labelKey: string, paramKey?: string | string[]): void => {
     const paramKeyArray = paramKey ? asArray(paramKey)! : emptyArray;
     if (!popPageNavigationTill(labelKey, paramKeyArray)) {
-      // appendPageNavigation(navigate, path, labelKey, filteredParamKeyArray);
       appendPageNavigation(path, labelKey, paramKeyArray);
     }
   };
@@ -72,6 +72,8 @@ export const BreadcrumbProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     breadcrumbNavigation: breadcrumbPath,
     startBreadcrumb,
     appendBreadcrumb,
+    isNavgiateToParentOnly,
+    setNavgiateToParentOnly
   };
 
   return <BreadcrumbContext.Provider value={value}>{children}</BreadcrumbContext.Provider>;

@@ -3,6 +3,9 @@ import {
   BreadcrumbItem as FluentUiBreadcrumbItem,
   BreadcrumbDivider,
   BreadcrumbButton,
+  Body2,
+  Button,
+  tokens,
 } from '@fluentui/react-components';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +14,8 @@ import { constructMessage } from '../utils/string-util';
 import { MenuItem } from '../models/login';
 import { getMenuItemIdByPath } from '../pages/common';
 import { useBreadcrumb } from '../hooks/use-breadcrumb';
+import { ChevronLeftRegular } from '@fluentui/react-icons';
+import { useIsMobile } from '../hooks/use-mobile';
 
 // Recursive function to find the path
 const findPath = (
@@ -38,17 +43,40 @@ type BreadcrumbNavigationProps = {
   confirmationPrompt?: (action: () => void) => void;
 };
 
+export const BackButton = () => {
+  const { setNavgiateToParentOnly } = useBreadcrumb();
+
+  const { navigate } = useNavigationHelpers();
+  return (
+    <Button
+      appearance="transparent"
+      icon={<ChevronLeftRegular color={tokens.colorBrandForeground1} fontSize={20} />}
+      onClick={() => {
+        navigate(-1, { replace: true });
+        setNavgiateToParentOnly(false);
+      }}
+      style={{
+        height: 32,
+        color: tokens.colorBrandForeground1,
+        padding: '0', // remove all internal padding
+        minWidth: 'auto', // optional: stops the button from enforcing a minimum width
+      }}
+    >
+      <Body2>Back</Body2>
+    </Button>
+  );
+};
+
 export const Breadcrumb: React.FC<BreadcrumbNavigationProps> = ({
   menuData,
   confirmationPrompt,
 }: BreadcrumbNavigationProps) => {
-  // const location = useLocation();
   const { t } = useTranslation();
   const { navigate } = useNavigationHelpers();
-  const { breadcrumbNavigation: pageNavigation } = useBreadcrumb();
+  const { isNavgiateToParentOnly, breadcrumbNavigation } = useBreadcrumb();
 
   // Check if need to prepend extra elements
-  const rootPathElement = pageNavigation[0]?.path;
+  const rootPathElement = breadcrumbNavigation[0]?.path;
   const menuItemId = rootPathElement ? getMenuItemIdByPath(rootPathElement) : undefined;
   const menuPathIds = menuItemId
     ? (findPath(menuData, menuItemId) ?? [])
@@ -58,10 +86,15 @@ export const Breadcrumb: React.FC<BreadcrumbNavigationProps> = ({
     : [];
 
   const lastBreadcrumbItem =
-    pageNavigation.length > 0
-      ? pageNavigation[pageNavigation.length - 1]
+    breadcrumbNavigation.length > 0
+      ? breadcrumbNavigation[breadcrumbNavigation.length - 1]
       : menuPathIds[menuPathIds.length - 1];
-  return (
+
+  const isMobile = useIsMobile();
+
+  return isMobile && isNavgiateToParentOnly ? (
+    <BackButton />
+  ) : (
     <FluentUiBreadcrumb aria-label="breadcrubm">
       {menuPathIds.map((id) => {
         const label = t(`system.menu.${id}`);
@@ -80,13 +113,13 @@ export const Breadcrumb: React.FC<BreadcrumbNavigationProps> = ({
           </React.Fragment>
         );
       })}
-      {pageNavigation.map((node, idx) => (
+      {breadcrumbNavigation.map((node, idx) => (
         <React.Fragment key={node.labelKey}>
           <FluentUiBreadcrumbItem>
             <BreadcrumbButton
               current={lastBreadcrumbItem === node}
               onClick={() => {
-                const delta = -(pageNavigation.length - idx - 1);
+                const delta = -(breadcrumbNavigation.length - idx - 1);
                 const navigation = () => navigate(delta);
                 if (confirmationPrompt) {
                   confirmationPrompt(navigation);

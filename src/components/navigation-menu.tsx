@@ -185,36 +185,10 @@ const useStyles = makeStyles({
     marginLeft: tokens.spacingHorizontalM,
     marginRight: tokens.spacingHorizontalM,
   },
-
-  bottomBar: {
-    bottomBar: {
-      position: 'fixed',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: tokens.colorNeutralBackground1,
-      borderTop: `1px solid ${tokens.colorNeutralStroke1}`,
-      zIndex: 100,
-      display: 'flex',
-      justifyContent: 'space-around',
-      alignItems: 'center',
-    },
-  },
-  tabButton: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    fontSize: tokens.fontSizeBase300,
-    color: tokens.colorNeutralForeground2,
-    cursor: 'pointer',
-    '&:hover': {
-      color: tokens.colorBrandForeground1,
-    },
-  },
-    
   tabList: {
-    justifyContent: 'space-around',
-    padding: '0',
+    justifyContent: 'space-between',
+    marginLeft: tokens.spacingHorizontalXXL,
+    marginRight: tokens.spacingHorizontalXXL,
     height: '56px', // Adjust height here
   },
   tab: {
@@ -223,7 +197,6 @@ const useStyles = makeStyles({
     height: '100%',
     minWidth: '48px', // Optional: control tab width
   },
-
   tabContentWrapper: {
     display: 'flex',
     flexDirection: 'column',
@@ -231,7 +204,6 @@ const useStyles = makeStyles({
     paddingTop: '4px',
     position: 'relative',
   },
-
   icon: {
     fontSize: '24px',
     marginBottom: '2px',
@@ -327,7 +299,6 @@ export const SidebarMenu = ({ collapsed }: SidebarMenuProps) => {
 
           const menuItem = (
             <MenuItem
-              key={item.label}
               collapsed={collapsed}
               icon={item.icon}
               label={item.label}
@@ -336,9 +307,12 @@ export const SidebarMenu = ({ collapsed }: SidebarMenuProps) => {
           );
 
           return item.roles ? (
-            <RoleBaseComponent entitledRole={item.roles}>{menuItem}</RoleBaseComponent>
+            <RoleBaseComponent key={item.id} entitledRole={item.roles}>
+              {menuItem}
+            </RoleBaseComponent>
           ) : (
-            menuItem
+            // menuItem
+            cloneElement(menuItem, { key: item.id })
           );
         })}
     </div>
@@ -375,34 +349,32 @@ export const ButtombarMenu = () => {
   const styles = useStyles();
 
   return (
-    <div className={styles.bottomBar}>
-      <TabList
-        appearance="transparent"
-        className={styles.tabList}
-        defaultSelectedValue="home"
-        size="large"
-      >
-        {navigationMenu
-          .filter(isMenuItem)
-          .filter((item) => item.showInBottomBar)
-          .map((item) => {
-            const menuItem = (
-              <ButtombarMenuItem
-                key={`${item.id}_1`}
-                icon={item.icon}
-                label={item.label}
-                path={item.path}
-              />
-            );
-            return item.roles ? (
-              <RoleBaseComponent key={item.id} entitledRole={item.roles}>
-                {menuItem}
-              </RoleBaseComponent>
-            ) : (
-              cloneElement(menuItem, { key: item.id })
-            );
-          })}
-      </TabList>
-    </div>
+    <TabList
+      appearance="transparent"
+      className={styles.tabList}
+      defaultSelectedValue="home"
+      size="large"
+    >
+      {navigationMenu
+        .filter(isMenuItem)
+        .filter((item) => item.showInBottomBar)
+        .map((item) => {
+          const menuItem = (
+            <ButtombarMenuItem
+              key={`${item.id}_1`}
+              icon={item.icon}
+              label={item.label}
+              path={item.path}
+            />
+          );
+          return item.roles ? (
+            <RoleBaseComponent key={item.id} entitledRole={item.roles}>
+              {menuItem}
+            </RoleBaseComponent>
+          ) : (
+            cloneElement(menuItem, { key: item.id })
+          );
+        })}
+    </TabList>
   );
 };

@@ -6,6 +6,8 @@ export type BreadcrumbItem = {
 
 export interface BreadcrumbContextType {
   breadcrumbNavigation: BreadcrumbItem[];
+  isNavgiateToParentOnly: boolean;
+  setNavgiateToParentOnly: (value: boolean) => void,
   startBreadcrumb: (path: string, labelKey: string, paramKey?: string | string[]) => void;
   appendBreadcrumb: (path: string, labelKey: string, paramKey?: string | string[]) => void;
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { Body2, Button, makeStyles, shorthands, tokens } from '@fluentui/react-components';
 import { SystemToolbar } from './components/system-toolbar';
@@ -33,6 +33,7 @@ import { DeviceComponent } from './components/device-component';
 import { MobileSettingsPage } from './pages/setting';
 import { useNavigationHelpers } from './hooks/use-delay-navigate';
 import { useScrollDirection } from './hooks/use-scroll-direction';
+import { useIsMobile } from './hooks/use-mobile';
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
@@ -46,7 +47,7 @@ const bottomBarHeight = '56px';
 const useStyles = makeStyles({
   app: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
   header: {
-    position: 'sticky',
+    // position: 'sticky',
     top: 0,
     zIndex: 100,
     backgroundColor: tokens.colorNeutralBackground1,
@@ -73,7 +74,6 @@ const useStyles = makeStyles({
     flex: 1,
     overflowY: 'auto',
     height: '100vh',
-    // paddingBottom: '56px', // Give space for the bottom bar  [must be same as the height in bottom bar]
   },
 
   spacer: {
@@ -104,7 +104,7 @@ const useStyles = makeStyles({
     zIndex: 100,
     transition: 'transform 0.3s ease-in-out',
     transform: 'translateY(100%)',
-  },  
+  },
 });
 
 // TODO : Move to breadcrumb
@@ -139,7 +139,6 @@ export const Main: React.FC = () => {
   const [showBottomBar, setShowBottomBar] = useState(true);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isShowBackButton, setShowBackButton] = useState(false);
 
   const styles = useStyles();
   const { i18n } = useTranslation();
@@ -147,6 +146,7 @@ export const Main: React.FC = () => {
   const login = useAtomValue(authenticationAtom).login;
   const { isDirty, resetDirty } = useFormDirty();
   const { showDiscardChangeDialog } = useDialog();
+  const isMobile = useIsMobile();
 
   const selectedLanguage = i18n.language === 'en' ? Language.ENGLISH : Language.TRADITIONAL_CHINESE;
 
@@ -173,19 +173,19 @@ export const Main: React.FC = () => {
   };
 
   useEffect(() => {
-    if (window.innerWidth > 600) {
-      return;
-    } // only apply on mobile
-    if (scrollDirection === 'down') {
-      setShowBottomBar(false);
+    // only apply on mobile
+    if (isMobile) {
+      if (scrollDirection === 'down') {
+        setShowBottomBar(false);
+      }
+      if (scrollDirection === 'up') {
+        setShowBottomBar(true);
+      }
     }
-    if (scrollDirection === 'up') {
-      setShowBottomBar(true);
-    }
-  }, [scrollDirection]);
+  }, [isMobile, scrollDirection]);
 
   return (
-    <Router>
+    <BrowserRouter>
       <div className={styles.app}>
         <header className={styles.header}>
           <div className={styles.headerMenu}>
@@ -199,36 +199,25 @@ export const Main: React.FC = () => {
                 />
               </DeviceComponent>
             )}
-            {isShowBackButton && (
-              <DeviceComponent forMobile={true}>
-                <BackButton onClick={() => setShowBackButton(false)} />
-              </DeviceComponent>
-            )}
-            {menuData && !isShowBackButton && (
-              <Breadcrumb confirmationPrompt={confirmationPrompt} menuData={menuData} />
-            )}
+            {menuData && <Breadcrumb confirmationPrompt={confirmationPrompt} menuData={menuData} />}
           </div>
-          {!isShowBackButton && (
-            <>
-              <div className={styles.headerItem}>
-                <SystemToolbar
-                  language={
-                    selectedLanguage === Language.ENGLISH
-                      ? Language.ENGLISH
-                      : Language.TRADITIONAL_CHINESE
-                  }
-                  onSetLanguage={(value) => {
-                    i18n.changeLanguage(value === Language.TRADITIONAL_CHINESE ? 'zhHant' : 'en');
-                  }}
-                  onSetTheme={(theme) => {
-                    setTheme(theme);
-                  }}
-                  setShowBackButton={(v) => setShowBackButton(v)}
-                  theme={['light', 'dark', 'playful'].includes(theme) ? theme : 'light'}
-                />
-              </div>
-            </>
-          )}
+          <div className={styles.headerItem}>
+            <SystemToolbar
+              language={
+                selectedLanguage === Language.ENGLISH
+                  ? Language.ENGLISH
+                  : Language.TRADITIONAL_CHINESE
+              }
+              onSetLanguage={(value) => {
+                i18n.changeLanguage(value === Language.TRADITIONAL_CHINESE ? 'zhHant' : 'en');
+              }}
+              onSetTheme={(theme) => {
+                setTheme(theme);
+              }}
+              setShowBackButton={() => {}}
+              theme={['light', 'dark', 'playful'].includes(theme) ? theme : 'light'}
+            />
+          </div>
         </header>
 
         <div className={styles.body}>
@@ -302,9 +291,8 @@ export const Main: React.FC = () => {
           <div className={showBottomBar ? styles.bottomBarVisible : styles.bottomBarHidden}>
             <ButtombarMenu />
           </div>
-          {/* <ButtombarMenu /> */}
         </DeviceComponent>
       </div>
-    </Router>
+    </BrowserRouter>
   );
 };

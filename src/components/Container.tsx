@@ -16,6 +16,9 @@ const useStyles = makeStyles({
     ...shorthands.overflow('hidden'),
     display: 'flex',
     // height: '100vh',
+    '@media (max-width: 600px)': {
+      minHeight: 'calc(100vh - 56px)', // adjust 56px if your bottom bar height changes
+    },
     ...shorthands.flex(1),
     margin: `0 ${tokens.spacingHorizontalXXL} 0 ${tokens.spacingHorizontalXXL}`,
   },
@@ -67,9 +70,15 @@ type FormProps = {
   children: ReactElement | ReactElement[];
 };
 
-export const Root: React.FC<{ children: ReactElement | ReactElement[] }> = ({ children }) => {
+export const Root: React.FC<{
+  children: ReactElement | ReactElement[];
+}> = ({ children }) => {
   const styles = useStyles();
-  return <div className={styles.root}>{children}</div>;
+  return (
+    <div className={styles.root}>
+      {children}
+    </div>
+  );
 };
 
 export const Form: React.FC<FormProps> = ({
