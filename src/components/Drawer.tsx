@@ -6,13 +6,20 @@ import {
   DrawerHeaderTitle,
   InlineDrawer,
   makeStyles,
+  OverlayDrawer,
 } from '@fluentui/react-components';
 import { Dismiss24Regular, EraserRegular, SearchRegular } from '@fluentui/react-icons';
 import { ReactElement } from 'react';
 import { Form } from './Container';
+import { useIsMobile } from '../hooks/use-mobile';
 
 const useStylesDrawer = makeStyles({
-  drawerSupplementInfo: { maxWidth: '40vw' },
+  drawerSupplementInfo: {
+    maxWidth: '40vw',
+    '@media (max-width: 600px)': {
+      maxWidth: '100vw',
+    },
+  },
   drawerSsearchCriteria: { minWidth: '400px', maxWidth: '25vw' },
 });
 
@@ -36,24 +43,36 @@ const DrawerComponent: React.FC<DrawerComponentProps> = ({
   className,
 }) => {
   const styles = noPadding ? { paddingLeft: 'unset', paddingTop: '6px' } : { paddingTop: '6px' };
-  return (
-    <InlineDrawer className={className} open={isOpen} position={position} separator size="large">
-      <DrawerHeader style={styles}>
-        <DrawerHeaderTitle
-          action={
-            <Button
-              appearance="subtle"
-              aria-label="Close"
-              icon={<Dismiss24Regular />}
-              onClick={onClose}
-            />
-          }
-        >
-          {title}
-        </DrawerHeaderTitle>
-      </DrawerHeader>
+  const isMobile = useIsMobile();
 
-      <DrawerBody style={styles}>{children}</DrawerBody>
+  const drawerHeader = (
+    <DrawerHeader style={styles}>
+      <DrawerHeaderTitle
+        action={
+          <Button
+            appearance="subtle"
+            aria-label="Close"
+            icon={<Dismiss24Regular />}
+            onClick={onClose}
+          />
+        }
+      >
+        {title}
+      </DrawerHeaderTitle>
+    </DrawerHeader>
+  );
+  const drawerBody = <DrawerBody style={styles}>{children}</DrawerBody>;
+
+  return isMobile ? (
+    // For mobile, must pop from bottom
+    <OverlayDrawer className={className} open={isOpen} position="bottom" size="small">
+      {drawerHeader}
+      {drawerBody}
+    </OverlayDrawer>
+  ) : (
+    <InlineDrawer className={className} open={isOpen} position={position} separator size="large">
+      {drawerHeader}
+      {drawerBody}
     </InlineDrawer>
   );
 };
@@ -113,7 +132,6 @@ type DetailEditingDrawerProps = {
   isOpen: boolean;
   onCloseDrawer: () => void;
   title: string;
-  t: TFunction;
 };
 
 export const DetailEditingDrawer: React.FC<DetailEditingDrawerProps> = ({

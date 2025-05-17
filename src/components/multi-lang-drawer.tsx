@@ -61,7 +61,7 @@ export const MultiLangDrawer = ({
   });
 
   return (
-    <DetailEditingDrawer isOpen={isOpen} onCloseDrawer={onDrawerClose} t={t} title={title}>
+    <DetailEditingDrawer isOpen={isOpen} onCloseDrawer={onDrawerClose} title={title}>
       <Form numColumn={1}>
         {Object.values([Language.ENGLISH, Language.TRADITIONAL_CHINESE]).map((lang) => (
           <Field
