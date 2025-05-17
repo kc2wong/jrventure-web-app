@@ -44,6 +44,7 @@ type BreadcrumbNavigationProps = {
 };
 
 export const BackButton = () => {
+  const { t } = useTranslation();
   const { setNavgiateToParentOnly } = useBreadcrumb();
 
   const { navigate } = useNavigationHelpers();
@@ -62,7 +63,7 @@ export const BackButton = () => {
         minWidth: 'auto', // optional: stops the button from enforcing a minimum width
       }}
     >
-      <Body2>Back</Body2>
+      <Body2>{t('system.message.back')}</Body2>
     </Button>
   );
 };

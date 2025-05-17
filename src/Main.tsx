@@ -214,7 +214,6 @@ export const Main: React.FC = () => {
               onSetTheme={(theme) => {
                 setTheme(theme);
               }}
-              setShowBackButton={() => {}}
               theme={['light', 'dark', 'playful'].includes(theme) ? theme : 'light'}
             />
           </div>

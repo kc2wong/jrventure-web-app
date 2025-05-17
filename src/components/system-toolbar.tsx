@@ -253,13 +253,13 @@ export const SystemToolbar = ({
   onSetTheme: (t: Theme) => void;
   language: Language;
   onSetLanguage: (l: Language) => void;
-  setShowBackButton: (toShow: boolean) => void;
+  // setShowBackButton: (toShow: boolean) => void;
 }) => {
   const styles = useStyles();
   const { t } = useTranslation();
   const { login, selectedStudent } = useAtomValue(authenticationAtom);
   const { navigate } = useNavigationHelpers();
-  const { isNavgiateToParentOnly, setNavgiateToParentOnly } = useBreadcrumb();
+  const { isNavgiateToParentOnly } = useBreadcrumb();
 
   const SettingButton = () => {
     return (
@@ -267,7 +267,6 @@ export const SystemToolbar = ({
         icon={<SettingsRegular />}
         onClick={() => {
           navigate('/setting');
-          setNavgiateToParentOnly(true);
         }}
       />
     );

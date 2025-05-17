@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles, tokens, Text, Subtitle2, Subtitle1 } from '@fluentui/react-components';
 import {
   BalloonRegular,
@@ -9,6 +9,7 @@ import {
 import { Theme } from '../contexts/Theme';
 import { Language } from '../models/openapi';
 import { useTranslation } from 'react-i18next';
+import { useBreadcrumb } from '../hooks/use-breadcrumb';
 
 type SettingOption<T> = {
   label: string;
@@ -71,6 +72,11 @@ export const MobileSettingsPage: React.FC<{
 }> = ({ theme, onSetTheme, language, onSetLanguage }) => {
   const styles = useStyles();
   const { t } = useTranslation();
+  const { setNavgiateToParentOnly } = useBreadcrumb();
+
+  useEffect(() => {
+    setNavgiateToParentOnly(true);
+  }, []);
 
   const themeIcons: Record<Theme, JSX.Element> = {
     light: <WeatherSunnyRegular fontSize={24} />,
