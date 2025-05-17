@@ -14,7 +14,7 @@ import { constructMessage } from '../utils/string-util';
 import { MenuItem } from '../models/login';
 import { getMenuItemIdByPath } from '../pages/common';
 import { useBreadcrumb } from '../hooks/use-breadcrumb';
-import { ChevronLeftRegular } from '@fluentui/react-icons';
+import { ChevronLeftRegular, CookiesRegular } from '@fluentui/react-icons';
 import { useIsMobile } from '../hooks/use-mobile';
 
 // Recursive function to find the path
@@ -93,8 +93,12 @@ export const Breadcrumb: React.FC<BreadcrumbNavigationProps> = ({
 
   const isMobile = useIsMobile();
 
-  return isMobile && isNavgiateToParentOnly ? (
-    <BackButton />
+  return isMobile ? (
+    isNavgiateToParentOnly ? (
+      <BackButton />
+    ) : (
+      <CookiesRegular fontSize={24}/>
+    )
   ) : (
     <FluentUiBreadcrumb aria-label="breadcrubm">
       {menuPathIds.map((id) => {

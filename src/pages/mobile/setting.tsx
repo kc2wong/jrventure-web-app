@@ -6,10 +6,11 @@ import {
   DarkThemeRegular,
   WeatherSunnyRegular,
 } from '@fluentui/react-icons';
-import { Theme } from '../contexts/Theme';
-import { Language } from '../models/openapi';
+import { Theme } from '../../contexts/Theme';
+import { Language } from '../../models/openapi';
 import { useTranslation } from 'react-i18next';
-import { useBreadcrumb } from '../hooks/use-breadcrumb';
+import { useBreadcrumb } from '../../hooks/use-breadcrumb';
+import { MobileRoot } from '../../components/Container';
 
 type SettingOption<T> = {
   label: string;
@@ -26,9 +27,7 @@ type SettingsSection<T> = {
 };
 
 const useStyles = makeStyles({
-  page: {
-    backgroundColor: tokens.colorNeutralBackground4,
-    minHeight: 'calc(100vh - 56px)',
+  content: {
     overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
@@ -52,7 +51,7 @@ const useStyles = makeStyles({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalXL}`,
-    backgroundColor: tokens.colorNeutralBackground1,
+    backgroundColor: tokens.colorNeutralBackground3,
     borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
     cursor: 'pointer',
     ':last-child': {
@@ -113,46 +112,48 @@ export const MobileSettingsPage: React.FC<{
   const sections: SettingsSection<any>[] = [themeSection, languageSection];
 
   return (
-    <div className={styles.page}>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <Subtitle1 className={styles.headerTitle}>Setting</Subtitle1>
-      </div>
-      {sections.map((section) => (
-        <div
-          key={section.key}
-          style={{ display: 'flex', flexDirection: 'column', marginBottom: '10px' }}
-        >
-          <Subtitle2 className={styles.sectionTitle}>{section.title}</Subtitle2>
-          <div className={styles.sectionGroup}>
-            {section.options.map((option) => (
-              <div
-                key={option.value}
-                className={styles.row}
-                onClick={() => section.onSelect(option.value)}
-              >
-                {option.icon ? (
-                  <div
-                    style={{
-                      gap: tokens.spacingHorizontalXS,
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {option.icon}
-                    <Text>{option.label}</Text>
-                  </div>
-                ) : (
-                  <div>
-                    <Text>{option.label}</Text>
-                  </div>
-                )}
-                {section.selectedValue === option.value && <Checkmark24Regular />}
-              </div>
-            ))}
-          </div>
+    <MobileRoot>
+      <div className={styles.content}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Subtitle1 className={styles.headerTitle}>Setting</Subtitle1>
         </div>
-      ))}
-    </div>
+        {sections.map((section) => (
+          <div
+            key={section.key}
+            style={{ display: 'flex', flexDirection: 'column', marginBottom: '10px' }}
+          >
+            <Subtitle2 className={styles.sectionTitle}>{section.title}</Subtitle2>
+            <div className={styles.sectionGroup}>
+              {section.options.map((option) => (
+                <div
+                  key={option.value}
+                  className={styles.row}
+                  onClick={() => section.onSelect(option.value)}
+                >
+                  {option.icon ? (
+                    <div
+                      style={{
+                        gap: tokens.spacingHorizontalXS,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      {option.icon}
+                      <Text>{option.label}</Text>
+                    </div>
+                  ) : (
+                    <div>
+                      <Text>{option.label}</Text>
+                    </div>
+                  )}
+                  {section.selectedValue === option.value && <Checkmark24Regular />}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </MobileRoot>
   );
 };

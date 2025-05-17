@@ -15,12 +15,16 @@ const useStyles = makeStyles({
   root: {
     ...shorthands.overflow('hidden'),
     display: 'flex',
-    // height: '100vh',
     '@media (max-width: 600px)': {
       minHeight: 'calc(100vh - 56px)', // adjust 56px if your bottom bar height changes
     },
     ...shorthands.flex(1),
     margin: `0 ${tokens.spacingHorizontalXXL} 0 ${tokens.spacingHorizontalXXL}`,
+  },
+  mobileRoot: {
+    '@media (max-width: 600px)': {
+      minHeight: 'calc(100vh - 56px)', // adjust 56px if your bottom bar height changes
+    },
   },
   titleBar: {
     display: 'flex',
@@ -35,11 +39,19 @@ const useStyles = makeStyles({
     display: 'grid',
     columnGap: '15px',
     width: '100%',
+    '@media (max-width: 600px)': {
+      display: 'flex',
+      flexDirection: 'column',
+    },
   },
   buttonPanel: {
     display: 'flex',
     justifyContent: 'flex-end',
     gap: '10px',
+    '@media (max-width: 600px)': {
+      gap: '20px',
+      flexDirection: 'column',
+    },
   },
   columnTwo: {
     gridTemplateColumns: 'repeat(2, 1fr)',
@@ -74,11 +86,14 @@ export const Root: React.FC<{
   children: ReactElement | ReactElement[];
 }> = ({ children }) => {
   const styles = useStyles();
-  return (
-    <div className={styles.root}>
-      {children}
-    </div>
-  );
+  return <div className={styles.root}>{children}</div>;
+};
+
+export const MobileRoot: React.FC<{
+  children: ReactElement | ReactElement[];
+}> = ({ children }) => {
+  const styles = useStyles();
+  return <div className={styles.mobileRoot}>{children}</div>;
 };
 
 export const Form: React.FC<FormProps> = ({

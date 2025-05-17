@@ -30,10 +30,12 @@ import { ProductApprovalPage } from './pages/product-approval/product-approval-p
 import { useDialog } from './hooks/use-dialog';
 import { useFormDirty } from './contexts/FormDirty';
 import { DeviceComponent } from './components/device-component';
-import { MobileSettingsPage } from './pages/setting';
+import { MobileSettingsPage } from './pages/mobile/setting';
 import { useNavigationHelpers } from './hooks/use-delay-navigate';
 import { useScrollDirection } from './hooks/use-scroll-direction';
 import { useIsMobile } from './hooks/use-mobile';
+import { MobileUserProfilePage } from './pages/mobile/profile';
+import { MobileParentUserPage } from './pages/mobile/parent-user';
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
@@ -280,6 +282,8 @@ export const Main: React.FC = () => {
                   }
                   path="/setting"
                 />
+                <Route element={<MobileUserProfilePage />} path="/profile" />
+                <Route element={<MobileParentUserPage />} path="/parent" />
               </Routes>
             </PageTransitionProvider>
             <div className={styles.spacer} /> {/* Reserve space for bottom bar */}

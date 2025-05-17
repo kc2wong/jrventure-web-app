@@ -58,6 +58,7 @@ export const BreadcrumbProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (!popPageNavigationTill(labelKey)) {
       const paramKeyArray = paramKey ? asArray(paramKey)! : emptyArray;
       startPageNavigation(path, labelKey, paramKeyArray);
+      setNavgiateToParentOnly(false);
     }
   };
 

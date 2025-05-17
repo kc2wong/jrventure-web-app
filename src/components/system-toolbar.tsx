@@ -21,9 +21,6 @@ import {
 import {
   BalloonRegular,
   BookRegular,
-  CheckmarkRegular,
-  DismissRegular,
-  DoorArrowLeftRegular,
   GlobeRegular,
   MailUnreadRegular,
   PeopleAddRegular,
@@ -35,11 +32,8 @@ import React, { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Language, Student, UserRole } from '../models/openapi';
 import { Theme } from '../contexts/Theme';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useFormDirty } from '../contexts/FormDirty';
+import { useAtom, useAtomValue } from 'jotai';
 import { authenticationAtom } from '../states/authentication';
-import { useDialog } from '../hooks/use-dialog';
-import { useMessage } from '../hooks/use-message';
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { SimpleUser } from '../__generated__/linkedup-web-api-client';
 import { useNameInPreferredLanguage } from '../hooks/use-preferred-language';
@@ -48,6 +42,8 @@ import { useTimezone } from '../hooks/use-timezone';
 import { RoleIcon } from '../pages/user-maintenance/role-label';
 import { DeviceComponent } from './device-component';
 import { useBreadcrumb } from '../hooks/use-breadcrumb';
+import { useIsMobile } from '../hooks/use-mobile';
+import { SignoutButton } from './signout-button';
 
 const useStyles = makeStyles({
   toolbar: {
@@ -58,6 +54,31 @@ const useStyles = makeStyles({
     minHeight: '32px',
   },
   divider: { width: '8px' },
+  classStudentWrapper: {
+    display: 'flex', 
+    flexDirection: 'row',
+    '@media (max-width: 600px)': {
+      flexDirection: 'column',
+    },
+  },
+  classStudent: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: tokens.spacingHorizontalS,
+    minWidth: '80px',
+    '@media (max-width: 600px)': {
+      maxWidth: '80px', // or set a width depending on layout
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      display: 'block',
+      fontSize: '12px',
+      margin: '2px',
+      lineHeight: 1,
+    },
+    cursor: 'pointer',
+    margin: '4px',
+  },
 });
 
 const Spacer: React.FC = () => {
@@ -67,25 +88,30 @@ const Spacer: React.FC = () => {
 
 const AvatarInfo = forwardRef<
   HTMLDivElement,
-  { student: Student } & React.HTMLAttributes<HTMLDivElement>
->(({ student, ...rest }, ref) => (
-  <div
-    ref={ref}
-    {...rest}
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: tokens.spacingHorizontalS,
-      minWidth: '150px',
-      cursor: 'pointer',
-      margin: '4px',
-    }}
-  >
-    <BookRegular fontSize={24} />
-    <Label style={{ width: 50 }}>{`${student.classId}-${student.studentNumber}`}</Label>
-    <Label>{useNameInPreferredLanguage(student)}</Label>
-  </div>
-));
+  { student: Student; onClick?: () => void } & React.HTMLAttributes<HTMLDivElement>
+>(({ student, onClick, ...rest }, ref) => {
+  const styles = useStyles();
+  return (
+    <div
+      ref={ref}
+      onClick={onClick}
+      {...rest}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+        gap: tokens.spacingHorizontalXXS,
+        cursor: 'pointer',
+      }}
+    >
+      <BookRegular fontSize={24} />
+      <div className={styles.classStudentWrapper}>
+        <Label className={styles.classStudent}>{`${student.classId}-${student.studentNumber}`}</Label>
+        <Label className={styles.classStudent}>{useNameInPreferredLanguage(student)}</Label>
+      </div>
+    </div>
+  );
+});
 
 const ParentRoleInfo = ({
   entitledStudent,
@@ -142,13 +168,22 @@ const StudentRoleInfo = ({
   student?: Student;
 }) => {
   const { t } = useTranslation();
-  const { navigateWithSpinner } = useNavigationHelpers();
+  const { navigate, navigateWithSpinner } = useNavigationHelpers();
+  const isMobile = useIsMobile();
   const [isPopupOpen, setPopupOpen] = useState(false);
+
   if (!student) {
     return null;
   }
 
-  return (
+  return isMobile ? (
+    <AvatarInfo
+      onClick={() => {
+        navigate('/parent');
+      }}
+      student={student}
+    />
+  ) : (
     <Popover onOpenChange={(_, data) => setPopupOpen(data.open)} open={isPopupOpen} withArrow>
       <PopoverTrigger disableButtonEnhancement>
         <AvatarInfo student={student} />
@@ -181,10 +216,23 @@ const StudentRoleInfo = ({
 const MessageButton = () => <Button icon={<MailUnreadRegular />} />;
 
 const ProfileButton = ({ login }: { login: Login }) => {
+  const { navigate } = useNavigationHelpers();
   const { t } = useTranslation();
   const { formatDatetime } = useTimezone();
+  const isMobile = useIsMobile();
   const name = useNameInPreferredLanguage(login.user);
-  return (
+
+  return isMobile ? (
+    <Avatar
+      color="brand"
+      name={name}
+      onClick={() => {
+        navigate('/profile');
+      }}
+      shape="square"
+      size={32}
+    />
+  ) : (
     <Popover withArrow>
       <PopoverTrigger disableButtonEnhancement>
         <Avatar color="brand" name={name} shape="square" size={32} />
@@ -202,47 +250,6 @@ const ProfileButton = ({ login }: { login: Login }) => {
   );
 };
 
-const SignoutButton = () => {
-  const action = useSetAtom(authenticationAtom);
-  const { t } = useTranslation();
-  const { showConfirmationDialog } = useDialog();
-  const { isDirty } = useFormDirty();
-  const { showSpinner, stopSpinner } = useMessage();
-  const { navigateWithSpinner } = useNavigationHelpers();
-
-  const confirmAndSignOut = () => {
-    showSpinner();
-    setTimeout(() => {
-      stopSpinner();
-      action({ signOut: {} });
-      navigateWithSpinner('/');
-    }, 500);
-  };
-
-  return (
-    <Button
-      icon={<DoorArrowLeftRegular />}
-      onClick={() =>
-        showConfirmationDialog({
-          confirmType: t('system.message.signOut'),
-          message: isDirty()
-            ? t('userProfile.discardChangeAndSignOut')
-            : t('userProfile.doYouWantToSignOut'),
-          primaryButton: {
-            label: t('userProfile.signOut'),
-            icon: <CheckmarkRegular />,
-            action: confirmAndSignOut,
-          },
-          secondaryButton: {
-            label: t('system.message.cancel'),
-            icon: <DismissRegular />,
-          },
-        })
-      }
-    />
-  );
-};
-
 export const SystemToolbar = ({
   theme,
   onSetTheme,
@@ -253,7 +260,6 @@ export const SystemToolbar = ({
   onSetTheme: (t: Theme) => void;
   language: Language;
   onSetLanguage: (l: Language) => void;
-  // setShowBackButton: (toShow: boolean) => void;
 }) => {
   const styles = useStyles();
   const { t } = useTranslation();
@@ -303,8 +309,9 @@ export const SystemToolbar = ({
             </>
           ) : null}
 
+          {login ? <ProfileButton login={login} /> : <></>}
+
           <DeviceComponent forMobile={false}>
-            {login ? <ProfileButton login={login} /> : <></>}
             <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
               <MenuTrigger disableButtonEnhancement>
                 <Button icon={<GlobeRegular />} />
@@ -352,7 +359,7 @@ export const SystemToolbar = ({
           <MessageButton />
 
           <DeviceComponent forMobile={false}>
-            <SignoutButton />
+            <SignoutButton showCaption={false} />
           </DeviceComponent>
         </>
       )}
