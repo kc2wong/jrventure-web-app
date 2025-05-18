@@ -96,8 +96,10 @@ export const Breadcrumb: React.FC<BreadcrumbNavigationProps> = ({
   return isMobile ? (
     isNavgiateToParentOnly ? (
       <BackButton />
+    ) : breadcrumbNavigation.length > 1 ? (
+      <CookiesRegular fontSize={24} />
     ) : (
-      <CookiesRegular fontSize={24}/>
+      <></>
     )
   ) : (
     <FluentUiBreadcrumb aria-label="breadcrubm">

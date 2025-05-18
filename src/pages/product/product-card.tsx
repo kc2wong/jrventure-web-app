@@ -22,20 +22,6 @@ import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
 import { shopAtom } from '../../states/student-shop';
 
 const useStyles = makeStyles({
-  main: {
-    gap: '16px',
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-  },
-
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '24px',
-    padding: tokens.spacingHorizontalXXL,
-  },
-
   dropdown: {
     width: '120px',
   },
@@ -60,20 +46,25 @@ const useStyles = makeStyles({
     flexWrap: 'wrap',
   },
 
-  pagination: {
-    display: 'flex',
-    gap: '6px',
-    flexWrap: 'wrap',
-  },
-
   card: {
     width: '240px',
+    '@media (max-width: 600px)': {
+      width: '43vw',
+    },
     maxWidth: '100%',
     height: 'fit-content',
   },
 
   caption: {
     color: tokens.colorNeutralForeground3,
+
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    lineHeight: tokens.lineHeightBase300, // Approximate line height
+    minHeight: `calc(${tokens.lineHeightBase300} * 2)`, // Reserve space for 2 lines
   },
 
   flex: {
@@ -101,10 +92,16 @@ const useStyles = makeStyles({
   },
 });
 
+export const DummpProductCard: React.FC<{}> = () => {
+  const styles = useStyles();
+  return <div className={styles.card} />;
+};
+
 export const ProductCard: React.FC<{
   product: Product;
+  onSelectedForView: (product: Product) => string;
   editAction?: () => void;
-}> = ({ product, editAction }) => {
+}> = ({ product, onSelectedForView: viewLink, editAction }) => {
   const [, action] = useAtom(shopAtom);
   const styles = useStyles();
   const { navigate } = useNavigationHelpers();
@@ -127,13 +124,16 @@ export const ProductCard: React.FC<{
       </div>
       <Card
         className={styles.card}
+        // onClick={() => viewAction(product)}
         onClick={() => {
           action({ select: { product } });
           setTimeout(() => {
-            navigate(`/market/${product.id}/${editAction ? 'edit' : 'view'}`);
+            // navigate(`/market/${product.id}/${editAction ? 'edit' : 'view'}`, {
+            //   state: product,
+            // });
+            navigate(viewLink(product));
           });
         }}
-        // selected={selected}
       >
         <CardPreview className={styles.grayBackground}>
           <Image

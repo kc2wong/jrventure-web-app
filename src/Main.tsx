@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import { Body2, Button, makeStyles, shorthands, tokens } from '@fluentui/react-components';
+import { Button, makeStyles, shorthands, tokens } from '@fluentui/react-components';
 import { SystemToolbar } from './components/system-toolbar';
 
 import languageEn from './i18n/en/language.json';
@@ -17,25 +17,20 @@ import HomePage from './pages/home-page';
 import { UserMaintenancePage } from './pages/user-maintenance/user-maintenance-page';
 import { Breadcrumb } from './components/breadcrumb';
 import { ButtombarMenu, SidebarMenu } from './components/navigation-menu';
-import {
-  ArrowLeftFilled,
-  ChevronLeftRegular,
-  HeartRegular,
-  RowTripleFilled,
-} from '@fluentui/react-icons';
+import { ArrowLeftFilled, RowTripleFilled } from '@fluentui/react-icons';
 import { MarketPlaceShowcase } from './pages/market/market-place';
-import { ProductDetail } from './pages/product/product-detail';
-import { StudentShopPage } from './pages/market/student-shop-page';
+import { StudentShopPage } from './pages/market/student-shop';
 import { ProductApprovalPage } from './pages/product-approval/product-approval-page';
 import { useDialog } from './hooks/use-dialog';
 import { useFormDirty } from './contexts/FormDirty';
 import { DeviceComponent } from './components/device-component';
 import { MobileSettingsPage } from './pages/mobile/setting';
-import { useNavigationHelpers } from './hooks/use-delay-navigate';
 import { useScrollDirection } from './hooks/use-scroll-direction';
 import { useIsMobile } from './hooks/use-mobile';
 import { MobileUserProfilePage } from './pages/mobile/profile';
-import { MobileParentUserPage } from './pages/mobile/parent-user';
+import { MobileParentUserPage } from './pages/mobile/parent';
+import { MarketPlaceProductDetail } from './pages/market/market-place-product-detail';
+import { StudentShoproductDetail } from './pages/market/student-shop-product-detail';
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
@@ -109,32 +104,6 @@ const useStyles = makeStyles({
   },
 });
 
-// TODO : Move to breadcrumb
-type BackButtonProps = {
-  onClick: () => void;
-};
-export const BackButton = ({ onClick }: BackButtonProps) => {
-  const { navigate } = useNavigationHelpers();
-  return (
-    <Button
-      appearance="transparent"
-      icon={<ChevronLeftRegular color={tokens.colorBrandForeground1} fontSize={20} />}
-      onClick={() => {
-        onClick();
-        navigate(-1, { replace: true });
-      }}
-      style={{
-        height: 32,
-        color: tokens.colorBrandForeground1,
-        padding: '0', // remove all internal padding
-        minWidth: 'auto', // optional: stops the button from enforcing a minimum width
-      }}
-    >
-      <Body2>Back</Body2>
-    </Button>
-  );
-};
-
 export const Main: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollDirection = useScrollDirection(contentRef);
@@ -153,12 +122,6 @@ export const Main: React.FC = () => {
   const selectedLanguage = i18n.language === 'en' ? Language.ENGLISH : Language.TRADITIONAL_CHINESE;
 
   const menuData = login?.menu;
-
-  const placeOrderButton = (
-    <Button key="order" appearance="primary" icon={<HeartRegular />}>
-      Place Order
-    </Button>
-  );
 
   const confirmationPrompt = (fn: () => void) => {
     if (isDirty()) {
@@ -192,14 +155,17 @@ export const Main: React.FC = () => {
         <header className={styles.header}>
           <div className={styles.headerMenu}>
             {menuData && (
-              <DeviceComponent forMobile={false}>
-                <Button
-                  appearance="subtle"
-                  aria-label="Close"
-                  icon={isMenuOpen ? <ArrowLeftFilled /> : <RowTripleFilled />}
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                />
-              </DeviceComponent>
+              <DeviceComponent
+                desktop={
+                  <Button
+                    appearance="subtle"
+                    aria-label="Close"
+                    icon={isMenuOpen ? <ArrowLeftFilled /> : <RowTripleFilled />}
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  />
+                }
+                mobile={<></>}
+              ></DeviceComponent>
             )}
             {menuData && <Breadcrumb confirmationPrompt={confirmationPrompt} menuData={menuData} />}
           </div>
@@ -222,9 +188,10 @@ export const Main: React.FC = () => {
         </header>
 
         <div className={styles.body}>
-          <DeviceComponent forMobile={false}>
-            <SidebarMenu collapsed={!isMenuOpen} />
-          </DeviceComponent>
+          <DeviceComponent
+            desktop={<SidebarMenu collapsed={!isMenuOpen} />}
+            mobile={<></>}
+          ></DeviceComponent>
 
           <main ref={contentRef} className={styles.content}>
             <PageTransitionProvider>
@@ -232,28 +199,9 @@ export const Main: React.FC = () => {
                 <Route element={<HomePage />} path="/" />
                 <Route element={<MarketPlaceShowcase />} path="/market" />
                 <Route element={<StudentShopPage />} path="/shop/:id" />
-                <Route
-                  element={
-                    <ProductDetail
-                      buttons={[placeOrderButton]}
-                      showOrder={false}
-                      showReview={true}
-                      showShopLink={true}
-                    />
-                  }
-                  path="/market/:id/view"
-                />
-                <Route
-                  element={
-                    <ProductDetail
-                      buttons={[]}
-                      showOrder={true}
-                      showReview={true}
-                      showShopLink={false}
-                    />
-                  }
-                  path="/market/:id/edit"
-                />
+                <Route element={<MarketPlaceProductDetail />} path="/market/:id/view" />
+                <Route element={<StudentShoproductDetail />} path="/shop/:id/view" />
+                <Route element={<StudentShoproductDetail />} path="/shop/:id/edit" />
                 <Route element={<ProductApprovalPage />} path="/approval" />
                 <Route element={<ProductApprovalPage />} path="/approval/:id/view" />
                 <Route element={<UserMaintenancePage />} path="/user" />
@@ -290,11 +238,14 @@ export const Main: React.FC = () => {
           </main>
         </div>
 
-        <DeviceComponent forMobile={true}>
-          <div className={showBottomBar ? styles.bottomBarVisible : styles.bottomBarHidden}>
-            <ButtombarMenu />
-          </div>
-        </DeviceComponent>
+        <DeviceComponent
+          desktop={<></>}
+          mobile={
+            <div className={showBottomBar ? styles.bottomBarVisible : styles.bottomBarHidden}>
+              <ButtombarMenu />
+            </div>
+          }
+        ></DeviceComponent>
       </div>
     </BrowserRouter>
   );

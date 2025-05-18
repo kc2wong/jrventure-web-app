@@ -14,9 +14,9 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    height: '100%',
     paddingTop: tokens.spacingVerticalXXL,
     paddingBottom: tokens.spacingVerticalXXL,
+    gap: tokens.spacingVerticalM,
   },
   name: {
     marginBottom: tokens.spacingVerticalXS,

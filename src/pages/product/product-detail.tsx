@@ -13,7 +13,6 @@ import {
 } from '@fluentui/react-icons';
 import {
   Button,
-  Title1,
   tokens,
   makeStyles,
   TabList,
@@ -34,10 +33,12 @@ import { Field } from '../../components/Field';
 import { useTimezone } from '../../hooks/use-timezone';
 import { BsCoin } from 'react-icons/bs';
 import { ImageCarousel } from '../../components/image-carousell';
-import { ButtonPanel } from '../../components/ButtonPanel';
+import { ButtonPanel } from '../../components/button-panel';
 import { ApprovalStatus, Product } from '../../__generated__/linkedup-web-api-client';
 import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
 import { shopAtom } from '../../states/student-shop';
+import { useLocation } from 'react-router-dom';
+import { PageTitle } from '../../components/page-title';
 
 const AppsListDetail = bundleIcon(AppsListDetailFilled, AppsListDetailRegular);
 const Comment = bundleIcon(CommentFilled, CommentRegular);
@@ -74,7 +75,6 @@ const useStyles = makeStyles({
     marginLeft: tokens.spacingHorizontalL,
     marginBottom: tokens.spacingVerticalXL,
   },
-  buttonPanel: { margin: '20px 20px 20px 0' },
 });
 
 type ProductDetailProps = {
@@ -88,7 +88,6 @@ type ProductDetailProps = {
 
 export const ProductDetail: React.FC<ProductDetailProps> = ({
   product: inProduct,
-  // type,
   approvalStatus,
   showOrder,
   showReview,
@@ -96,6 +95,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   buttons,
 }: ProductDetailProps) => {
   const { navigate, navigateWithSpinner } = useNavigationHelpers();
+  const location = useLocation();
   const state = useAtomValue(shopAtom);
 
   const [selectedValue, setSelectedValue] = React.useState<TabValue>('tab1');
@@ -107,7 +107,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const { formatDatetime, formatDistanceToNow } = useTimezone();
 
   const styles = useStyles();
-  const product: Product | undefined = inProduct ?? state.selectedProduct;
+  const product: Product | undefined = inProduct
+    ? inProduct
+    : location.state
+      ? (location.state as Product)
+      : state.selectedProduct;
 
   const backButton =
     window.history.length > 1 ? (
@@ -125,7 +129,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
   const ProductDetail = React.memo(() =>
     product ? (
-      <Form numColumn={2} styles={{ width: '690px' }}>
+      <Form numColumn={2}>
         <br />
         <Field colSpan={2} indentChildren={true} label="Summary">
           <Text>{product.summary}</Text>
@@ -195,13 +199,8 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
 
   const ProductReview = React.memo(() => (
     <div aria-labelledby="ProductReview" role="tabpanel">
-      <Form
-        numColumn={1}
-        styles={{
-          marginTop: tokens.spacingVerticalS,
-          width: '690px',
-        }}
-      >
+      <Form numColumn={1}>
+        <br />
         <div className={styles.row}>
           <div className={styles.col25}>
             <Text>Isaac Lau</Text>&nbsp;&nbsp;<Caption2>5E-20</Caption2>
@@ -314,18 +313,25 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   ));
 
   const productName = product?.name ?? '';
+  const title = <PageTitle>{productName}</PageTitle>;
   return (
     <Root>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalS }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: '100%',
+        }}
+      >
         {approvalStatus ? (
           <div>
-            <Title1>{productName}</Title1>&nbsp;&nbsp;
+            {title}&nbsp;&nbsp;
             <Subtitle2 italic={true} style={{ color: tokens.colorStatusWarningForeground1 }}>
               ({approvalStatus})
             </Subtitle2>
           </div>
         ) : (
-          <Title1>{productName}</Title1>
+          title
         )}
         <ImageCarousel
           images={product ? [product.imageUrl, product.imageUrl, product.imageUrl] : []}
@@ -352,11 +358,11 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
           {selectedValue === 'tab2' && <ProductReview />}
           {selectedValue === 'tab3' && <OrderHistory />}
         </div>
-        <ButtonPanel className={styles.buttonPanel}>
+        <ButtonPanel>
           {[backButton, ...buttons]
             .filter(Boolean)
             .map((button, index) => cloneElement(button, { key: button.key || index }))}
-        </ButtonPanel>{' '}
+        </ButtonPanel>
       </div>
     </Root>
   );

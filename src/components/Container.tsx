@@ -15,11 +15,16 @@ const useStyles = makeStyles({
   root: {
     ...shorthands.overflow('hidden'),
     display: 'flex',
+    marginLeft: tokens.spacingHorizontalXXL,
+    marginRight: tokens.spacingHorizontalXXL,
     '@media (max-width: 600px)': {
       minHeight: 'calc(100vh - 56px)', // adjust 56px if your bottom bar height changes
+      marginTop: tokens.spacingVerticalL,
+      marginBottom: tokens.spacingVerticalL,
+      marginLeft: tokens.spacingHorizontalM,
+      marginRight: tokens.spacingHorizontalM,
     },
     ...shorthands.flex(1),
-    margin: `0 ${tokens.spacingHorizontalXXL} 0 ${tokens.spacingHorizontalXXL}`,
   },
   mobileRoot: {
     '@media (max-width: 600px)': {

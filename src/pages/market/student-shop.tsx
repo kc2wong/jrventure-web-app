@@ -41,13 +41,16 @@ import {
   ShopStateProgress,
   ShopStateSuccess,
 } from '../../states/student-shop';
+import { Root } from '../../components/Container';
+import { useBreadcrumb } from '../../hooks/use-breadcrumb';
+import { PageTitle } from '../../components/page-title';
 
 const useStyles = makeStyles({
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
-    padding: tokens.spacingHorizontalXXL,
+    marginTop: tokens.spacingVerticalL,
+    gap: tokens.spacingVerticalS,
   },
 
   dropdown: {
@@ -128,6 +131,8 @@ export const StudentShopPage = () => {
   const [state, action] = useAtom(shopAtom);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { showSpinner, stopSpinner } = useMessage();
+  const { useStartBreadcrumb } = useBreadcrumb();
+
   const { login } = useAtomValue(authenticationAtom);
   const studentId = login?.user.entitledStudent[0].id;
 
@@ -141,6 +146,10 @@ export const StudentShopPage = () => {
   const onTabSelect = (event: SelectTabEvent, data: SelectTabData) => {
     setSelectedValue(data.value);
   };
+
+  useEffect(() => {
+    useStartBreadcrumb('My Shop');
+  }, []);
 
   useEffect(() => {
     if (state instanceof ShopStateInitial) {
@@ -160,6 +169,10 @@ export const StudentShopPage = () => {
     <div aria-labelledby="ProductReview" role="tabpanel">
       <ProductGrid
         editAction={(_p) => () => {}}
+        onSelectedForView={(product) => {
+          action({ select: { product } });
+          return `/shop/${product.id}/view`;
+        }}
         products={(state.shop?.approvedProducts ?? []).filter((s) => s.sellerId === 'S000000571')}
       />
     </div>
@@ -179,6 +192,10 @@ export const StudentShopPage = () => {
       ) : (
         <ProductGrid
           editAction={(_p) => () => {}}
+          onSelectedForView={(product) => {
+            action({ select: { product } });
+            return `/shop/${product.id}/view`;
+          }}  
           products={pendingItems
             .filter((s) => s.product.sellerId === 'S000000571')
             .map((s) => s.product)}
@@ -194,6 +211,10 @@ export const StudentShopPage = () => {
       ) : (
         <ProductGrid
           editAction={(_p) => () => {}}
+          onSelectedForView={(product) => {
+            action({ select: { product } });
+            return `/shop/${product.id}/view`;
+          }}  
           products={rejectedItems
             .filter((s) => s.product.sellerId === 'S000000571')
             .map((s) => s.product)}
@@ -205,114 +226,120 @@ export const StudentShopPage = () => {
   const imageUrl = state.shop?.imageUrl;
   const student = state.shop?.student;
   return (
-    <div className={styles.container}>
-      {/* Toolbar */}
-      <div className={styles.toolbar}>
-        <div style={{ display: 'flex', alignItems: 'stretch', gap: 12 }}>
-          {/* Avatar Box */}
-          <Avatar image={imageUrl ? { src: imageUrl } : undefined} size={64} />
+    <Root>
+      <div className={styles.container}>
+        {/* Toolbar */}
+        <div className={styles.toolbar}>
+          <div style={{ display: 'flex', alignItems: 'stretch', gap: 12 }}>
+            {/* Avatar Box */}
+            <Avatar image={imageUrl ? { src: imageUrl } : undefined} size={64} />
 
-          {/* Right box, matching avatar height */}
-          <div style={{ display: 'flex', alignItems: 'end' }}>
-            <div
-              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
-            >
-              <Title3>{useNameInPreferredLanguage(state.shop)}</Title3>
-              <Subtitle1>{useNameInPreferredLanguage(student)}</Subtitle1>
-            </div>
-            {ownShop ? (
-              <>
-                <Tooltip content={'Add new product'} relationship="label" withArrow>
-                  <Button appearance="transparent" icon={<AddCircleRegular />}></Button>
-                </Tooltip>
-                <Tooltip content={'Edit Profile'} relationship="label" withArrow>
-                  <Button appearance="transparent" icon={<EditRegular />}></Button>
-                </Tooltip>
-                <Tooltip content={t('system.message.refresh')} relationship="label" withArrow>
-                  <Button appearance="transparent" icon={<ArrowClockwiseRegular />}></Button>
-                </Tooltip>
-              </>
-            ) : (
-              <></>
-            )}
-          </div>
-        </div>
-        <div className={styles.pagination}>
-          {pageNumbers.map((page) => (
-            <div
-              key={page}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                width: '32px',
-              }}
-            >
-              <Button
-                appearance="transparent"
-                onClick={() => setCurrentPage(page)}
+            {/* Right box, matching avatar height */}
+            <div style={{ display: 'flex', alignItems: 'end' }}>
+              <div
                 style={{
-                  minWidth: 0,
-                  width: '32px',
-                  height: '32px',
-                  padding: '4px',
-                  fontWeight: currentPage === page ? 'bold' : 'normal',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
                 }}
               >
-                {page}
-              </Button>
-              {currentPage === page && (
-                <div
-                  style={{
-                    height: '2px',
-                    backgroundColor: tokens.colorBrandForeground1,
-                    width: '100%',
-                    borderRadius: '1px',
-                  }}
-                />
+                <PageTitle>{useNameInPreferredLanguage(state.shop)}</PageTitle>
+                <Subtitle1>{useNameInPreferredLanguage(student)}</Subtitle1>
+              </div>
+              {ownShop ? (
+                <>
+                  <Tooltip content={'Add new product'} relationship="label" withArrow>
+                    <Button appearance="transparent" icon={<AddCircleRegular />}></Button>
+                  </Tooltip>
+                  <Tooltip content={'Edit Profile'} relationship="label" withArrow>
+                    <Button appearance="transparent" icon={<EditRegular />}></Button>
+                  </Tooltip>
+                  <Tooltip content={t('system.message.refresh')} relationship="label" withArrow>
+                    <Button appearance="transparent" icon={<ArrowClockwiseRegular />}></Button>
+                  </Tooltip>
+                </>
+              ) : (
+                <></>
               )}
             </div>
-          ))}
-          <Button
-            appearance="transparent"
-            onClick={() => setCurrentPage(pageNumbers.length)}
-            style={{ minWidth: 0, width: '32px', height: '32px', padding: '4px' }}
-          >
-            ...
-          </Button>
-          <Button
-            appearance="transparent"
-            onClick={() => setCurrentPage(pageNumbers.length)}
-            style={{ minWidth: 0, width: '48px', height: '32px', padding: '4px' }}
-          >
-            Last
-          </Button>
-        </div>
-      </div>
-
-      {ownShop ? (
-        <>
-          <TabList onTabSelect={onTabSelect} selectedValue={selectedValue}>
-            <Tab icon={<CheckmarkStarburst />} value="tab1">
-              Approved
-            </Tab>
-            <Tab icon={<ApprovalsApp />} value="tab2">
-              Pending
-            </Tab>
-            <Tab icon={<DismissCircle />} value="tab3">
-              Rejected
-            </Tab>
-          </TabList>
-
-          <div className={styles.panels}>
-            {selectedValue === 'tab1' && <ApprovedGrid />}
-            {selectedValue === 'tab2' && <PendingGrid />}
-            {selectedValue === 'tab3' && <RejectedGrid />}
           </div>
-        </>
-      ) : (
-        <ApprovedGrid />
-      )}
-    </div>
+          <div className={styles.pagination}>
+            {pageNumbers.map((page) => (
+              <div
+                key={page}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  width: '32px',
+                }}
+              >
+                <Button
+                  appearance="transparent"
+                  onClick={() => setCurrentPage(page)}
+                  style={{
+                    minWidth: 0,
+                    width: '32px',
+                    height: '32px',
+                    padding: '4px',
+                    fontWeight: currentPage === page ? 'bold' : 'normal',
+                  }}
+                >
+                  {page}
+                </Button>
+                {currentPage === page && (
+                  <div
+                    style={{
+                      height: '2px',
+                      backgroundColor: tokens.colorBrandForeground1,
+                      width: '100%',
+                      borderRadius: '1px',
+                    }}
+                  />
+                )}
+              </div>
+            ))}
+            <Button
+              appearance="transparent"
+              onClick={() => setCurrentPage(pageNumbers.length)}
+              style={{ minWidth: 0, width: '32px', height: '32px', padding: '4px' }}
+            >
+              ...
+            </Button>
+            <Button
+              appearance="transparent"
+              onClick={() => setCurrentPage(pageNumbers.length)}
+              style={{ minWidth: 0, width: '48px', height: '32px', padding: '4px' }}
+            >
+              Last
+            </Button>
+          </div>
+        </div>
+
+        {ownShop ? (
+          <>
+            <TabList onTabSelect={onTabSelect} selectedValue={selectedValue}>
+              <Tab icon={<CheckmarkStarburst />} value="tab1">
+                Approved
+              </Tab>
+              <Tab icon={<ApprovalsApp />} value="tab2">
+                Pending
+              </Tab>
+              <Tab icon={<DismissCircle />} value="tab3">
+                Rejected
+              </Tab>
+            </TabList>
+
+            <div className={styles.panels}>
+              {selectedValue === 'tab1' && <ApprovedGrid />}
+              {selectedValue === 'tab2' && <PendingGrid />}
+              {selectedValue === 'tab3' && <RejectedGrid />}
+            </div>
+          </>
+        ) : (
+          <ApprovedGrid />
+        )}
+      </div>
+    </Root>
   );
 };

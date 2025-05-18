@@ -141,6 +141,9 @@
     "titleAddParent": "新增家長用戶",
     "titleEdit": "${1} User"
   },
+  "marketPlace": {
+    "title": "Market Place"
+  },
   "productApproval": {
     "approve": "Approve",
     "classNo": "Class ID",

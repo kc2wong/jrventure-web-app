@@ -20,19 +20,13 @@ import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
 
 const useStyles = makeStyles({
   content: {
+    overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    height: '100%',
     paddingTop: tokens.spacingVerticalXXL,
-    paddingBottom: tokens.spacingVerticalXXL,
-  },
-  name: {
-    marginBottom: tokens.spacingVerticalXS,
-  },
-  lastLogin: {
-    marginBottom: tokens.spacingVerticalL,
-    color: tokens.colorNeutralForeground3,
+    marginRight: tokens.spacingHorizontalXXL,
+    marginLeft: tokens.spacingHorizontalXXL,
+    gap: tokens.spacingVerticalM,
   },
 });
 
@@ -48,6 +42,7 @@ export const MobileParentUserPage: React.FC = () => {
   }, []);
 
   const parentUser = login?.parentUser ?? [];
+  
   return (
     <MobileRoot>
       <div className={styles.content}>

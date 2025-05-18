@@ -37,35 +37,23 @@ export const BreadcrumbProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  const startPageNavigation = (path: string, labelKey: string, labelParams?: string[]) => {
-    setBreadcrumbPath([{ path, labelKey, labelParams }]);
-  };
-
-  const appendPageNavigation = (
-    // navigate: NavigateFunction,
-    path: string,
-    labelKey: string,
-    labelParams?: string[],
-  ) => {
-    if (breadcrumbPath[breadcrumbPath.length - 1]?.labelKey !== labelKey) {
-      const newPageElement = [...breadcrumbPath];
-      newPageElement.push({ path, labelKey, labelParams });
-      setBreadcrumbPath(newPageElement);
-    }
-  };
-
   const startBreadcrumb = (path: string, labelKey: string, paramKey?: string | string[]): void => {
     if (!popPageNavigationTill(labelKey)) {
       const paramKeyArray = paramKey ? asArray(paramKey)! : emptyArray;
-      startPageNavigation(path, labelKey, paramKeyArray);
-      setNavgiateToParentOnly(false);
+      // startPageNavigation(path, labelKey, paramKeyArray);
+      setBreadcrumbPath([{ path, labelKey, labelParams: paramKeyArray }]);
     }
+    setNavgiateToParentOnly(false);
   };
 
   const appendBreadcrumb = (path: string, labelKey: string, paramKey?: string | string[]): void => {
     const paramKeyArray = paramKey ? asArray(paramKey)! : emptyArray;
     if (!popPageNavigationTill(labelKey, paramKeyArray)) {
-      appendPageNavigation(path, labelKey, paramKeyArray);
+      if (breadcrumbPath[breadcrumbPath.length - 1]?.labelKey !== labelKey) {
+        const newPageElement = [...breadcrumbPath];
+        newPageElement.push({ path, labelKey, labelParams: paramKeyArray });
+        setBreadcrumbPath(newPageElement);
+      }
     }
   };
 
@@ -74,7 +62,7 @@ export const BreadcrumbProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     startBreadcrumb,
     appendBreadcrumb,
     isNavgiateToParentOnly,
-    setNavgiateToParentOnly
+    setNavgiateToParentOnly,
   };
 
   return <BreadcrumbContext.Provider value={value}>{children}</BreadcrumbContext.Provider>;

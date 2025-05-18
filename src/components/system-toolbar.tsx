@@ -55,7 +55,7 @@ const useStyles = makeStyles({
   },
   divider: { width: '8px' },
   classStudentWrapper: {
-    display: 'flex', 
+    display: 'flex',
     flexDirection: 'row',
     '@media (max-width: 600px)': {
       flexDirection: 'column',
@@ -106,7 +106,9 @@ const AvatarInfo = forwardRef<
     >
       <BookRegular fontSize={24} />
       <div className={styles.classStudentWrapper}>
-        <Label className={styles.classStudent}>{`${student.classId}-${student.studentNumber}`}</Label>
+        <Label
+          className={styles.classStudent}
+        >{`${student.classId}-${student.studentNumber}`}</Label>
         <Label className={styles.classStudent}>{useNameInPreferredLanguage(student)}</Label>
       </div>
     </div>
@@ -311,56 +313,61 @@ export const SystemToolbar = ({
 
           {login ? <ProfileButton login={login} /> : <></>}
 
-          <DeviceComponent forMobile={false}>
-            <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
-              <MenuTrigger disableButtonEnhancement>
-                <Button icon={<GlobeRegular />} />
-              </MenuTrigger>
-              <MenuPopover>
-                <MenuList>
-                  <MenuItemRadio
-                    name="lang"
-                    onClick={() => onSetLanguage(Language.ENGLISH)}
-                    value="en"
-                  >
-                    {t('system.language.value.en')}
-                  </MenuItemRadio>
-                  <MenuItemRadio
-                    name="lang"
-                    onClick={() => onSetLanguage(Language.TRADITIONAL_CHINESE)}
-                    value="zhHant"
-                  >
-                    {t('system.language.value.zhHant')}
-                  </MenuItemRadio>
-                </MenuList>
-              </MenuPopover>
-            </Menu>
+          <DeviceComponent
+            desktop={
+              <>
+                <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
+                  <MenuTrigger disableButtonEnhancement>
+                    <Button icon={<GlobeRegular />} />
+                  </MenuTrigger>
+                  <MenuPopover>
+                    <MenuList>
+                      <MenuItemRadio
+                        name="lang"
+                        onClick={() => onSetLanguage(Language.ENGLISH)}
+                        value="en"
+                      >
+                        {t('system.language.value.en')}
+                      </MenuItemRadio>
+                      <MenuItemRadio
+                        name="lang"
+                        onClick={() => onSetLanguage(Language.TRADITIONAL_CHINESE)}
+                        value="zhHant"
+                      >
+                        {t('system.language.value.zhHant')}
+                      </MenuItemRadio>
+                    </MenuList>
+                  </MenuPopover>
+                </Menu>
 
-            <Menu checkedValues={{ theme: [theme] }}>
-              <MenuTrigger disableButtonEnhancement>
-                <Button icon={themeIcons[theme]} />
-              </MenuTrigger>
-              <MenuPopover>
-                <MenuList>
-                  {(['light', 'dark', 'playful'] as Theme[]).map((th) => (
-                    <MenuItemRadio key={th} name="theme" onClick={() => onSetTheme(th)} value={th}>
-                      {t(`system.theme.value.${th}`)}
-                    </MenuItemRadio>
-                  ))}
-                </MenuList>
-              </MenuPopover>
-            </Menu>
-          </DeviceComponent>
-
-          <DeviceComponent forMobile={true}>
-            <SettingButton />
-          </DeviceComponent>
-
+                <Menu checkedValues={{ theme: [theme] }}>
+                  <MenuTrigger disableButtonEnhancement>
+                    <Button icon={themeIcons[theme]} />
+                  </MenuTrigger>
+                  <MenuPopover>
+                    <MenuList>
+                      {(['light', 'dark', 'playful'] as Theme[]).map((th) => (
+                        <MenuItemRadio
+                          key={th}
+                          name="theme"
+                          onClick={() => onSetTheme(th)}
+                          value={th}
+                        >
+                          {t(`system.theme.value.${th}`)}
+                        </MenuItemRadio>
+                      ))}
+                    </MenuList>
+                  </MenuPopover>
+                </Menu>
+              </>
+            }
+            mobile={<SettingButton />}
+          ></DeviceComponent>
           <MessageButton />
-
-          <DeviceComponent forMobile={false}>
-            <SignoutButton showCaption={false} />
-          </DeviceComponent>
+          <DeviceComponent
+            desktop={<SignoutButton showCaption={false} />}
+            mobile={<></>}
+          ></DeviceComponent>
         </>
       )}
     </div>

@@ -145,6 +145,9 @@
     "titleAddParent": "Add Parent User",
     "titleEdit": "${1} User"
   },
+  "marketPlace": {
+    "title": "Market Place"
+  },
   "productApproval": {
     "approve": "Approve",
     "classNo": "Class ID",

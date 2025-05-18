@@ -6,6 +6,10 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'flex-end',
     gap: '10px',
+    '@media (max-width: 600px)': {
+      gap: '20px',
+      flexDirection: 'column',
+    },
   },
 });
 

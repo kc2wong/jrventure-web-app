@@ -20,7 +20,7 @@ const getAnnouncement: CarouselAnnouncerFunction = (index: number, totalSlides: 
 
 export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
   return (
-    <div style={{ width: '100%', maxWidth: 800, margin: '0 auto' }}>
+    <div style={{ width: '100vw', maxWidth: 800, margin: '0 auto' }}>
       <Carousel announcement={getAnnouncement} circular groupSize={1}>
         <CarouselViewport style={{ width: '100%', overflow: 'hidden' }}>
           <CarouselSlider
@@ -38,7 +38,8 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
                 style={{
                   width: '100%',
                   flexShrink: 0,
-                  height: '450px',
+                  // aspectRatio: '16 / 9',
+                  aspectRatio: 'auto',
                   overflow: 'hidden',
                 }}
               >
@@ -46,7 +47,11 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
                   fit="cover"
                   role="presentation"
                   src={imageSrc}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
                 />
               </CarouselCard>
             ))}
@@ -63,16 +68,6 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
             {(index) => <CarouselNavButton aria-label={`Carousel Nav Button ${index}`} />}
           </CarouselNav>
         </CarouselNavContainer>
-        {/* <CarouselNavContainer layout="inline">
-          <CarouselNav>
-            {(index) => (
-              <CarouselNavButton
-                key={index}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            )}
-          </CarouselNav>
-        </CarouselNavContainer> */}
       </Carousel>
     </div>
   );
