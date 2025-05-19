@@ -3,6 +3,7 @@ import { Language, User, UserCreation, UserRole, UserStatus } from '../../models
 import { Button, Dropdown, Option, Spinner } from '@fluentui/react-components';
 import { Field } from '../../components/Field';
 import { Input } from '../../components/Input';
+import { Switch } from '../../components/switch';
 import {
   ArrowTurnUpLeftRegular,
   CheckmarkRegular,
@@ -94,6 +95,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           name: {},
           entitledStudentId: login?.user.entitledStudent[0].id,
           entitledStudentId2: '',
+          withApprovalRight: false,
         };
       } else {
         return {
@@ -103,6 +105,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           name: {},
           entitledStudentId: '',
           entitledStudentId2: '',
+          withApprovalRight: false,
         };
       }
     }
@@ -133,6 +136,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
       role: zodString(),
       entitledStudentId: zodOptionalString(),
       entitledStudentId2: zodOptionalString(),
+      withApprovalRight: z.boolean(),
       status: zodString(),
     })
     // Rule 1: If STUDENT, then entitledStudentId must exist
@@ -181,6 +185,15 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
         emptyStringToUndefined(data.entitledStudentId2) === undefined ||
         studentListState.result.find((s) => s.id === data.entitledStudentId2),
       { message: 'zod.error.user.invalidStudentId', path: ['entitledStudentId2'] },
+    )
+    .refine(
+      (data) =>
+        (data.role !== UserRole.TEACHER && data.withApprovalRight === false) ||
+        data.role === UserRole.TEACHER,
+      {
+        message: 'zod.error.NotRequired',
+        path: ['withApprovalRight'],
+      },
     );
   type FormData = z.infer<typeof schema>;
 
@@ -452,12 +465,16 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                     onOptionSelect={(_ev, data) => {
                       field.onChange(data.selectedOptions[0] ?? '');
                       // clear entitledStudentId if role is not Student / Parent
-                      if (
-                        data.optionValue !== UserRole.STUDENT &&
-                        data.optionValue !== UserRole.PARENT
-                      ) {
+                      const optionValue = data.optionValue;
+                      if (optionValue !== UserRole.STUDENT && optionValue !== UserRole.PARENT) {
                         setValue('entitledStudentId', '');
                         setValue('entitledStudentId2', '');
+                      }
+                      if (
+                        optionValue !== UserRole.TEACHER &&
+                        formValues.withApprovalRight === true
+                      ) {
+                        setValue('withApprovalRight', false);
                       }
                     }}
                     selectedOptions={asArray(selectedValue)}
@@ -523,6 +540,22 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                 );
               }}
             />
+          </>
+        ) : formValues.role === UserRole.TEACHER ? (
+          <>
+            <Controller
+              control={control}
+              name="withApprovalRight"
+              render={({ field }) => {
+                const { value, ...others } = field;
+                return (
+                  <Field label={t('userMaintenance.withApprovalRight')}>
+                    <Switch {...others} checked={value} readOnly={readOnly} />
+                  </Field>
+                );
+              }}
+            />
+            <EmptyCell />
           </>
         ) : (
           <EmptyCell colSpan={2} />

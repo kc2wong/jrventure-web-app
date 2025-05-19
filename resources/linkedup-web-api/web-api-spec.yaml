@@ -573,6 +573,7 @@ components:
         - role
         - status
         - entitledStudentId
+        - withApprovalRight
       properties:
         email:
           type: string
@@ -589,6 +590,9 @@ components:
           items:
             type: string
             description: Id of student
+        withApprovalRight:
+          type: boolean
+          description: Has approval right or not.  Applicable to Teacher only
     User:
       type: object
       required:

@@ -137,6 +137,8 @@
     },
     "classId": "Class ID",
     "studentId": "Student ID",
+    "approval": "Apr. Right",
+    "withApprovalRight": "With Approval Right",
     "status": {
       "label": "Status",
       "value": { "Active": "Active", "Inactive": "Inactive", "Suspend": "Suspend" }

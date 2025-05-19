@@ -265,7 +265,7 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
     createTableColumn({
       columnId: 'role',
       header: t('userMaintenance.role.label'),
-      width: 16,
+      width: 8,
       builder: (user) => <RoleLabel role={user.role}></RoleLabel>,
     }),
     createTableColumn({
@@ -281,9 +281,21 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
       builder: (item) => <Body1>{undefinedToEmptyString(item.entitledStudentId[0])}</Body1>,
     }),
     createTableColumn({
+      columnId: 'withApprovalRight',
+      header: t('userMaintenance.approval'),
+      width: 12,
+      builder: (user) => (
+        <Body1>
+          {user.role === UserRole.TEACHER
+            ? t(`system.message.${user.withApprovalRight ? 'yes' : 'no'}`)
+            : ''}
+        </Body1>
+      ),
+    }),
+    createTableColumn({
       columnId: 'status',
       header: t('userMaintenance.status.label'),
-      width: 16,
+      width: 12,
       builder: (user) => <StatusLabel status={user.status}></StatusLabel>,
     }),
   ];

@@ -133,6 +133,8 @@
     },
     "classId": "班別",
     "studentId": "學生編號",
+    "approval": "批核權限",
+    "withApprovalRight": "批核權限",
     "status": {
       "label": "狀態",
       "value": { "Active": "有效", "Inactive": "無效", "Suspend": "暫停" }
