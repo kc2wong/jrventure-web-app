@@ -3,10 +3,7 @@ import {
   tokens,
   Dropdown,
   Option,
-  Button,
-  Title1,
   Tooltip,
-  Title3,
   Tag,
   Caption1,
 } from '@fluentui/react-components';
@@ -31,6 +28,7 @@ import { Root } from '../../components/Container';
 import { ProductGrid } from '../product/product-grid';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { PageTitle } from '../../components/page-title';
+import { Pagination } from '../../components/pagination';
 
 const useStyles = makeStyles({
   main: {
@@ -99,61 +97,8 @@ export const MarketPlaceShowcase = () => {
   const [state, action] = useAtom(marketPlaceAtom);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const pageNumbers = [1, 2, 3, 4, 5];
-  const pagination = (
-    <div className={styles.pagination}>
-      {pageNumbers.map((page) => (
-        <div
-          key={page}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '32px',
-          }}
-        >
-          <Button
-            appearance="transparent"
-            onClick={() => setCurrentPage(page)}
-            style={{
-              minWidth: 0,
-              width: '32px',
-              height: '32px',
-              padding: '4px',
-              fontWeight: currentPage === page ? 'bold' : 'normal',
-            }}
-          >
-            {page}
-          </Button>
-          {currentPage === page && (
-            <div
-              style={{
-                height: '2px',
-                backgroundColor: tokens.colorBrandForeground1,
-                width: '100%',
-                borderRadius: '1px',
-              }}
-            />
-          )}
-        </div>
-      ))}
-      <Button
-        appearance="transparent"
-        onClick={() => setCurrentPage(pageNumbers.length)}
-        style={{ minWidth: 0, width: '32px', height: '32px', padding: '4px' }}
-      >
-        ...
-      </Button>
-      <Button
-        appearance="transparent"
-        onClick={() => setCurrentPage(pageNumbers.length)}
-        style={{ minWidth: 0, width: '48px', height: '32px', padding: '4px' }}
-      >
-        Last
-      </Button>
-    </div>
-  );
-
+  const pagination = <Pagination onPageSelected={setCurrentPage} selectedPage={currentPage} totalPages={20} />
+  
   useEffect(() => {
     useStartBreadcrumb('marketPlace.title');
   }, []);

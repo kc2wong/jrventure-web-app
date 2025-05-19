@@ -5,7 +5,6 @@ import {
   tokens,
   Avatar,
   Button,
-  Title3,
   Tooltip,
   Subtitle1,
   SelectTabData,
@@ -44,6 +43,8 @@ import {
 import { Root } from '../../components/Container';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { PageTitle } from '../../components/page-title';
+import { Pagination } from '../../components/pagination';
+import { DeviceComponent } from '../../components/device-component';
 
 const useStyles = makeStyles({
   container: {
@@ -77,12 +78,6 @@ const useStyles = makeStyles({
     flexWrap: 'wrap',
   },
 
-  pagination: {
-    display: 'flex',
-    gap: '6px',
-    flexWrap: 'wrap',
-  },
-
   card: {
     width: '240px',
     maxWidth: '100%',
@@ -106,17 +101,6 @@ const useStyles = makeStyles({
 
   smallRadius: { borderRadius: tokens.borderRadiusSmall },
 
-  grayBackground: {
-    backgroundColor: tokens.colorNeutralBackground3,
-  },
-
-  logoBadge: {
-    padding: '5px',
-    borderRadius: tokens.borderRadiusSmall,
-    backgroundColor: '#FFF',
-    boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12)',
-  },
-
   panels: {
     padding: '0 10px',
     '& th': {
@@ -138,8 +122,6 @@ export const StudentShopPage = () => {
 
   const { id } = useParams<{ id: string }>();
   const ownShop = id === studentId;
-
-  const pageNumbers = [1, 2, 3, 4, 5]; // Example only, update dynamically as needed
 
   const [selectedValue, setSelectedValue] = useState<TabValue>('tab1');
 
@@ -195,7 +177,7 @@ export const StudentShopPage = () => {
           onSelectedForView={(product) => {
             action({ select: { product } });
             return `/shop/${product.id}/view`;
-          }}  
+          }}
           products={pendingItems
             .filter((s) => s.product.sellerId === 'S000000571')
             .map((s) => s.product)}
@@ -214,7 +196,7 @@ export const StudentShopPage = () => {
           onSelectedForView={(product) => {
             action({ select: { product } });
             return `/shop/${product.id}/view`;
-          }}  
+          }}
           products={rejectedItems
             .filter((s) => s.product.sellerId === 'S000000571')
             .map((s) => s.product)}
@@ -222,6 +204,10 @@ export const StudentShopPage = () => {
       )}
     </div>
   ));
+
+  const pagination = (
+    <Pagination onPageSelected={setCurrentPage} selectedPage={currentPage} totalPages={20} />
+  );
 
   const imageUrl = state.shop?.imageUrl;
   const student = state.shop?.student;
@@ -263,57 +249,7 @@ export const StudentShopPage = () => {
               )}
             </div>
           </div>
-          <div className={styles.pagination}>
-            {pageNumbers.map((page) => (
-              <div
-                key={page}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  width: '32px',
-                }}
-              >
-                <Button
-                  appearance="transparent"
-                  onClick={() => setCurrentPage(page)}
-                  style={{
-                    minWidth: 0,
-                    width: '32px',
-                    height: '32px',
-                    padding: '4px',
-                    fontWeight: currentPage === page ? 'bold' : 'normal',
-                  }}
-                >
-                  {page}
-                </Button>
-                {currentPage === page && (
-                  <div
-                    style={{
-                      height: '2px',
-                      backgroundColor: tokens.colorBrandForeground1,
-                      width: '100%',
-                      borderRadius: '1px',
-                    }}
-                  />
-                )}
-              </div>
-            ))}
-            <Button
-              appearance="transparent"
-              onClick={() => setCurrentPage(pageNumbers.length)}
-              style={{ minWidth: 0, width: '32px', height: '32px', padding: '4px' }}
-            >
-              ...
-            </Button>
-            <Button
-              appearance="transparent"
-              onClick={() => setCurrentPage(pageNumbers.length)}
-              style={{ minWidth: 0, width: '48px', height: '32px', padding: '4px' }}
-            >
-              Last
-            </Button>
-          </div>
+          <DeviceComponent desktop={pagination} mobile={<></>} />
         </div>
 
         {ownShop ? (
@@ -339,6 +275,8 @@ export const StudentShopPage = () => {
         ) : (
           <ApprovedGrid />
         )}
+
+        <DeviceComponent desktop={<></>} mobile={pagination} />
       </div>
     </Root>
   );
