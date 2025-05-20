@@ -22,7 +22,7 @@ import {
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { useAtomValue } from 'jotai';
 import { authenticationAtom } from '../states/authentication';
-import { UserRole } from '../models/openapi';
+import { UserRoleEnum } from '../models/openapi';
 import { RoleBaseComponent } from './role-based-component';
 
 type NavigationMenuItem =
@@ -32,14 +32,14 @@ type NavigationMenuItem =
       label: string;
       icon: React.ElementType<React.SVGProps<SVGSVGElement>>;
       path: string;
-      roles?: UserRole[];
+      roles?: UserRoleEnum[];
       showInSidebar?: boolean;
       showInBottomBar?: boolean;
     }
   | {
       type: 'divider';
       title?: string;
-      roles?: UserRole[];
+      roles?: UserRoleEnum[];
       showInSidebar?: boolean;
     };
 
@@ -71,7 +71,7 @@ const navigationMenu: NavigationMenuItem[] = [
     label: 'My Shop',
     icon: ShoppingBagRegular,
     path: '/shop/:studentId',
-    roles: [UserRole.STUDENT, UserRole.PARENT],
+    roles: [UserRoleEnum.Student, UserRoleEnum.Parent],
     showInSidebar: true,
     showInBottomBar: true,
   },
@@ -95,7 +95,7 @@ const navigationMenu: NavigationMenuItem[] = [
     showInSidebar: true,
   },
 
-  { type: 'divider', title: 'Approval', showInSidebar: true, roles: [UserRole.TEACHER] },
+  { type: 'divider', title: 'Approval', showInSidebar: true, roles: [UserRoleEnum.Teacher] },
 
   {
     type: 'item',
@@ -103,7 +103,7 @@ const navigationMenu: NavigationMenuItem[] = [
     label: 'Product Approval',
     icon: BoxCheckmarkRegular,
     path: '/approval',
-    roles: [UserRole.TEACHER],
+    roles: [UserRoleEnum.Teacher],
     showInSidebar: true,
   },
   {
@@ -112,7 +112,7 @@ const navigationMenu: NavigationMenuItem[] = [
     label: 'Banner Approval',
     icon: PeopleCheckmarkRegular,
     path: '/approval',
-    roles: [UserRole.TEACHER],
+    roles: [UserRoleEnum.Teacher],
     showInSidebar: true,
   },
 
@@ -122,7 +122,7 @@ const navigationMenu: NavigationMenuItem[] = [
     label: 'User',
     icon: PeopleRegular,
     path: '/user',
-    roles: [UserRole.ADMIN],
+    roles: [UserRoleEnum.Admin],
     showInSidebar: true,
   },
 ];

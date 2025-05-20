@@ -1,10 +1,10 @@
 import { Error } from '../models/openapi';
 
 export const createSystemError = (error: any): Error => {
-  if (error.body && error.body.code && error.body.message) {
-    return { ...error.body };
+  if ('code' in error && 'message' in error) {
+    return error;
   } else {
     const message = error.message ?? error.toString();
-    return { code: 'UNEXPECTED_ERROR', message: message };
+    return { code: 'UNEXPECTED_ERROR', parameter: [], message: message };
   }
 };

@@ -3,11 +3,11 @@ import { Body1, InputProps, makeStyles, shorthands } from '@fluentui/react-compo
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../components/Input';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
-import { ApprovalStatus } from '../../__generated__/linkedup-web-api-client';
 import { CheckmarkRegular, DismissCircleRegular, PauseCircleRegular } from '@fluentui/react-icons';
+import { ApprovalStatusEnum } from '../../models/openapi';
 
 interface ApprovalStatusLabelProps {
-  status: ApprovalStatus;
+  status: ApprovalStatusEnum;
 }
 
 const useStyles = makeStyles({
@@ -18,7 +18,7 @@ const useStyles = makeStyles({
   },
 });
 
-const statusIcons: Record<ApprovalStatus, JSX.Element> = {
+const statusIcons: Record<ApprovalStatusEnum, JSX.Element> = {
   Pending: <PauseCircleRegular />,
   Rejected: <DismissCircleRegular />,
   Approved: <CheckmarkRegular />,
@@ -39,7 +39,7 @@ export const ApprovalStatusLabel: FC<ApprovalStatusLabelProps> = ({ status }) =>
 export const ApprovalStatusReadOnlyInput: React.FC<InputProps> = ({ value, ...others }) => {
   const { t } = useTranslation();
 
-  const status = value ? getEnumValueByRawValue(ApprovalStatus, value) : undefined;
+  const status = value ? getEnumValueByRawValue(ApprovalStatusEnum, value) : undefined;
   return (
     <Input
       {...others}

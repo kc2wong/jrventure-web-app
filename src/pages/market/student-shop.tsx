@@ -33,7 +33,6 @@ import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
 import { ProductGrid } from '../product/product-grid';
 import { authenticationAtom } from '../../states/authentication';
-import { ApprovalStatus } from '../../__generated__/linkedup-web-api-client';
 import {
   shopAtom,
   ShopStateInitial,
@@ -45,6 +44,7 @@ import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { PageTitle } from '../../components/page-title';
 import { Pagination } from '../../components/pagination';
 import { DeviceComponent } from '../../components/device-component';
+import { ApprovalStatusEnum } from '../../models/openapi';
 
 const useStyles = makeStyles({
   container: {
@@ -161,10 +161,10 @@ export const StudentShopPage = () => {
   ));
 
   const pendingItems = (state.shop?.pendingProducts ?? [])?.filter(
-    (item) => item.product.sellerId === studentId && item.status === ApprovalStatus.PENDING,
+    (item) => item.product.sellerId === studentId && item.status === ApprovalStatusEnum.Pending,
   );
   const rejectedItems = (state.shop?.rejectedProducts ?? [])?.filter(
-    (item) => item.product.sellerId === studentId && item.status === ApprovalStatus.REJECTED,
+    (item) => item.product.sellerId === studentId && item.status === ApprovalStatusEnum.Rejected,
   );
 
   const PendingGrid = React.memo(() => (

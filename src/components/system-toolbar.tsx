@@ -30,7 +30,7 @@ import {
 } from '@fluentui/react-icons';
 import React, { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Language, Student, UserRole } from '../models/openapi';
+import { LanguageEnum, Student, UserRoleEnum } from '../models/openapi';
 import { Theme } from '../contexts/Theme';
 import { useAtom, useAtomValue } from 'jotai';
 import { authenticationAtom } from '../states/authentication';
@@ -260,8 +260,8 @@ export const SystemToolbar = ({
 }: {
   theme: Theme;
   onSetTheme: (t: Theme) => void;
-  language: Language;
-  onSetLanguage: (l: Language) => void;
+  language: LanguageEnum;
+  onSetLanguage: (l: LanguageEnum) => void;
 }) => {
   const styles = useStyles();
   const { t } = useTranslation();
@@ -293,7 +293,7 @@ export const SystemToolbar = ({
       ) : (
         <>
           <Spacer />
-          {login?.user.role === UserRole.STUDENT ? (
+          {login?.user.role === UserRoleEnum.Student ? (
             <>
               <StudentRoleInfo
                 parentUser={login?.parentUser ?? []}
@@ -301,7 +301,7 @@ export const SystemToolbar = ({
               />
               <Spacer />
             </>
-          ) : login?.user.role === UserRole.PARENT ? (
+          ) : login?.user.role === UserRoleEnum.Parent ? (
             <>
               <ParentRoleInfo
                 entitledStudent={login?.user.entitledStudent ?? []}
@@ -316,7 +316,7 @@ export const SystemToolbar = ({
           <DeviceComponent
             desktop={
               <>
-                <Menu checkedValues={{ lang: [language === Language.ENGLISH ? 'en' : 'zhHant'] }}>
+                <Menu checkedValues={{ lang: [language === LanguageEnum.English ? 'en' : 'zhHant'] }}>
                   <MenuTrigger disableButtonEnhancement>
                     <Button icon={<GlobeRegular />} />
                   </MenuTrigger>
@@ -324,14 +324,14 @@ export const SystemToolbar = ({
                     <MenuList>
                       <MenuItemRadio
                         name="lang"
-                        onClick={() => onSetLanguage(Language.ENGLISH)}
+                        onClick={() => onSetLanguage(LanguageEnum.English)}
                         value="en"
                       >
                         {t('system.language.value.en')}
                       </MenuItemRadio>
                       <MenuItemRadio
                         name="lang"
-                        onClick={() => onSetLanguage(Language.TRADITIONAL_CHINESE)}
+                        onClick={() => onSetLanguage(LanguageEnum.TraditionalChinese)}
                         value="zhHant"
                       >
                         {t('system.language.value.zhHant')}

@@ -7,7 +7,7 @@ import {
   WeatherSunnyRegular,
 } from '@fluentui/react-icons';
 import { Theme } from '../../contexts/Theme';
-import { Language } from '../../models/openapi';
+import { LanguageEnum } from '../../models/openapi';
 import { useTranslation } from 'react-i18next';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { MobileRoot } from '../../components/Container';
@@ -66,8 +66,8 @@ const useStyles = makeStyles({
 export const MobileSettingsPage: React.FC<{
   theme: Theme;
   onSetTheme: (t: Theme) => void;
-  language: Language;
-  onSetLanguage: (l: Language) => void;
+  language: LanguageEnum;
+  onSetLanguage: (l: LanguageEnum) => void;
 }> = ({ theme, onSetTheme, language, onSetLanguage }) => {
   const styles = useStyles();
   const { t } = useTranslation();
@@ -96,8 +96,8 @@ export const MobileSettingsPage: React.FC<{
     }),
   };
 
-  const availableLanguage: Language[] = [Language.ENGLISH, Language.TRADITIONAL_CHINESE];
-  const languageSection: SettingsSection<Language> = {
+  const availableLanguage: LanguageEnum[] = [LanguageEnum.English, LanguageEnum.TraditionalChinese];
+  const languageSection: SettingsSection<LanguageEnum> = {
     title: t('system.language.label'),
     key: 'language',
     selectedValue: language,
