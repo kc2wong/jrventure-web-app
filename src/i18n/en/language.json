@@ -133,7 +133,13 @@
     "name": "Name",
     "role": {
       "label": "Role",
-      "value": { "Student": "Student", "Parent": "Parent", "Teacher": "Teacher", "Admin": "Admin", "Alumni": "Alumni" }
+      "value": {
+        "Student": "Student",
+        "Parent": "Parent",
+        "Teacher": "Teacher",
+        "Admin": "Admin",
+        "Alumni": "Alumni"
+      }
     },
     "classId": "Class ID",
     "studentId": "Student ID",
@@ -168,57 +174,36 @@
     "title": "Product Approval",
     "titleReview": "Review Product"
   },
-  "paymentMaintenance": {
-    "account": "Account",
-    "accountHint": "Valid account code is PK1999 or GJ71WHP",
-    "action": "Action",
-    "amount": "Amount",
-    "code": "Code",
-    "direction": {
-      "label": "Direction",
-      "value": { "incoming": "Incoming", "outgoing": "Outgoing" }
-    },
-    "bankBuy": "Bank Buy (Credit)",
-    "bankBuyCcy": "Bank Buy CCY",
-    "bankSell": "Bank Sell (Debit)",
-    "bankSellCcy": "Bank Sell CCY",
-    "dealCcy": "Deal CCY",
-    "dealAmount": "Deal Amount",
-    "executeDate": "Execute Date",
-    "fxRef": "FX Ref",
-    "instructionId": "Instruction Id",
-    "memo": "Memo",
-    "message": {
-      "doYouWantToInitiatePaymentRequest": "Do you want to initiate payment request",
-      "doYouWantToSubmitMatchingRequest": "Do you want to submit matching request with fxRef [${1}]",
-      "doYouWantToSubmitBookingRequest": "Do you want to submit booking request with product [${1}] and value date [${2}]",
-      "initiatePaymentSuccess": "Payment is initated successfully",
-      "submitRequestSuccess": "${1} request is submitted successfully"
-    },
+  "activityMaintenance": {
+    "id": "Id",
+    "category": "Category",
     "name": "Name",
-    "pairedFxRef": "Paired FX Ref",
-    "pairing": {
-      "title": "Submit Matching or Booking",
-      "value": { "matching": "Matching", "booking": "Booking" }
-    },
-    "product": "Product",
-    "remainingCcy": "Remaining CCY",
-    "remainingAmount": "Remaining Amount",
-    "site": "Site",
+    "description": "Description",
+    "title": "Activity List",
+    "titleEdit": "${1} Activity",
+    "forClass": "For Class",
     "status": {
       "label": "Status",
       "value": {
-        "new": "New",
-        "started": "Started",
-        "cancelled": "Cancelled",
-        "rejected": "Rejected",
-        "submitted": "Submitted",
-        "paired": "Paired"
+        "Open": "Open",
+        "Closed": "Closed",
+        "Cancelled": "Cancelled",
+        "Scheduled": "Scheduled"
       }
     },
-    "title": "Payment List",
-    "titleEdit": "${1} Payment Detail",
-    "valueDate": "Value Date"
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "sharable": "Sharing",
+    "ratable": "Rating",
+    "eCoin": "e-Coin",
+    "submissionRole": {
+      "label": "Submit By",
+      "value": {
+        "Teacher": "Teacher",
+        "Student": "Student",
+        "Both": "Both"
+      }
+    }
   },
   "zod": {
     "error": {

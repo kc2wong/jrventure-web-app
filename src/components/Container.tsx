@@ -10,6 +10,9 @@ import {
 } from '@fluentui/react-components';
 import React from 'react';
 import { ReactElement } from 'react';
+import { Pagination } from './pagination';
+import { PageTitle } from './page-title';
+import { DeviceComponent } from './device-component';
 
 const useStyles = makeStyles({
   root: {
@@ -35,10 +38,12 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: '15px',
+    marginTop: tokens.spacingVerticalM,
+    marginBottom: tokens.spacingVerticalM,
     minHeight: '40px',
     gap: tokens.spacingVerticalS,
     '& span': typographyStyles.title3,
+    justifyContent: 'space-between',
   },
   baseForm: {
     display: 'grid',
@@ -76,12 +81,18 @@ const useStyles = makeStyles({
   spanFour: {
     gridColumn: 'span 4',
   },
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: tokens.spacingHorizontalS,
+  },
 });
 
 type FormProps = {
   numColumn: 1 | 2 | 3 | 4;
   buttons?: React.ReactElement<typeof Button>[];
   toolbarSlot?: React.ReactElement<typeof ToolbarButton>[] | React.ReactElement<typeof MessageBar>;
+  pagination?: React.ReactElement<typeof Pagination>;
   styles?: React.CSSProperties;
   title?: string;
   children: ReactElement | ReactElement[];
@@ -104,6 +115,7 @@ export const MobileRoot: React.FC<{
 export const Form: React.FC<FormProps> = ({
   buttons,
   toolbarSlot,
+  pagination,
   numColumn,
   styles: inputStyles,
   title,
@@ -139,8 +151,11 @@ export const Form: React.FC<FormProps> = ({
       {title ? (
         <>
           <div className={styles.titleBar}>
-            <span>{title}</span>
-            {toolBar}
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <PageTitle>{title}</PageTitle>
+              {toolBar}
+            </div>
+            <DeviceComponent desktop={pagination ?? <></>} mobile={<></>}></DeviceComponent>
           </div>
         </>
       ) : (
@@ -156,6 +171,19 @@ export const Form: React.FC<FormProps> = ({
           <></>
         )}
       </div>
+      <DeviceComponent desktop={<></>} mobile={pagination ?? <></>}></DeviceComponent>
+    </div>
+  );
+};
+
+export const Row: React.FC<{
+  children: ReactElement | ReactElement[];
+  style?: React.CSSProperties;
+}> = ({ children, style }) => {
+  const styles = useStyles();
+  return (
+    <div className={styles.row} style={style}>
+      {children}
     </div>
   );
 };

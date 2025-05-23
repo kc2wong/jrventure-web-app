@@ -1,8 +1,17 @@
 import { useTranslation } from 'react-i18next';
-import { LanguageEnum, Student, User, Shop, SimpleUser } from '../models/openapi';
+import {
+  LanguageEnum,
+  Student,
+  User,
+  Shop,
+  SimpleUser,
+  Activity,
+  ActivityCategory,
+} from '../models/openapi';
 
 export const useNameInPreferredLanguage = (
-  object: Student | SimpleUser | User | Shop | undefined,
+  object: Student | SimpleUser | User | Shop | ActivityCategory | Activity | undefined,
+  // attributeName?: string,
 ): string => {
   const { i18n } = useTranslation();
 

@@ -11,12 +11,14 @@ export const useTimezone = () => {
     throw new Error('useTimezone must be used within a TimezoneProvider');
   }
 
-  const formatDate = (date: Date): string => {
-    return DateTime.fromJSDate(date).setZone(context.timezone).toFormat('dd-LL-yyyy');
+  const formatDate = (value: Date | string): string => {
+    const date = value instanceof Date ? value : new Date(value);
+    return isNaN(date.getTime()) ? '' : DateTime.fromJSDate(date).setZone(context.timezone).toFormat('yyyy-LL-dd');
   };
 
-  const formatDatetime = (date: Date): string => {
-    return DateTime.fromJSDate(date).setZone(context.timezone).toFormat('dd-LL-yyyy HH:mm:ss');
+  const formatDatetime = (value: Date): string => {
+    const date = value instanceof Date ? value : new Date(value);
+    return isNaN(date.getTime()) ? '' : DateTime.fromJSDate(date).setZone(context.timezone).toFormat('yyyy-LL-dd HH:mm:ss');
   };
 
   const formatDistanceToNow = (date: Date): string => {

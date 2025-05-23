@@ -1,7 +1,7 @@
 import { makeStyles, shorthands, tokens, typographyStyles } from '@fluentui/react-components';
 import pathMappingJson from './path-mapping.json';
 
-export const useStyles = makeStyles({
+export const useCommonStyles = makeStyles({
   root: {
     ...shorthands.overflow('hidden'),
     display: 'flex',
@@ -35,6 +35,13 @@ export const useStyles = makeStyles({
   buttonPanel: {
     display: 'flex',
     justifyContent: 'flex-end',
+  },
+
+  field: {
+    width: '100%', // Fill full 1fr column
+    minWidth: 0, // Override Fluent UI's internal ~200px min-width
+    maxWidth: '100%', // Prevent it from overflowing
+    boxSizing: 'border-box', // Ensure padding doesn't break layout
   },
 });
 

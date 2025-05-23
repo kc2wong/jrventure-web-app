@@ -129,7 +129,13 @@
     "name": "姓名",
     "role": {
       "label": "角色",
-      "value": { "Student": "學生", "Parent": "家長", "Teacher": "導師", "Admin": "管理員", "Alumni": "校友" }
+      "value": {
+        "Student": "學生",
+        "Parent": "家長",
+        "Teacher": "導師",
+        "Admin": "管理員",
+        "Alumni": "校友"
+      }
     },
     "classId": "班別",
     "studentId": "學生編號",
@@ -160,56 +166,36 @@
     "title": "Product Approval",
     "titleReview": "Review Product"
   },
-  "paymentMaintenance": {
-    "account": "Account",
-    "action": "Action",
-    "amount": "Amount",
-    "code": "Code",
-    "direction": {
-      "label": "Direction",
-      "value": { "incoming": "Incoming", "outgoing": "Outgoing" }
-    },
-    "bankBuy": "Bank Buy (Credit)",
-    "bankBuyCcy": "Bank Buy CCY",
-    "bankSell": "Bank Sell (Debit)",
-    "bankSellCcy": "Bank Sell CCY",
-    "dealCcy": "Deal CCY",
-    "dealAmount": "Deal Amount",
-    "executeDate": "Execute Date",
-    "fxRef": "FX Ref",
-    "instructionId": "Instruction Id",
-    "memo": "Memo",
-    "message": {
-      "doYouWantToInitiatePaymentRequest": "Do you want to initiate payment request",
-      "doYouWantToSubmitMatchingRequest": "Do you want to submit matching request with fxRef [${1}]",
-      "doYouWantToSubmitBookingRequest": "Do you want to submit booking request with product [${1}] and value date [${2}]",
-      "initiatePaymentSuccess": "Payment is initated successfully",
-      "submitRequestSuccess": "${1} request is submitted successfully"
-    },
+  "activityMaintenance": {
+    "id": "Id",
+    "category": "Category",
     "name": "Name",
-    "pairedFxRef": "Paired FX Ref",
-    "pairing": {
-      "title": "Submit matching or booking",
-      "value": { "matching": "Matching", "booking": "Booking" }
-    },
-    "product": "Product",
-    "remainingCcy": "Remaining CCY",
-    "remainingAmount": "Remaining Amount",
-    "site": "Site",
+    "description": "Description",
+    "title": "Activity List",
+    "titleEdit": "${1} Activity",
+    "forClass": "For Class",
     "status": {
       "label": "Status",
       "value": {
-        "new": "New",
-        "started": "Started",
-        "cancelled": "Cancelled",
-        "rejected": "Rejected",
-        "submitted": "Submitted",
-        "paired": "Paired"
+        "Open": "開放",
+        "Closed": "關閉",
+        "Cancelled": "取消",
+        "Scheduled": "預定"
       }
     },
-    "title": "Payment List",
-    "titleEdit": "${1} Payment Detail",
-    "valueDate": "Value Date"
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "sharable": "Sharing",
+    "ratable": "Rating",
+    "eCoin": "e-Coin",
+    "submissionRole": {
+      "label": "Submit By",
+      "value": {
+        "Teacher": "導師",
+        "Student": "學生",
+        "Both": "二者"
+      }
+    }
   },
   "zod": {
     "error": {

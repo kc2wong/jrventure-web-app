@@ -1,24 +1,25 @@
 import * as React from 'react';
 import {
-  Input,
-  Switch as FlientUiSwitch,
-  SwitchProps as FluentUiSwitchProps,
+  Switch as FluentSwitch,
+  SwitchProps as FluentSwitchProps,
 } from '@fluentui/react-components';
-import { useTranslation } from 'react-i18next';
 
-type SwitchProps = FluentUiSwitchProps & {
+type SwitchProps = FluentSwitchProps & {
   readOnly?: boolean;
 };
 
-export const Switch: React.FC<SwitchProps> = ({ readOnly = false, checked, ...rest }) => {
-  const { t } = useTranslation();
-  return readOnly ? (
-    <Input
-      appearance="underline"
-      readOnly
-      value={`${checked === true ? t('system.message.yes') : t('system.message.no')}`}
-    />
-  ) : (
-    <FlientUiSwitch checked={checked} {...rest}></FlientUiSwitch>
-  );
-};
+export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
+  ({ readOnly = false, checked, style, onChange, ...rest }, ref) => {
+    return (
+      <FluentSwitch
+        checked={checked}
+        onChange={readOnly ? undefined : onChange}
+        style={style}
+        {...rest}
+        ref={ref}
+      />
+    );
+  },
+);
+
+Switch.displayName = 'Switch';

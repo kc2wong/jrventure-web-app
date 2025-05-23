@@ -47,3 +47,8 @@ export const zodOptionalString = (options?: { minLength?: number; maxLength?: nu
 
   return schema.optional();
 };
+
+export const zodOptionalDate = () => {
+  let schema = z.date();
+  return schema.optional();
+};

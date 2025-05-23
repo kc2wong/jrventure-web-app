@@ -13,6 +13,8 @@ tags:
     description: User Authentication
   - name: Student
     description: Student
+  - name: Activity
+    description: Activity and Achievement
 
 servers:
   - url: http://localhost:8080
@@ -418,6 +420,124 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /activity-categories:
+    get:
+      summary: List all activity category
+      operationId: listActivityCategory
+      tags:
+        - Activity
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityCategory"
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"  
+  /activities:
+      get:
+        summary: Search activities by criteria
+        operationId: findActivity
+        tags:
+          - Activity
+        parameters:
+          - in: query
+            name: categoryCode
+            schema:
+              type: array
+              items:
+                type: string
+          - in: query
+            name: name
+            schema:
+              type: string
+          - in: query
+            name: startDateFrom
+            schema:
+              type: string
+              format: datetime
+          - in: query
+            name: startDateTo
+            schema:
+              type: string
+              format: datetime
+          - in: query
+            name: endDateFrom
+            schema:
+              type: string
+              format: datetime
+          - in: query
+            name: endDateTo
+            schema:
+              type: string
+              format: datetime
+          - in: query
+            name: participantGrade
+            schema:
+              type: array
+              items:
+                type: number
+          - in: query
+            name: status
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ActivityStatus"
+        responses:
+          "200":
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Activity"
+          "500":
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+  /activities/{id}:
+    get:
+      summary: Get activity by id
+      operationId: getActivityById
+      tags:
+        - Activity
+      parameters:
+        - in: path
+          name: id
+          required: true          
+          schema:
+            type: string
+          description: activity id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Activity"
+        "404":
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                  
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                                  
 components:
   securitySchemes:
     jwtCookieAuth:
@@ -474,6 +594,19 @@ components:
       - Conversation
       - Rejection
       - Approval
+    ActivityStatus:
+      type: string
+      enum:
+      - Closed
+      - Open
+      - Scheduled
+      - Cancelled      
+    AchievementSubmissionRole:
+      type: string
+      enum:
+      - Teacher
+      - Student
+      - Both
     AuditControl:
       type: object
       required:
@@ -748,3 +881,66 @@ components:
           type: array
           items:
           $ref: "#/components/schemas/Product"
+
+    ActivityCategory:
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          type: string
+        name:
+          $ref: "#/components/schemas/MultiLingual"
+    Activity:
+      type: object
+      allOf:
+        - type: object
+          required:
+            - id
+            - categoryCode
+            - name
+            - description
+            - startDate
+            - endDate
+            - achievementSubmissionRole
+            - participantGrade
+            - sharable
+            - ratable
+            - eCoin
+            - status
+          properties:
+            id:
+              type: string
+            categoryCode:
+              type: string
+            name:
+              type: object
+              additionalProperties: true
+            description:
+              type: string
+            startDate:
+              type: string
+              format: datetime
+              description: Start date of the activity.  The time part must be zero
+            endDate:
+              type: string
+              format: datetime
+              description: Start date of the activity.  The time part must be zero
+            achievementSubmissionRole:
+              $ref: "#/components/schemas/AchievementSubmissionRole"
+            participantGrade:
+              type: array
+              items:
+                type: number
+                format: int32
+            sharable:
+              type: boolean
+            ratable:
+              type: boolean
+            eCoin:
+              type: number
+              format: int32
+            status:
+              $ref: "#/components/schemas/ActivityStatus"
+        - $ref: "#/components/schemas/AuditControl"
