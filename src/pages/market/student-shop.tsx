@@ -206,7 +206,12 @@ export const StudentShopPage = () => {
   ));
 
   const pagination = (
-    <Pagination onPageSelected={setCurrentPage} selectedPage={currentPage} totalPages={20} />
+    <Pagination
+      offset={currentPage * 5}
+      onOffsetChanged={(offSet) => setCurrentPage(Math.floor(offSet / 5) + 1)}
+      pageSize={5}
+      totalRecord={20 * 5}
+    />
   );
 
   const imageUrl = state.shop?.imageUrl;

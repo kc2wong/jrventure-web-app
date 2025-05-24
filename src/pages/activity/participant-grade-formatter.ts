@@ -17,14 +17,14 @@ export const formatParticpantGrade = (numbers: number[]): string => {
       end = current;
     } else {
       // Break in the sequence
-      result.push(start === end ? `${start}` : `${start} to ${end}`);
+      result.push(start === end ? `P${start}` : `P${start} - P${end}`);
       start = current;
       end = current;
     }
   }
 
   // Push the final range
-  result.push(start === end ? `P${start}` : `P${start}-P${end}`);
+  result.push(start === end ? `P${start}` : `P${start} - P${end}`);
 
   return result.join(', ');
 };

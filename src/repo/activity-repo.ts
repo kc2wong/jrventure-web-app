@@ -1,4 +1,9 @@
-import { Activity, ActivityDetail, ActivityStatus, ActivityPayload } from '../models/openapi';
+import {
+  ActivityDetail,
+  ActivityStatus,
+  ActivityPayload,
+  FindActivityResult,
+} from '../models/openapi';
 import {
   findActivity as findActivityRepo,
   getActivityById as getActivityByIdRepo,
@@ -16,6 +21,8 @@ type FindActivityArgs = {
   endDateFrom?: Date;
   endDateTo?: Date;
   status?: ActivityStatus[];
+  limit: number;
+  offset: number;
 };
 export const findActivity = async ({
   categoryCode,
@@ -26,19 +33,24 @@ export const findActivity = async ({
   endDateFrom,
   endDateTo,
   status,
-}: FindActivityArgs): Promise<Activity[]> => {
+  limit,
+  offset,
+}: FindActivityArgs): Promise<FindActivityResult> => {
   return await callRepo(() => {
+    const query = {
+      categoryCode: categoryCode ? [categoryCode] : undefined,
+      name,
+      participantGrade,
+      status,
+      startDateFrom: startDateFrom ? startDateFrom.toISOString() : undefined,
+      startDateTo: startDateTo ? startDateTo.toISOString() : undefined,
+      endDateFrom: endDateFrom ? endDateFrom.toISOString() : undefined,
+      endDateTo: endDateTo ? endDateTo.toISOString() : undefined,
+      limit,
+      offset,
+    };
     return findActivityRepo({
-      query: {
-        categoryCode: categoryCode ? [categoryCode] : undefined,
-        name,
-        participantGrade,
-        status,
-        startDateFrom: startDateFrom ? startDateFrom.toISOString() : undefined,
-        startDateTo: startDateTo ? startDateTo.toISOString() : undefined,
-        endDateFrom: endDateFrom ? endDateFrom.toISOString() : undefined,
-        endDateTo: endDateTo ? endDateTo.toISOString() : undefined,
-      },
+      query,
     });
   });
 };

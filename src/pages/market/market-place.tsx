@@ -97,8 +97,15 @@ export const MarketPlaceShowcase = () => {
   const [state, action] = useAtom(marketPlaceAtom);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const pagination = <Pagination onPageSelected={setCurrentPage} selectedPage={currentPage} totalPages={20} />
-  
+  const pagination = (
+    <Pagination
+      offset={currentPage * 5}
+      onOffsetChanged={(offSet) => setCurrentPage(Math.floor(offSet / 5) + 1)}
+      pageSize={5}
+      totalRecord={20 * 5}
+    />
+  );
+
   useEffect(() => {
     useStartBreadcrumb('marketPlace.title');
   }, []);

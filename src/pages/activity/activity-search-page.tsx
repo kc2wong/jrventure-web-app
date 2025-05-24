@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   ToolbarButton,
   Table,
@@ -34,7 +34,6 @@ import {} from '../../models/system';
 import { SearchCriteriaDrawer } from '../../components/Drawer';
 import { Form, Root } from '../../components/Container';
 import { Field } from '../../components/Field';
-import { logger } from '../../utils/logging-util';
 import {
   Filter,
   activityListAtom,
@@ -59,6 +58,7 @@ import { formatParticpantGrade } from './participant-grade-formatter';
 import { DatePicker } from '@fluentui/react-datepicker-compat';
 import { useCommonStyles } from '../common';
 import { Input } from '../../components/Input';
+import { ToolbarButtonWithLabel } from '../../components/toolbar-button';
 
 const searchSchema = z.object({
   categoryCode: zodOptionalString(),
@@ -71,6 +71,7 @@ const searchSchema = z.object({
   status: z.array(z.string()).optional(),
 });
 
+const pageSize = 4;
 const statusList = Object.values(ActivityStatusEnum) as ActivityStatusEnum[];
 const gradeList = [1, 2, 3, 4, 5, 6];
 
@@ -127,7 +128,6 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
       onDrawerClose={() => onOpenChange(false)}
       onSearch={handleSubmit(() => {
         const formData = getValues();
-        logger.info(`Start search activity with criteria ${JSON.stringify(formData)}`);
         action({
           search: {
             filter: _searchFormData2Filter(formData),
@@ -144,6 +144,7 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
         control={control}
         name="categoryCode"
         render={({ field }) => {
+          const activityCategoryList = activtyCategoryState.getResult() ?? [];
           const { value, ...others } = field;
           return (
             <Field
@@ -165,8 +166,11 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
                   );
                 }}
                 selectedOptions={value ? [value] : []}
+                value={useNameInPreferredLanguage(
+                  activityCategoryList.find((ac) => ac.code === value),
+                )}
               >
-                {(activtyCategoryState.getResult() ?? []).map((ac) => (
+                {activityCategoryList.map((ac) => (
                   <Option key={ac.code} value={`${ac.code}`}>
                     {useNameInPreferredLanguage(ac)}
                   </Option>
@@ -217,6 +221,7 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
                   setValue(name, data.selectedOptions);
                 }}
                 selectedOptions={value}
+                value={(value ? value.sort().map((i) => `P${i}`) : []).join(',')}
               >
                 {gradeList.map((i) => (
                   <Option key={i} value={`${i}`}>
@@ -350,7 +355,6 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
   onViewButtonClick,
 }: ActivitySearchPageProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useAtom(drawerOpenAtom);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const { t } = useTranslation();
 
   const { useStartBreadcrumb } = useBreadcrumb();
@@ -468,7 +472,7 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
     }),
   ];
 
-  const items = state.getResult() ?? [];
+  const items = state.getResult()?.data ?? [];
   const {
     getRows,
     selection: { toggleRow, isRowSelected },
@@ -557,8 +561,18 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
     </Tooltip>
   );
 
-  const pagination = (
-    <Pagination onPageSelected={setCurrentPage} selectedPage={currentPage} totalPages={20} />
+  const result = state.getResult();
+  const pagination = result ? (
+    <Pagination
+      offset={result.offset}
+      onOffsetChanged={(offset) => {
+        action({ pagination: { offSet: offset } });
+      }}
+      pageSize={pageSize}
+      totalRecord={result.total}
+    />
+  ) : (
+    <></>
   );
 
   return (
@@ -634,9 +648,11 @@ const _searchFormData2Filter = ({
   ...others
 }: SearchFormData): Filter => {
   return {
+    ...others,
     participantGrade: participantGrade ? participantGrade.map((i) => parseInt(i)) : undefined,
     status: status?.map((s) => getEnumValueByRawValue(ActivityStatusEnum, s)!) ?? [],
-    ...others,
+    offset: 0,
+    limit: pageSize,
   };
 };
 

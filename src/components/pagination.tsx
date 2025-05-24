@@ -3,9 +3,10 @@ import { Button, makeStyles, mergeClasses, shorthands, tokens } from '@fluentui/
 import { ChevronCircleLeftRegular, ChevronCircleRightRegular } from '@fluentui/react-icons'; // Ensure this is the correct library
 
 type PaginationProps = {
-  totalPages: number;
-  selectedPage: number;
-  onPageSelected: (page: number) => void;
+  offset: number;
+  pageSize: number;
+  totalRecord: number;
+  onOffsetChanged: (offset: number) => void;
 };
 
 const useStyles = makeStyles({
@@ -95,11 +96,18 @@ export const getPaginationSlots = (selectedPage: number, totalPages: number): Pa
 };
 
 export const Pagination: React.FC<PaginationProps> = ({
-  totalPages,
-  selectedPage,
-  onPageSelected,
+  offset,
+  pageSize,
+  totalRecord,
+  onOffsetChanged,
 }) => {
   const styles = useStyles();
+
+  if (totalRecord === 0) {
+    return <></>;
+  }
+  const totalPages = Math.ceil(totalRecord / pageSize);
+  const selectedPage = Math.floor(offset / pageSize) + 1;
 
   const pageItems = getPaginationSlots(selectedPage, totalPages);
 
@@ -110,7 +118,12 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={styles.pageButton}
         disabled={selectedPage === 1}
         icon={<ChevronCircleLeftRegular />}
-        onClick={() => onPageSelected(selectedPage - 1)}
+        onClick={() => {
+          const newOffset = Math.max(0, (selectedPage - 2) * pageSize);
+          if (newOffset !== offset) {
+            onOffsetChanged(newOffset);
+          }
+        }} // Ensure offset does not go below 0
       ></Button>
 
       {pageItems.map(({ label, page, key }) => (
@@ -121,7 +134,12 @@ export const Pagination: React.FC<PaginationProps> = ({
               styles.pageButton,
               selectedPage === page && styles.selectedPageButton,
             )}
-            onClick={() => page !== null && onPageSelected(page)}
+            onClick={() => {
+              const newOffset = page !== null ? (page - 1) * pageSize : offset;
+              if (newOffset !== offset) {
+                onOffsetChanged(newOffset);
+              }
+            }}
           >
             {label}
           </Button>
@@ -134,7 +152,12 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={styles.pageButton}
         disabled={selectedPage === totalPages}
         icon={<ChevronCircleRightRegular />}
-        onClick={() => onPageSelected(selectedPage + 1)}
+        onClick={() => {
+          const newOffset = Math.min(totalRecord, selectedPage * pageSize);
+          if (newOffset !== offset) {
+            onOffsetChanged(newOffset);
+          }
+        }}
       ></Button>
     </div>
   );

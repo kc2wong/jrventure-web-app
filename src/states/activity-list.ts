@@ -1,6 +1,6 @@
 import { Atom, atom, Setter } from 'jotai';
 import { atomWithReset, RESET } from 'jotai/utils';
-import { ActivityStatusEnum, Activity } from '../models/openapi';
+import { ActivityStatusEnum, Activity, FindActivityResult } from '../models/openapi';
 import { OneOnly } from '../utils/object-util';
 import { EmptyObject } from '../models/common';
 import { isError, Message, MessageType } from '../models/system';
@@ -9,6 +9,8 @@ import { delay } from '../utils/date-util';
 import { findActivity as findActivityRepo } from '../repo/activity-repo';
 
 enum ActivityOrdering {
+  NameAsc,
+  NameDesc,
   StartDateAsc,
   StartDateDesc,
 }
@@ -21,10 +23,12 @@ export type Filter = {
   endDateFrom?: Date;
   endDateTo?: Date;
   status?: ActivityStatusEnum[];
+  offset: number;
+  limit: number;
 };
 
 type ActivityListStateArgs = {
-  result?: Activity[];
+  result?: FindActivityResult;
   selectedResult?: Activity;
   isDirty: boolean;
   ordering: ActivityOrdering;
@@ -32,7 +36,7 @@ type ActivityListStateArgs = {
 };
 
 class ActivityListState implements BaseState {
-  result?: Activity[];
+  result?: FindActivityResult;
   selectedResult?: Activity;
   isDirty: boolean;
   ordering: ActivityOrdering;
@@ -48,7 +52,7 @@ class ActivityListState implements BaseState {
     this.eventTime = Date.now();
   }
 
-  getResult = (): Activity[] | undefined => {
+  getResult = (): FindActivityResult | undefined => {
     return this.result;
   };
 }
@@ -58,7 +62,7 @@ class ActivityListStateInitial extends ActivityListState {
     super({
       ordering: ActivityOrdering.StartDateAsc,
       isDirty: false,
-      filter: { participantGrade: [] },
+      filter: { participantGrade: [], offset: 0, limit: 0 },
     });
   }
 }
@@ -70,12 +74,12 @@ class ActivityListStateProgress extends ActivityListState {
 }
 
 class ActivityListStateSuccess extends ActivityListState {
-  override result: Activity[];
+  override result: FindActivityResult;
   override filter: Filter;
   override ordering: ActivityOrdering;
 
   constructor(
-    result: Activity[],
+    result: FindActivityResult,
     filter: Filter,
     isDirty: boolean,
     ordering: ActivityOrdering,
@@ -101,10 +105,12 @@ const activityListBaseAtom = atomWithReset<ActivityListState>(new ActivityListSt
 
 type SearchPayload = { filter: Filter };
 type UpdateOrderingPayload = { filter: Filter; ordering: ActivityOrdering };
+type PaginationPayload = { offSet: number}
 
 type ActivityListPayload = {
   search: SearchPayload;
   refresh: EmptyObject;
+  pagination: PaginationPayload;
   updateOrdering: UpdateOrderingPayload;
   markDirty: EmptyObject;
   reset: EmptyObject;
@@ -128,6 +134,8 @@ const searchOrRefresh = async (
     endDateFrom,
     endDateTo,
     status,
+    offset,
+    limit,
   } = filter;
   const result = await findActivityRepo({
     categoryCode,
@@ -137,10 +145,12 @@ const searchOrRefresh = async (
     endDateFrom,
     endDateTo,
     status,
+    offset,
+    limit
   });
   const endTime = Date.now();
-  if (endTime - startTime < 1000) {
-    await delay(1000 - (endTime - startTime));
+  if (endTime - startTime < 250) {
+    await delay(250 - (endTime - startTime));
   }
 
   const isFailed = isError(result);
@@ -160,12 +170,16 @@ const searchOrRefresh = async (
   }
 };
 
-export const activityListAtom = atom<ActivityListState, [OneOnly<ActivityListPayload>], Promise<void>>(
+export const activityListAtom = atom<
+  ActivityListState,
+  [OneOnly<ActivityListPayload>],
+  Promise<void>
+>(
   (get) => get(activityListBaseAtom),
   async (
     get,
     set,
-    { search, refresh, updateOrdering, reset, select, markDirty }: OneOnly<ActivityListPayload>,
+    { search, refresh, pagination, updateOrdering, reset, select, markDirty }: OneOnly<ActivityListPayload>,
   ) => {
     const current = get(activityListBaseAtom);
     if (search) {
@@ -173,6 +187,11 @@ export const activityListAtom = atom<ActivityListState, [OneOnly<ActivityListPay
     } else if (refresh) {
       if (current instanceof ActivityListStateSuccess) {
         searchOrRefresh(current, get, set, current.filter, current.ordering);
+      }
+    } else if (pagination) {
+      if (current instanceof ActivityListStateSuccess) {
+        const newFilter = { ...current.filter, offset: pagination.offSet };
+        searchOrRefresh(current, get, set, newFilter, current.ordering);
       }
     } else if (updateOrdering) {
       searchOrRefresh(current, get, set, current.filter, updateOrdering.ordering);

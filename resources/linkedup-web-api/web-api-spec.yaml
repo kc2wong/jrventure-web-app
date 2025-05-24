@@ -491,15 +491,23 @@ paths:
               type: array
               items:
                 $ref: "#/components/schemas/ActivityStatus"
+          - in: query
+            name: offset
+            required: true
+            schema:
+              type: number
+          - in: query
+            name: limit
+            required: true
+            schema:
+              type: number
         responses:
           "200":
             description: OK
             content:
               application/json:
                 schema:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/Activity"
+                  $ref: '#/components/schemas/FindActivityResult'              
           "500":
             description: Unexpected error
             content:
@@ -1032,6 +1040,24 @@ components:
             id:
               type: string
         - $ref: "#/components/schemas/ActivityPayload"
+    FindActivityResult:
+      type: object
+      required:
+        - offset
+        - limit
+        - total
+        - data
+      properties:
+        offset:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Activity'
     ActivityDetail:
       type: object
       allOf:

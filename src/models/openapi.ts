@@ -8,6 +8,7 @@ import {
   ActivityStatus,
   ActivityPayload,
   AchievementSubmissionRole,
+  FindActivityResult,
 } from '../__generated__/linkedup-web-api-client';
 
 import { Language, UserRole, UserStatus } from '../__generated__/linkedup-web-api-client';
@@ -81,4 +82,5 @@ export type {
   ActivityStatus,
   ActivityPayload,
   AchievementSubmissionRole,
+  FindActivityResult,
 };
