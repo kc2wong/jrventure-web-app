@@ -215,6 +215,7 @@ export const Main: React.FC = () => {
                 <Route element={<ActivityMaintenancePage />} path="/activity" />
                 <Route element={<ActivityMaintenancePage />} path="/activity/add" />
                 <Route element={<ActivityMaintenancePage />} path="/activity/:id/view" />
+                <Route element={<ActivityMaintenancePage />} path="/activity/:id/edit" />
                 <Route
                   element={
                     <MobileSettingsPage

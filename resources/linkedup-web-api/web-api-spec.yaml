@@ -506,6 +506,42 @@ paths:
               application/json:
                 schema:
                   $ref: "#/components/schemas/Error"
+      post:
+        summary: Create a new activity
+        operationId: createActivity
+        tags:
+          - Activity
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityPayload"
+        responses:
+          "201":
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ActivityDetail"
+          "400":
+            description: Validation error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          "401":
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          "500":
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
   /activities/{id}:
     get:
       summary: Get activity by id
@@ -525,7 +561,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Activity"
+                $ref: "#/components/schemas/ActivityDetail"
         "404":
           description: not found
           content:
@@ -537,7 +573,53 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"                                  
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update an existing activity
+      operationId: updateActivity
+      tags:
+        - Activity
+      parameters:
+        - in: path
+          name: id
+          required: true          
+          schema:
+            type: string
+          description: Activity ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - $ref: "#/components/schemas/ActivityPayload"
+                - type: object
+                  required:
+                    - version
+                  properties:
+                    version:
+                      type: number
+
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityDetail"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   securitySchemes:
     jwtCookieAuth:
@@ -892,12 +974,11 @@ components:
           type: string
         name:
           $ref: "#/components/schemas/MultiLingual"
-    Activity:
+    ActivityPayload:
       type: object
       allOf:
         - type: object
           required:
-            - id
             - categoryCode
             - name
             - description
@@ -910,8 +991,6 @@ components:
             - eCoin
             - status
           properties:
-            id:
-              type: string
             categoryCode:
               type: string
             name:
@@ -943,4 +1022,18 @@ components:
               format: int32
             status:
               $ref: "#/components/schemas/ActivityStatus"
+    Activity:
+      type: object
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+        - $ref: "#/components/schemas/ActivityPayload"
+    ActivityDetail:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Activity"
         - $ref: "#/components/schemas/AuditControl"

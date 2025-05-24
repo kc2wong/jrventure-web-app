@@ -3,6 +3,7 @@ import React from 'react';
 import { z } from 'zod';
 import {
   Activity,
+  ActivityPayload,
   ActivityStatusEnum,
   LanguageEnum,
   SubmissionRoleEnum,
@@ -34,7 +35,11 @@ import { hasMissingRequiredField } from '../../utils/form-util';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 import { activityCategoryListAtom } from '../../states/activity-category-list';
-import { activityDetailAtom, ActivityDetailStateGetSuccess } from '../../states/activity-detail';
+import {
+  activityDetailAtom,
+  ActivityDetailStateGetSuccess,
+  ActivityDetailStateUpdateSuccess,
+} from '../../states/activity-detail';
 import { MultiLangButton, MultiLangDrawer } from '../../components/multi-lang-drawer';
 import { useTimezone } from '../../hooks/use-timezone';
 import { Switch } from '../../components/switch';
@@ -45,8 +50,9 @@ import { SpinButton } from '../../components/spinner-button';
 import { RadioGroup } from '../../components/radio-group';
 import { Dropdown } from '../../components/drop-down';
 import { Checkbox } from '../../components/check-box';
+import { getEnumValueByRawValue } from '../../utils/enum-util';
+import { MessageType } from '../../models/system';
 
-// form for editing user
 const maxNameLength = 50;
 
 const roleList = Object.values(SubmissionRoleEnum) as SubmissionRoleEnum[];
@@ -70,7 +76,7 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
   const { t } = useTranslation();
   const { formatDate } = useTimezone();
   const { dispatchMessage } = useMessage();
-  const { useStartBreadcrumb, useAppendBreadcrumb } = useBreadcrumb();
+  const { useAppendBreadcrumb } = useBreadcrumb();
 
   const { showConfirmationDialog } = useDialog();
   const { markDirty, resetDirty } = useFormDirty();
@@ -131,40 +137,53 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
     }
   };
 
-  //   const _formData2UserCreation = (formData: FormData): UserCreation => {
-  //     const { role, status, entitledStudentId, entitledStudentId2, ...others } = formData;
-  //     return {
-  //       role: getEnumValueByRawValue(UserRoleEnum, role)!,
-  //       status: getEnumValueByRawValue(UserStatusEnum, status)!,
-  //       entitledStudentId: [entitledStudentId, entitledStudentId2]
-  //         .map((s) => emptyStringToUndefined(s))
-  //         .filter((s) => s !== undefined),
-  //       ...others,
-  //     };
-  //   };
+  const _formData2ActivityCreation = (formData: FormData): ActivityPayload => {
+    const { submissionRole, status, startDate, endDate, ...rest } = formData;
+    const rtn = {
+      achievementSubmissionRole: getEnumValueByRawValue(SubmissionRoleEnum, submissionRole)!,
+      status: getEnumValueByRawValue(ActivityStatusEnum, status)!,
+      startDate: startDate!.toISOString(),
+      endDate: endDate!.toISOString(),
+      ...rest,
+    };
+    return rtn;
+  };
 
-  const schema = z.object({
-    id: zodOptionalString(),
-    categoryCode: zodString(),
-    name: z
-      .record(zodOptionalString({ maxLength: maxNameLength }))
-      .refine(
-        (data) => data[LanguageEnum.English] && data[LanguageEnum.English].trim().length > 0,
-        {
-          message: 'Required',
-          path: ['en'], // path of error
-        },
-      ),
-    description: zodString(),
-    submissionRole: zodString(),
-    participantGrade: z.array(z.number()),
-    startDate: z.date().nullable(),
-    endDate: z.date().optional().nullable(),
-    ratable: z.boolean(),
-    sharable: z.boolean(),
-    eCoin: z.number(),
-    status: zodString(),
-  });
+  const schema = z
+    .object({
+      id: zodOptionalString(),
+      categoryCode: zodString(),
+      name: z
+        .record(zodOptionalString({ maxLength: maxNameLength }))
+        .refine(
+          (data) => data[LanguageEnum.English] && data[LanguageEnum.English].trim().length > 0,
+          {
+            message: 'zod.error.required',
+            path: ['en'], // path of error
+          },
+        ),
+      description: zodString(),
+      submissionRole: zodString(),
+      participantGrade: z.array(z.number()).refine((data) => data.length > 0, {
+        message: 'zod.error.required',
+      }),
+      startDate: z.date().nullable(),
+      endDate: z.date().nullable(),
+      ratable: z.boolean(),
+      sharable: z.boolean(),
+      eCoin: z.number(),
+      status: zodString(),
+    })
+    .refine(
+      (data) =>
+        data.startDate === null ||
+        data.endDate === null ||
+        data.endDate.getTime() >= data.startDate.getTime(),
+      {
+        message: 'zod.error.too_small',
+        path: ['endDate'], // path of error
+      },
+    );
 
   type FormData = z.infer<typeof schema>;
 
@@ -204,6 +223,15 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
       baselineTimestamp.current = state.eventTime;
       if (state instanceof ActivityDetailStateGetSuccess) {
         reset(_activity2FormData(state.result));
+      } else if (state instanceof ActivityDetailStateUpdateSuccess) {
+        dispatchMessage({
+          type: MessageType.Success,
+          text: constructMessage(t, 'system.message.saveObjectSuccess', [
+            'Activity',
+            state.result.id,
+          ]),
+        });
+        onSave();
       }
     }
   }, [state]);
@@ -244,17 +272,17 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
             label: t('system.message.save'),
             icon: <CheckmarkRegular />,
             action: () => {
-              //   action(
-              //     state.result
-              //       ? {
-              //           update: {
-              //             id: state.result.id,
-              //             version: state.result.version,
-              //             user: _formData2UserCreation(formValues),
-              //           },
-              //         }
-              //       : { create: _formData2UserCreation(formValues) },
-              //   );
+              action(
+                state.result
+                  ? {
+                      update: {
+                        id: state.result.id,
+                        version: state.result.version,
+                        activity: _formData2ActivityCreation(formValues),
+                      },
+                    }
+                  : { create: _formData2ActivityCreation(formValues) },
+              );
             },
           },
           secondaryButton: { label: t('system.message.cancel'), icon: <DismissRegular /> },
@@ -382,12 +410,19 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
           control={control}
           name="participantGrade"
           render={({ field }) => {
-            const { name, value } = field;
+            const { value, onChange } = field;
+            const handleCheckboxToggle = (num: number) => {
+              const newValue = value.includes(num)
+                ? value.filter((e) => e !== num)
+                : [...value, num];
+              onChange(newValue); // This keeps RHF in sync
+            };
+
             return (
               <Field
                 colSpan={2}
                 label={t('activityMaintenance.forClass')}
-                required={true}
+                required
                 validationMessage={errors?.participantGrade?.message}
               >
                 <Row>
@@ -398,16 +433,7 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
                         key={num}
                         checked={checked}
                         label={`P${num}`}
-                        onChange={() => {
-                          if (checked) {
-                            setValue(
-                              name,
-                              value.filter((e) => e !== num),
-                            );
-                          } else {
-                            setValue(name, [...value, num]);
-                          }
-                        }}
+                        onChange={() => handleCheckboxToggle(num)}
                         readOnly={readOnly}
                       />
                     );
@@ -424,6 +450,7 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
           control={control}
           name="startDate"
           render={({ field }) => {
+            const { onChange, ...others } = field;
             return (
               <Field
                 label={t('activityMaintenance.startDate')}
@@ -431,9 +458,14 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
                 validationMessage={errors?.startDate?.message}
               >
                 <DatePicker
-                  formatDate={(date) => (date ? formatDate(date) : '')}
+                  formatDate={(date) => {
+                    return date ? formatDate(date) : '';
+                  }}
+                  onSelectDate={(data) => {
+                    onChange(data ? data : null);
+                  }}
                   readOnly={readOnly}
-                  {...field}
+                  {...others}
                 />
               </Field>
             );
@@ -444,6 +476,7 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
           control={control}
           name="endDate"
           render={({ field }) => {
+            const { onChange, ...others } = field;
             return (
               <Field
                 label={t('activityMaintenance.endDate')}
@@ -452,8 +485,11 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
               >
                 <DatePicker
                   formatDate={(date) => (date ? formatDate(date) : '')}
+                  onSelectDate={(data) => {
+                    onChange(data ? data : null);
+                  }}
                   readOnly={readOnly}
-                  {...field}
+                  {...others}
                 />
               </Field>
             );
@@ -464,14 +500,24 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
           control={control}
           name="eCoin"
           render={({ field }) => {
-            const { ...others } = field;
+            const { onChange, ...others } = field;
+            // console.log(`onChange = ${onChange}`);
             return (
               <Field
                 label={t('activityMaintenance.eCoin')}
                 required
                 validationMessage={errors?.eCoin?.message}
               >
-                <SpinButton min={0} readOnly={readOnly} {...others} />
+                <SpinButton
+                  min={0}
+                  onChange={(_ev, data) => {
+                    if (data.value) {
+                      setValue(field.name, data.value);
+                    }
+                  }}
+                  readOnly={readOnly}
+                  {...others}
+                />
               </Field>
             );
           }}
@@ -487,7 +533,7 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
                 colSpan={2}
                 label={t('activityMaintenance.submissionRole.label')}
                 required={true}
-                validationMessage={errors?.participantGrade?.message}
+                validationMessage={errors?.submissionRole?.message}
               >
                 <Row>
                   <RadioGroup layout="horizontal" readOnly={readOnly} {...others}>

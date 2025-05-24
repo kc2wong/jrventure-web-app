@@ -126,17 +126,15 @@ export const ActivityMaintenancePage: React.FC = () => {
     <ActivitySearchPage
       onAddButtonClick={() => navigate('/activity/add')}
       onEditButtonClick={() => {
-        // const selectedActivity = activityListState.selectedResult;
-        // if (selectedActivity) {
-        //   navigateWithSpinner(`/activity/${selectedActivity.id}/edit`, { state: { user: selectedActivity } });
-        // }
+        const selectedActivity = activityListState.selectedResult;
+        if (selectedActivity) {
+          navigateWithSpinner(`/activity/${selectedActivity.id}/edit`);
+        }
       }}
       onViewButtonClick={() => {
         const selectedActivity = activityListState.selectedResult;
         if (selectedActivity) {
-          navigateWithSpinner(`/activity/${selectedActivity.id}/view`, {
-            state: { activity: selectedActivity },
-          });
+          navigateWithSpinner(`/activity/${selectedActivity.id}/view`);
         }
       }}
     />

@@ -1,7 +1,9 @@
-import { Activity, ActivityStatus } from '../models/openapi';
+import { Activity, ActivityDetail, ActivityStatus, ActivityPayload } from '../models/openapi';
 import {
   findActivity as findActivityRepo,
   getActivityById as getActivityByIdRepo,
+  createActivity as createActivityRepo,
+  updateActivity as updateActivityRepo,
 } from '../__generated__/linkedup-web-api-client';
 import { callRepo } from './repo-util';
 
@@ -41,8 +43,24 @@ export const findActivity = async ({
   });
 };
 
-export const getActivityById = async (id: string): Promise<Activity> => {
+export const getActivityById = async (id: string): Promise<ActivityDetail> => {
   return await callRepo(() => {
     return getActivityByIdRepo({ path: { id } });
+  });
+};
+
+export const createActivity = async (args: ActivityPayload): Promise<ActivityDetail> => {
+  return await callRepo(() => {
+    return createActivityRepo({ body: args });
+  });
+};
+
+export const updateActivity = async (
+  activityId: string,
+  version: number,
+  activity: ActivityPayload,
+): Promise<ActivityDetail> => {
+  return await callRepo(() => {
+    return updateActivityRepo({ path: { id: activityId }, body: { ...activity, version } });
   });
 };

@@ -13,12 +13,16 @@ export const useTimezone = () => {
 
   const formatDate = (value: Date | string): string => {
     const date = value instanceof Date ? value : new Date(value);
-    return isNaN(date.getTime()) ? '' : DateTime.fromJSDate(date).setZone(context.timezone).toFormat('yyyy-LL-dd');
+    return isNaN(date.getTime())
+      ? ''
+      : DateTime.fromJSDate(date).setZone(context.timezone).toFormat('yyyy-LL-dd');
   };
 
   const formatDatetime = (value: Date): string => {
     const date = value instanceof Date ? value : new Date(value);
-    return isNaN(date.getTime()) ? '' : DateTime.fromJSDate(date).setZone(context.timezone).toFormat('yyyy-LL-dd HH:mm:ss');
+    return isNaN(date.getTime())
+      ? ''
+      : DateTime.fromJSDate(date).setZone(context.timezone).toFormat('yyyy-LL-dd HH:mm:ss');
   };
 
   const formatDistanceToNow = (date: Date): string => {

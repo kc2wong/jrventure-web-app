@@ -18,7 +18,6 @@ import {
   BoxCheckmarkRegular,
   StoreMicrosoftRegular,
   PeopleCheckmarkRegular,
-  CalendarDateRegular,
 } from '@fluentui/react-icons';
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { useAtomValue } from 'jotai';
@@ -83,7 +82,7 @@ const navigationMenu: NavigationMenuItem[] = [
     type: 'item',
     id: 'mnuActivity',
     label: 'Activity',
-    icon: CalendarDateRegular,
+    icon: AccessibilityRegular,
     path: '/activity',
     showInSidebar: true,
   },

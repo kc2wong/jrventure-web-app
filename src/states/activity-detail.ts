@@ -1,6 +1,6 @@
 import { atom, Getter, Setter } from 'jotai';
 import { atomWithReset, RESET } from 'jotai/utils';
-import { Activity, Error } from '../models/openapi';
+import { ActivityDetail, ActivityPayload, Error } from '../models/openapi';
 import { OneOnly } from '../utils/object-util';
 import { EmptyObject } from '../models/common';
 import { isError, Message, MessageType } from '../models/system';
@@ -9,14 +9,14 @@ import { undefinedToEmptyString } from '../utils/object-util';
 import { delay } from '../utils/date-util';
 import {
   getActivityById as getActivityByIdRepo,
-  // createUser as createUserRepo,
-  // updateUser as updateUserRepo,
+  createActivity as createActivityRepo,
+  updateActivity as updateActivityRepo,
 } from '../repo/activity-repo';
 
-type ActivityDetailStateArgs = { result?: Activity; updateSuccessTime?: number };
+type ActivityDetailStateArgs = { result?: ActivityDetail; updateSuccessTime?: number };
 
 class ActivityDetailState implements BaseState {
-  result?: Activity;
+  result?: ActivityDetail;
   eventTime: number;
 
   constructor({ result }: ActivityDetailStateArgs) {
@@ -38,18 +38,18 @@ class ActivityDetailStateProgress extends ActivityDetailState {
 }
 
 class ActivityDetailStateGetSuccess extends ActivityDetailState {
-  override result: Activity;
+  override result: ActivityDetail;
 
-  constructor(result: Activity) {
+  constructor(result: ActivityDetail) {
     super({ result });
     this.result = result;
   }
 }
 
 class ActivityDetailStateUpdateSuccess extends ActivityDetailState {
-  override result: Activity;
+  override result: ActivityDetail;
 
-  constructor(result: Activity) {
+  constructor(result: ActivityDetail) {
     super({ result });
     this.result = result;
   }
@@ -66,12 +66,12 @@ class ActivityDetailStateFail extends ActivityDetailState {
 
 const activityDetailBaseAtom = atomWithReset<ActivityDetailState>(new ActivityDetailStateInitial());
 
-type UserDetailPayload = {
+type ActivityDetailPayload = {
   search: { id: string };
   refresh: EmptyObject;
   reset: EmptyObject;
-  // create: UserCreation;
-  // update: { id: string; version: number; user: UserCreation };
+  create: ActivityPayload;
+  update: { id: string; version: number; activity: ActivityPayload };
 };
 
 const _setProgress = (current: ActivityDetailState, set: Setter) => {
@@ -92,10 +92,10 @@ const _withMinDuration = async <T>(promise: Promise<T>, minDurationMs = 1000): P
 };
 
 const _handleResult = (
-  result: Activity | Error,
+  result: ActivityDetail | Error,
   set: Setter,
   currentState: ActivityDetailState,
-  successState: (user: Activity) => ActivityDetailState,
+  successState: (activityDetail: ActivityDetail) => ActivityDetailState,
 ): ActivityDetailState => {
   if (isError(result)) {
     const failure: Message = {
@@ -125,36 +125,36 @@ const _searchOrRefresh = async (
 ) => {
   const stateProgress = _setProgress(current, set);
   const result = await _withMinDuration(getActivityByIdRepo(id));
-  _handleResult(result, set, stateProgress, (user) => new ActivityDetailStateGetSuccess(user));
+  _handleResult(result, set, stateProgress, (activity) => new ActivityDetailStateGetSuccess(activity));
 };
 
-// const _createOrUpdate = async (
-//   current: ActivityDetailState,
-//   set: Setter,
-//   userCreation: UserCreation,
-//   userIdVersion?: { id: string; version: number },
-// ) => {
-//   const stateProgress = _setProgress(current, set);
-//   const result = await _withMinDuration(
-//     userIdVersion
-//       ? updateUserRepo(userIdVersion.id, userIdVersion.version, userCreation)
-//       : createUserRepo(userCreation),
-//   );
-//   const _nextState = _handleResult(
-//     result,
-//     set,
-//     stateProgress,
-//     (user) => new ActivityDetailStateUpdateSuccess(user),
-//   );
-// };
+const _createOrUpdate = async (
+  current: ActivityDetailState,
+  set: Setter,
+  activityPayload: ActivityPayload,
+  activityIdVersion?: { id: string; version: number },
+) => {
+  const stateProgress = _setProgress(current, set);
+  const result = await _withMinDuration(
+    activityIdVersion
+      ? updateActivityRepo(activityIdVersion.id, activityIdVersion.version, activityPayload)
+      : createActivityRepo(activityPayload),
+  );
+  _handleResult(
+    result,
+    set,
+    stateProgress,
+    (activity) => new ActivityDetailStateUpdateSuccess(activity),
+  );
+};
 
 export const activityDetailAtom = atom<
   ActivityDetailState,
-  [OneOnly<UserDetailPayload>],
+  [OneOnly<ActivityDetailPayload>],
   Promise<void>
 >(
   (get) => get(activityDetailBaseAtom),
-  async (get, set, { search, refresh, reset }: OneOnly<UserDetailPayload>) => {
+  async (get, set, { search, refresh, create, update, reset }: OneOnly<ActivityDetailPayload>) => {
     const current = get(activityDetailBaseAtom);
     if (search) {
       _searchOrRefresh(current, get, set, search.id);
@@ -164,10 +164,10 @@ export const activityDetailAtom = atom<
       }
     } else if (reset) {
       set(activityDetailBaseAtom, RESET);
-      // } else if (create) {
-      //   _createOrUpdate(current, set, create);
-      // } else if (update) {
-      //   _createOrUpdate(current, set, update.user, { id: update.id, version: update.version });
+    } else if (create) {
+      _createOrUpdate(current, set, create);
+    } else if (update) {
+      _createOrUpdate(current, set, update.activity, { id: update.id, version: update.version });
     }
   },
 );

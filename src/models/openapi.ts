@@ -3,8 +3,10 @@ import { UserCreation, SimpleUser } from '../__generated__/linkedup-web-api-clie
 import { User } from '../__generated__/linkedup-web-api-client';
 import {
   Activity,
+  ActivityDetail,
   ActivityCategory,
   ActivityStatus,
+  ActivityPayload,
   AchievementSubmissionRole,
 } from '../__generated__/linkedup-web-api-client';
 
@@ -74,7 +76,9 @@ export type {
   Student,
   Shop,
   Activity,
+  ActivityDetail,
   ActivityCategory,
   ActivityStatus,
+  ActivityPayload,
   AchievementSubmissionRole,
 };
