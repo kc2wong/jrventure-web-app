@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { LanguageEnum } from '../models/openapi';
 import { zodOptionalString } from '../types/zod';
-import { DetailEditingDrawer } from './Drawer';
+import { DetailEditingDrawer } from './drawer';
 import { Button } from '@fluentui/react-components';
 import { ArrowCircleLeftRegular, TranslateAutoRegular } from '@fluentui/react-icons';
 

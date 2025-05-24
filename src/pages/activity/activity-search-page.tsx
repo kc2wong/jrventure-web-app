@@ -31,7 +31,7 @@ import { atom, useAtom, useAtomValue } from 'jotai';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {} from '../../models/system';
-import { SearchCriteriaDrawer } from '../../components/Drawer';
+import { SearchCriteriaDrawer } from '../../components/drawer';
 import { Form, Root } from '../../components/Container';
 import { Field } from '../../components/Field';
 import {
@@ -130,10 +130,6 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
         action({
           search: {
             filter: _searchFormData2Filter(formData),
-            // offset: 0,
-            // pageSize: 25,
-            // code: formData?.code,
-            // name: formData?.name,
           },
         });
       })}
@@ -220,7 +216,7 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
                   setValue(name, data.selectedOptions);
                 }}
                 selectedOptions={value}
-                value={(value ? value.sort().map((i) => `P${i}`) : []).join(',')}
+                value={(value ? value.sort().map((i) => `P${i}`) : []).join(', ')}
               >
                 {gradeList.map((i) => (
                   <Option key={i} value={`${i}`}>
@@ -325,6 +321,7 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
                   setValue(field.name, data.selectedOptions);
                 }}
                 selectedOptions={value}
+                value={(value ? value.sort().map((s) => t(`activityMaintenance.status.value.${s}`)) : []).join(', ')}
               >
                 {statusList.map((status) => (
                   <Option key={status.toString()} value={`${status}`}>
