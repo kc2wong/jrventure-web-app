@@ -58,7 +58,6 @@ import { formatParticpantGrade } from './participant-grade-formatter';
 import { DatePicker } from '@fluentui/react-datepicker-compat';
 import { useCommonStyles } from '../common';
 import { Input } from '../../components/Input';
-import { ToolbarButtonWithLabel } from '../../components/toolbar-button';
 
 const searchSchema = z.object({
   categoryCode: zodOptionalString(),
