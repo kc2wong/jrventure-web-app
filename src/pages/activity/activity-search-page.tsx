@@ -36,7 +36,6 @@ import { Field } from '../../components/Field';
 import {
   Filter,
   activityListAtom,
-  ActivityListStateFail,
   ActivityListStateInitial,
   ActivityListStateSuccess,
 } from '../../states/activity-list';
@@ -45,7 +44,6 @@ import { getRawValueByEnumValue, getEnumValueByRawValue } from '../../utils/enum
 import { constructErrorMessage } from '../../utils/string-util';
 import { zodOptionalDate, zodOptionalString } from '../../types/zod';
 import { createTableColumn } from '../../components/table/create-table-column-definition';
-import { useMessage } from '../../hooks/use-message';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 import { activityCategoryListAtom } from '../../states/activity-category-list';
@@ -205,7 +203,7 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
               validationMessage={
                 errors.categoryCode?.message
                   ? constructErrorMessage(t, errors.categoryCode?.message)
-                  : undefined 
+                  : undefined
               }
             >
               <Dropdown
@@ -358,7 +356,6 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
 
   const { useStartBreadcrumb } = useBreadcrumb();
   const { formatDate } = useTimezone();
-  const { dispatchMessage } = useMessage();
   const [state, action] = useAtom(activityListAtom);
 
   useEffect(() => {
@@ -366,12 +363,6 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
       if (state.isDirty) {
         action({ refresh: {} });
       }
-    } else if (state instanceof ActivityListStateFail) {
-      const failure = state.failure;
-      dispatchMessage({
-        type: failure.type,
-        text: constructErrorMessage(t, failure.key, failure.parameters)!,
-      });
     }
   }, [state]);
 

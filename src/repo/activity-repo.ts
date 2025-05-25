@@ -3,6 +3,7 @@ import {
   ActivityStatus,
   ActivityPayload,
   FindActivityResult,
+  Error,
 } from '../models/openapi';
 import {
   findActivity as findActivityRepo,
@@ -35,7 +36,7 @@ export const findActivity = async ({
   status,
   limit,
   offset,
-}: FindActivityArgs): Promise<FindActivityResult> => {
+}: FindActivityArgs): Promise<FindActivityResult | Error> => {
   return await callRepo(() => {
     const query = {
       categoryCode: categoryCode ? [categoryCode] : undefined,
@@ -55,13 +56,13 @@ export const findActivity = async ({
   });
 };
 
-export const getActivityById = async (id: string): Promise<ActivityDetail> => {
+export const getActivityById = async (id: string): Promise<ActivityDetail | Error> => {
   return await callRepo(() => {
     return getActivityByIdRepo({ path: { id } });
   });
 };
 
-export const createActivity = async (args: ActivityPayload): Promise<ActivityDetail> => {
+export const createActivity = async (args: ActivityPayload): Promise<ActivityDetail | Error> => {
   return await callRepo(() => {
     return createActivityRepo({ body: args });
   });
@@ -71,7 +72,7 @@ export const updateActivity = async (
   activityId: string,
   version: number,
   activity: ActivityPayload,
-): Promise<ActivityDetail> => {
+): Promise<ActivityDetail | Error> => {
   return await callRepo(() => {
     return updateActivityRepo({ path: { id: activityId }, body: { ...activity, version } });
   });

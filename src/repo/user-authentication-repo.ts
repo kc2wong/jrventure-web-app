@@ -8,6 +8,7 @@ import {
 } from '../__generated__/linkedup-web-api-client';
 import { callRepo } from './repo-util';
 import { createSystemError } from './error-util';
+import { isError } from '../models/system';
 
 export const authenticateUser = async (
   email: string,
@@ -17,6 +18,9 @@ export const authenticateUser = async (
     const resp = await callRepo(() => {
       return postUserAuthentications({ body: { email, password } });
     });
+    if (isError(resp)) {
+      return resp;
+    }
     const { user } = jwtDecode<{ user: User }>(resp.token);
     const login: Login = {
       user,
@@ -34,6 +38,9 @@ export const googleAuthenticate = async (accessToken: string): Promise<Login | E
     const resp = await callRepo(() => {
       return authenticateGoogleUser({ body: { accessToken } });
     });
+    if (isError(resp)) {
+      return resp;
+    }
     const { user } = jwtDecode<{ user: User }>(resp.token);
     const login: Login = {
       user,

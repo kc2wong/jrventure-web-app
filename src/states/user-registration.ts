@@ -59,43 +59,20 @@ export const userRegistrationAtom = atom<UserRegistrationState, [SignUpPayload],
     const current = get(userRegistrationBaseAtom);
 
     set(userRegistrationBaseAtom, new UserRegistrationStateProgress());
-    try {
-      const result = await registerUserRepo(accessToken, studentId, studentName);
+    const result = await registerUserRepo(accessToken, studentId, studentName);
+    if (isError(result)) {
+      const failure: Message = {
+        key: result.code,
+        type: MessageType.Error,
+        parameters: result.parameter,
+        fallbackMessage: result.message,
+      };
+      set(userRegistrationBaseAtom, new UserRegistrationStateFail(failure, current));
+    } else {
       set(userRegistrationBaseAtom, new UserRegistrationStateSuccess(result.email));
-      await delay(1000);
+      await delay(250);
       set(userRegistrationBaseAtom, new UserRegistrationStateSuccess(result.email, result));
-    } catch (error) {
-      if (isError(error)) {
-        const failure: Message = {
-          key: error.code,
-          type: MessageType.Error,
-          parameters: error.parameter,
-          fallbackMessage: error.message,
-        };
-        set(userRegistrationBaseAtom, new UserRegistrationStateFail(failure, current));
-      }
-
-      // const failure: Message = {
-      //   key: result.code,
-      //   type: MessageType.Error,
-      //   parameters: result.parameter,
-      //   fallbackMessage: result.message,
-      // };
-      // set(userRegistrationBaseAtom, new UserRegistrationStateFail(failure, current));
     }
-    // if (isError(result)) {
-    //   const failure: Message = {
-    //     key: result.code,
-    //     type: MessageType.Error,
-    //     parameters: result.parameter,
-    //     fallbackMessage: result.message,
-    //   };
-    //   set(userRegistrationBaseAtom, new UserRegistrationStateFail(failure, current));
-    // } else {
-    //   set(userRegistrationBaseAtom, new UserRegistrationStateSuccess(result.email));
-    //   await delay(1000);
-    //   set(userRegistrationBaseAtom, new UserRegistrationStateSuccess(result.email, result));
-    // }
   },
 );
 
