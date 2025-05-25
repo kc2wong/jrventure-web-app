@@ -7,12 +7,18 @@ import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
 import { delay } from '../utils/date-util';
 import { findActivity as findActivityRepo } from '../repo/activity-repo';
+import {
+  FindActivityOrderByField,
+  OrderByDirection,
+} from '../__generated__/linkedup-web-api-client';
 
-enum ActivityOrdering {
+export enum ActivityOrdering {
   NameAsc,
   NameDesc,
   StartDateAsc,
   StartDateDesc,
+  EndDateAsc,
+  EndDateDesc,
 }
 
 export type Filter = {
@@ -60,7 +66,7 @@ class ActivityListState implements BaseState {
 class ActivityListStateInitial extends ActivityListState {
   constructor() {
     super({
-      ordering: ActivityOrdering.StartDateAsc,
+      ordering: ActivityOrdering.NameAsc,
       isDirty: false,
       filter: { participantGrade: [], offset: 0, limit: 0 },
     });
@@ -104,17 +110,34 @@ class ActivityListStateFail extends ActivityListState {
 const activityListBaseAtom = atomWithReset<ActivityListState>(new ActivityListStateInitial());
 
 type SearchPayload = { filter: Filter };
-type UpdateOrderingPayload = { filter: Filter; ordering: ActivityOrdering };
-type PaginationPayload = { offSet: number}
+type OrderByPayload = { ordering: ActivityOrdering };
+type PaginationPayload = { offSet: number };
 
 type ActivityListPayload = {
   search: SearchPayload;
   refresh: EmptyObject;
   pagination: PaginationPayload;
-  updateOrdering: UpdateOrderingPayload;
+  orderBy: OrderByPayload;
   markDirty: EmptyObject;
   reset: EmptyObject;
   select: { activity?: Activity };
+};
+
+const resolveSort = (value: ActivityOrdering): [FindActivityOrderByField, OrderByDirection] => {
+  switch (value) {
+    case ActivityOrdering.NameAsc:
+      return ['Name', 'Ascending'];
+    case ActivityOrdering.NameDesc:
+      return ['Name', 'Descending'];
+    case ActivityOrdering.StartDateAsc:
+      return ['StartDate', 'Ascending'];
+    case ActivityOrdering.StartDateDesc:
+      return ['StartDate', 'Descending'];
+    case ActivityOrdering.EndDateAsc:
+      return ['EndDate', 'Ascending'];
+    case ActivityOrdering.EndDateDesc:
+      return ['EndDate', 'Descending'];
+  }
 };
 
 const searchOrRefresh = async (
@@ -137,6 +160,7 @@ const searchOrRefresh = async (
     offset,
     limit,
   } = filter;
+  const [orderByField, orderByDirection] = resolveSort(ordering);
   const result = await findActivityRepo({
     categoryCode,
     participantGrade,
@@ -146,7 +170,9 @@ const searchOrRefresh = async (
     endDateTo,
     status,
     offset,
-    limit
+    limit,
+    orderByField,
+    orderByDirection,
   });
   const endTime = Date.now();
   if (endTime - startTime < 250) {
@@ -179,7 +205,15 @@ export const activityListAtom = atom<
   async (
     get,
     set,
-    { search, refresh, pagination, updateOrdering, reset, select, markDirty }: OneOnly<ActivityListPayload>,
+    {
+      search,
+      refresh,
+      pagination,
+      orderBy,
+      reset,
+      select,
+      markDirty,
+    }: OneOnly<ActivityListPayload>,
   ) => {
     const current = get(activityListBaseAtom);
     if (search) {
@@ -193,8 +227,8 @@ export const activityListAtom = atom<
         const newFilter = { ...current.filter, offset: pagination.offSet };
         searchOrRefresh(current, get, set, newFilter, current.ordering);
       }
-    } else if (updateOrdering) {
-      searchOrRefresh(current, get, set, current.filter, updateOrdering.ordering);
+    } else if (orderBy) {
+      searchOrRefresh(current, get, set, current.filter, orderBy.ordering);
     } else if (select) {
       if (current instanceof ActivityListStateSuccess) {
         set(

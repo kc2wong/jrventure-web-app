@@ -38,6 +38,7 @@ import {
   activityListAtom,
   ActivityListStateInitial,
   ActivityListStateSuccess,
+  ActivityOrdering,
 } from '../../states/activity-list';
 import { Activity, ActivityStatusEnum, SubmissionRoleEnum } from '../../models/openapi';
 import { getRawValueByEnumValue, getEnumValueByRawValue } from '../../utils/enum-util';
@@ -67,7 +68,7 @@ const searchSchema = z.object({
   status: z.array(z.string()).optional(),
 });
 
-const pageSize = 4;
+const pageSize = 10;
 const statusList = Object.values(ActivityStatusEnum) as ActivityStatusEnum[];
 const gradeList = [1, 2, 3, 4, 5, 6];
 
@@ -370,9 +371,15 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
     useStartBreadcrumb('activityMaintenance.title');
   });
 
-  const ActivityCategoryInPreferredLanguage = ({ activityCode }: { activityCode: string }) => {
+  const ActivityCategoryInPreferredLanguage = ({
+    activityCategoryCode,
+  }: {
+    activityCategoryCode: string;
+  }) => {
     const activtyCategoryState = useAtomValue(activityCategoryListAtom);
-    const ac = (activtyCategoryState.getResult() ?? []).find((ac) => ac.code === activityCode);
+    const ac = (activtyCategoryState.getResult() ?? []).find(
+      (ac) => ac.code === activityCategoryCode,
+    );
     return <Body1>{useNameInPreferredLanguage(ac)}</Body1>;
   };
 
@@ -380,13 +387,14 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
     return <Body1>{useNameInPreferredLanguage(activity)}</Body1>;
   };
 
+  const orderBy = state.getResult() ? state.ordering : undefined;
   const columns: TableColumnDefinition<Activity>[] = [
     createTableColumn({
       columnId: 'category',
       header: t('activityMaintenance.category'),
       width: 10,
       builder: (activity) => (
-        <ActivityCategoryInPreferredLanguage activityCode={activity.categoryCode} />
+        <ActivityCategoryInPreferredLanguage activityCategoryCode={activity.categoryCode} />
       ),
     }),
     createTableColumn({
@@ -394,6 +402,19 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
       header: t('activityMaintenance.name'),
       width: 25,
       builder: (activity) => <ActivityNameInPreferredLanguage activity={activity} />,
+      sortDirection:
+        orderBy === ActivityOrdering.NameAsc
+          ? 'asc'
+          : orderBy === ActivityOrdering.NameDesc
+            ? 'desc'
+            : undefined,
+      onSort: (direction) => {
+        action({
+          orderBy: {
+            ordering: direction === 'asc' ? ActivityOrdering.NameAsc :  ActivityOrdering.NameDesc
+          },
+        });
+      },
     }),
     createTableColumn({
       columnId: 'participantGrade',
@@ -406,12 +427,38 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
       header: t('activityMaintenance.startDate'),
       width: 10,
       builder: (activity) => <Body1>{formatDate(activity.startDate)}</Body1>,
+      sortDirection:
+        orderBy === ActivityOrdering.StartDateAsc
+          ? 'asc'
+          : orderBy === ActivityOrdering.StartDateDesc
+            ? 'desc'
+            : undefined,
+      onSort: (direction) => {
+        action({
+          orderBy: {
+            ordering: direction === 'asc' ? ActivityOrdering.StartDateAsc :  ActivityOrdering.StartDateDesc
+          },
+        });
+      },
     }),
     createTableColumn({
       columnId: 'endDate',
       header: t('activityMaintenance.endDate'),
       width: 10,
       builder: (activity) => <Body1>{formatDate(activity.endDate)}</Body1>,
+      sortDirection:
+        orderBy === ActivityOrdering.EndDateAsc
+          ? 'asc'
+          : orderBy === ActivityOrdering.EndDateDesc
+            ? 'desc'
+            : undefined,
+      onSort: (direction) => {
+        action({
+          orderBy: {
+            ordering: direction === 'asc' ? ActivityOrdering.EndDateAsc :  ActivityOrdering.EndDateDesc
+          },
+        });
+      },
     }),
     createTableColumn({
       columnId: 'sharable',
@@ -447,13 +494,13 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
     createTableColumn({
       columnId: 'eCoin',
       header: t('activityMaintenance.eCoin'),
-      width: 5,
+      width: 7,
       builder: (activity) => <Body1>{activity.eCoin}</Body1>,
     }),
     createTableColumn({
       columnId: 'status',
       header: t('activityMaintenance.status.label'),
-      width: 10,
+      width: 8,
       builder: (activity) => (
         <StatusLabel
           status={getEnumValueByRawValue(ActivityStatusEnum, activity.status) as ActivityStatusEnum}

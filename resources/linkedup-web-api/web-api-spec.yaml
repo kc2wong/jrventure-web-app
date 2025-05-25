@@ -501,6 +501,16 @@ paths:
             required: true
             schema:
               type: number
+          - in: query
+            name: orderByField
+            required: true
+            schema:
+              $ref: '#/components/schemas/FindActivityOrderByField'
+          - in: query
+            name: orderByDirection
+            required: true
+            schema:
+              $ref: '#/components/schemas/OrderByDirection'
         responses:
           "200":
             description: OK
@@ -648,13 +658,18 @@ components:
           items:
             type: string
         message:
-          type: string
+          type: string          
     Language:
       type: string
       enum:
       - English
       - TraditionalChinese
       - SimplifiedChinese
+    OrderByDirection:
+      type: string
+      enum:
+        - Ascending
+        - Descending
     MultiLingual:
       type: object
       additionalProperties: true
@@ -720,6 +735,18 @@ components:
           description: Create datetime
         version:
           type: number
+    Pagination:
+      type: object
+      required:
+        - offset
+        - total
+      properties:
+        offset:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
     Class:
       type: object
       required:
@@ -1040,24 +1067,24 @@ components:
             id:
               type: string
         - $ref: "#/components/schemas/ActivityPayload"
+    FindActivityOrderByField:
+      type: string
+      enum:
+        - Name
+        - StartDate
+        - EndDate
     FindActivityResult:
       type: object
-      required:
-        - offset
-        - limit
-        - total
-        - data
-      properties:
-        offset:
-          type: integer
-        limit:
-          type: integer
-        total:
-          type: integer
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Activity'
+      allOf:
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Activity'
+        - $ref: '#/components/schemas/Pagination'
     ActivityDetail:
       type: object
       allOf:

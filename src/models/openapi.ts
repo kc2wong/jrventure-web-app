@@ -9,6 +9,7 @@ import {
   ActivityPayload,
   AchievementSubmissionRole,
   FindActivityResult,
+  OrderByDirection,
 } from '../__generated__/linkedup-web-api-client';
 
 import { Language, UserRole, UserStatus } from '../__generated__/linkedup-web-api-client';
@@ -71,6 +72,7 @@ export const activityStatusToEnum = (activityStatus: ActivityStatus): ActivitySt
 // export type { Language, UserRole, UserStatus };
 export type {
   Error,
+  OrderByDirection,
   User,
   SimpleUser,
   UserCreation,

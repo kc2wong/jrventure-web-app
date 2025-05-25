@@ -10,6 +10,8 @@ import {
   getActivityById as getActivityByIdRepo,
   createActivity as createActivityRepo,
   updateActivity as updateActivityRepo,
+  FindActivityOrderByField,
+  OrderByDirection,
 } from '../__generated__/linkedup-web-api-client';
 import { callRepo } from './repo-util';
 
@@ -24,6 +26,8 @@ type FindActivityArgs = {
   status?: ActivityStatus[];
   limit: number;
   offset: number;
+  orderByField: FindActivityOrderByField;
+  orderByDirection: OrderByDirection;
 };
 export const findActivity = async ({
   categoryCode,
@@ -36,6 +40,8 @@ export const findActivity = async ({
   status,
   limit,
   offset,
+  orderByField,
+  orderByDirection,
 }: FindActivityArgs): Promise<FindActivityResult | Error> => {
   return await callRepo(() => {
     const query = {
@@ -49,6 +55,8 @@ export const findActivity = async ({
       endDateTo: endDateTo ? endDateTo.toISOString() : undefined,
       limit,
       offset,
+      orderByField,
+      orderByDirection,
     };
     return findActivityRepo({
       query,
