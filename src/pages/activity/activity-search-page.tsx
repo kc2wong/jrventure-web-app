@@ -9,13 +9,13 @@ import {
   TableSelectionCell,
   useTableFeatures,
   TableColumnDefinition,
-  Dropdown,
   Option,
   Body1,
   useTableSelection,
   Tooltip,
   Label,
   makeStyles,
+  Dropdown,
 } from '@fluentui/react-components';
 import {
   AddCircleRegular,
@@ -30,7 +30,6 @@ import { TFunction } from 'i18next';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {} from '../../models/system';
 import { SearchCriteriaDrawer } from '../../components/drawer';
 import { Form, Root } from '../../components/Container';
 import { Field } from '../../components/Field';
@@ -55,9 +54,9 @@ import { StatusLabel } from './status-label';
 import { RoleLabel } from './role-label';
 import { Pagination } from '../../components/pagination';
 import { formatParticpantGrade } from './participant-grade-formatter';
-import { DatePicker } from '@fluentui/react-datepicker-compat';
 import { useCommonStyles } from '../common';
 import { Input } from '../../components/Input';
+import { DatePicker } from '../../components/date-picker';
 
 const searchSchema = z.object({
   categoryCode: zodOptionalString(),
@@ -206,11 +205,12 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
               validationMessage={
                 errors.categoryCode?.message
                   ? constructErrorMessage(t, errors.categoryCode?.message)
-                  : undefined
+                  : undefined 
               }
             >
               <Dropdown
                 {...others}
+                className={commonStyles.field}
                 multiselect={true}
                 onOptionSelect={(_ev, data) => {
                   setValue(name, data.selectedOptions);
@@ -321,7 +321,10 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
                   setValue(field.name, data.selectedOptions);
                 }}
                 selectedOptions={value}
-                value={(value ? value.sort().map((s) => t(`activityMaintenance.status.value.${s}`)) : []).join(', ')}
+                value={(value
+                  ? value.sort().map((s) => t(`activityMaintenance.status.value.${s}`))
+                  : []
+                ).join(', ')}
               >
                 {statusList.map((status) => (
                   <Option key={status.toString()} value={`${status}`}>

@@ -20,7 +20,7 @@ const useStylesDrawer = makeStyles({
       maxWidth: '100vw',
     },
   },
-  drawerSsearchCriteria: { minWidth: '200px', width: '20%' },
+  drawerSsearchCriteria: { minWidth: '300px', width: '20%' },
 });
 
 type DrawerComponentProps = {
