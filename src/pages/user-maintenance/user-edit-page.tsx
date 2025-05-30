@@ -34,7 +34,7 @@ import { useDialog } from '../../hooks/use-dialog';
 import { useFormDirty } from '../../contexts/FormDirty';
 import { constructMessage } from '../../utils/string-util';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
-import { EmptyCell } from '../../components/EmptyCell';
+import { EmptyCell } from '../../components/Container';
 import { asArray } from '../../utils/array-util';
 import {
   studentListAtom,
@@ -286,8 +286,8 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
 
       if (formValues.role === UserRoleEnum.Student) {
         setValue('name', {
-          [LanguageEnum.English]: `${student.firstName[LanguageEnum.English] ?? ''} ${student.lastName[LanguageEnum.English] ?? ''}`,
-          [LanguageEnum.TraditionalChinese]: `${student.lastName[LanguageEnum.TraditionalChinese] ?? ''}${student.firstName[LanguageEnum.TraditionalChinese] ?? ''}`,
+          [LanguageEnum.English]: `${student.name[LanguageEnum.English] ?? ''}`,
+          [LanguageEnum.TraditionalChinese]: `${student.name[LanguageEnum.TraditionalChinese] ?? ''}}`,
           // [Language.SIMPLIFIED_CHINESE]: `${student.lastName[Language.SIMPLIFIED_CHINESE] ?? ''}${student.firstName[Language.SIMPLIFIED_CHINESE] ?? ''}`,
         });
       }

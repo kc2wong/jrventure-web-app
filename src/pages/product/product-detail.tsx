@@ -28,7 +28,7 @@ import {
   Caption1,
 } from '@fluentui/react-components';
 import { t } from 'i18next';
-import { EmptyCell } from '../../components/EmptyCell';
+import { EmptyCell } from '../../components/Container';
 import { Field } from '../../components/Field';
 import { useTimezone } from '../../hooks/use-timezone';
 import { BsCoin } from 'react-icons/bs';

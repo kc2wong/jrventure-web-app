@@ -1,12 +1,16 @@
 import {
+  Activity,
   ActivityDetail,
   ActivityStatus,
   ActivityPayload,
   FindActivityResult,
   Error,
+  AchievementStatusEnum,
+  achievementStatusToEnum,
 } from '../models/openapi';
 import {
   findActivity as findActivityRepo,
+  findActivityByStudentId as findActivityByStudentIdApi,
   getActivityById as getActivityByIdRepo,
   createActivity as createActivityRepo,
   updateActivity as updateActivityRepo,
@@ -62,6 +66,24 @@ export const findActivity = async ({
       query,
     });
   });
+};
+
+type FindActivityByStudentIdResults = Activity & { achievementStatus: AchievementStatusEnum };
+export const findActivityByStudentIdRepo = async (
+  studentId: string,
+): Promise<FindActivityByStudentIdResults[] | Error> => {
+  const result = await callRepo(() => {
+    return findActivityByStudentIdApi({ path: { id: studentId } });
+  });
+  if (Array.isArray(result)) {
+    // success
+    return result.map(({ activity, achievementStatus }) => {
+      return { ...activity, achievementStatus: achievementStatusToEnum(achievementStatus!) };
+    });
+  } else {
+    // error
+    return result;
+  }
 };
 
 export const getActivityById = async (id: string): Promise<ActivityDetail | Error> => {

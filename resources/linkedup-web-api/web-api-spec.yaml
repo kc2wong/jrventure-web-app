@@ -14,7 +14,9 @@ tags:
   - name: Student
     description: Student
   - name: Activity
-    description: Activity and Achievement
+    description: Activity
+  - name: Achievement
+    description: Student Achievement
 
 servers:
   - url: http://localhost:8080
@@ -125,6 +127,81 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /students/{id}/activities:
+    get:
+      summary: Find activities that can be participated by a student and status of achievement submitted
+      operationId: findActivityByStudentId
+      tags:
+        - Activity
+      parameters:
+        - in: path
+          name: id
+          required: true          
+          schema:
+            type: string
+          description: student id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - activity
+                  properties:
+                    activity:
+                      $ref: "#/components/schemas/Activity"
+                    achievementStatus:
+                      $ref: "#/components/schemas/AchievementStatus"
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /students/{id}/activities/{activityId}/achievements:
+    get:
+      summary: Find achievement of the activity
+      operationId: findAchievementByStudentActivityId
+      tags:
+        - Achievement
+      parameters:
+        - in: path
+          name: id
+          required: true          
+          schema:
+            type: string
+          description: student id
+        - in: path
+          name: activityId
+          required: true          
+          schema:
+            type: string
+          description: activity id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Achievement"
+        "400":
+          description: Validation fails, e.g. student or activity not found, or student is not a particpant of the activity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                                
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                                
   /users:
     get:
       summary: Search users by criteria
@@ -638,6 +715,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /achievements:
+    post:
+      summary: Create a new student achievement
+      operationId: createAchievement
+      tags:
+        - Achievement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AchievementCreation'
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Achievement'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   securitySchemes:
     jwtCookieAuth:
@@ -712,6 +828,13 @@ components:
       - Teacher
       - Student
       - Both
+    AchievementStatus:
+      type: string
+      enum:
+      - Pending
+      - Approved
+      - Rejected
+      - Published      
     AuditControl:
       type: object
       required:
@@ -766,8 +889,7 @@ components:
       type: object
       required:
         - id
-        - lastName
-        - firstName
+        - name
         - classId
         - studentNumber
       properties:
@@ -779,10 +901,7 @@ components:
           description: id of class
         studentNumber:
           type: number
-        lastName:
-          type: object
-          additionalProperties: true
-        firstName:
+        name:
           type: object
           additionalProperties: true
     UserRegistrationRequest:
@@ -1090,3 +1209,35 @@ components:
       allOf:
         - $ref: "#/components/schemas/Activity"
         - $ref: "#/components/schemas/AuditControl"
+    AchievementCreation:
+      type: object
+      required:
+        - studentId
+        - activityId
+        - comment
+      properties:
+        studentId:
+          type: string
+        activityId:
+          type: string
+        rating:
+          type: number
+          format: int32
+        comment:
+          type: string
+    Achievement:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AchievementCreation"
+        - type: object
+          required:
+            - id
+            - submissionRole
+            - status
+          properties:
+            id:
+              type: string
+            submissionRole:
+              $ref: "#/components/schemas/AchievementSubmissionRole"
+            status:
+              $ref: "#/components/schemas/AchievementStatus"

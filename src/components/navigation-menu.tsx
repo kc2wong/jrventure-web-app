@@ -12,12 +12,12 @@ import {
 import {
   AccessibilityRegular,
   ShoppingBagRegular,
-  PenSparkleRegular,
   PeopleRegular,
   WalletRegular,
   BoxCheckmarkRegular,
   StoreMicrosoftRegular,
   PeopleCheckmarkRegular,
+  TrophyRegular,
 } from '@fluentui/react-icons';
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { useAtomValue } from 'jotai';
@@ -86,13 +86,15 @@ const navigationMenu: NavigationMenuItem[] = [
     path: '/activity',
     showInSidebar: true,
   },
+
   {
     type: 'item',
-    id: 'mnuEvaluation',
-    label: 'Evaluation',
-    icon: PenSparkleRegular,
-    path: '/',
+    id: 'mnuAchievement',
+    label: 'Achievement',
+    icon: TrophyRegular,
+    path: '/achievement',
     showInSidebar: true,
+    showInBottomBar: true,
   },
 
   { type: 'divider', title: 'Approval', showInSidebar: true, roles: [UserRoleEnum.Teacher] },
@@ -246,7 +248,7 @@ const MenuItem = ({ icon: Icon, label, collapsed, path }: MenuItemProps) => {
     <div
       className={styles.menuItem}
       onClick={() => {
-        navigateWithSpinner(path);
+        navigateWithSpinner(path, { state: { reset: true } });
       }}
     >
       <div className={styles.iconWrapper}>
@@ -330,7 +332,11 @@ const ButtombarMenuItem = ({ icon: Icon, label, path }: ButtombarMenuItemProps) 
   const { navigateWithSpinner } = useNavigationHelpers();
 
   return (
-    <Tab className={styles.tab} onClick={() => navigateWithSpinner(path)} value={label}>
+    <Tab
+      className={styles.tab}
+      onClick={() => navigateWithSpinner(path, { state: { reset: true } })}
+      value={label}
+    >
       <div className={styles.tabContentWrapper}>
         <Icon className={styles.icon} />
         <Caption2>{label}</Caption2>

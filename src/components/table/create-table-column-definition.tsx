@@ -14,25 +14,27 @@ interface createTableColumnProps<T> {
   width: number;
   header: string;
   sortDirection?: SortDirection;
+  onSort?: (sortDirection: SortDirection) => void;
   builder: (item: T) => ReactElement;
 }
 
 export const createTableColumn = <T extends { id: string | number }>(
   props: createTableColumnProps<T>,
-): TableColumnDefinition<T> {
-  const { columnId, width, header, builder } = props;
 ): TableColumnDefinition<T> => {
+  const { columnId, width, header, onSort, sortDirection, builder } = props;
   const style = { width: `${width}%` };
 
   return {
     columnId,
     renderHeaderCell: () => (
-      <TableHeaderCell key={columnId} style={{ pointerEvents: 'none', ...style }}>
-        <TableCellLayout appearance="primary">
-          <span style={{ color: tokens.colorBrandForeground1 }}>
-            <Body1Strong>{header}</Body1Strong>
-          </span>
-        </TableCellLayout>
+      <TableHeaderCell
+        key={columnId}
+        onClick={onSort ? () => onSort(sortDirection === 'asc' ? 'desc' : 'asc') : undefined}
+        sortable={onSort !== undefined}
+        sortDirection={
+          sortDirection === 'asc'
+            ? 'ascending'
+            : sortDirection === 'desc'
               ? 'descending'
               : undefined
         }

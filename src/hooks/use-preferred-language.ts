@@ -1,50 +1,19 @@
 import { useTranslation } from 'react-i18next';
-import {
-  LanguageEnum,
-  Student,
-  User,
-  Shop,
-  SimpleUser,
-  Activity,
-  ActivityCategory,
-} from '../models/openapi';
+import { Student, User, Shop, SimpleUser, Activity, ActivityCategory } from '../models/openapi';
+import { getFieldValueInPreferredLanguage } from '../utils/language-util';
 
 export const useNameInPreferredLanguage = (
   object: Student | SimpleUser | User | Shop | ActivityCategory | Activity | undefined,
-  // attributeName?: string,
 ): string => {
   const { i18n } = useTranslation();
-
-  const languagePreference =
-    i18n.language === 'en'
-      ? [LanguageEnum.English, LanguageEnum.TraditionalChinese]
-      : [LanguageEnum.TraditionalChinese, LanguageEnum.English];
 
   if (object === undefined) {
     return '';
   }
-  const constuctStudentName = (student: Student) => {
-    return {
-      [LanguageEnum.English]: `${student.firstName[LanguageEnum.English]} ${student.lastName[LanguageEnum.English]}`,
-      [LanguageEnum.TraditionalChinese]: `${student.lastName[LanguageEnum.TraditionalChinese]}${student.firstName[LanguageEnum.TraditionalChinese]}`,
-      [LanguageEnum.SimplifiedChinese]: `${student.lastName[LanguageEnum.SimplifiedChinese]}${student.firstName[LanguageEnum.SimplifiedChinese]}`,
-    };
-  };
-
-  const name =
-    'name' in object
-      ? object.name
-      : 'description' in object
-        ? object.description
-        : constuctStudentName(object);
-
-  if (typeof name === 'string') {
-    return name;
+  if ('name' in object) {
+    return getFieldValueInPreferredLanguage(i18n.language, 'name', object);
+  } else if ('description' in object) {
+    return getFieldValueInPreferredLanguage(i18n.language, 'description', object);
   }
-
-  return (
-    languagePreference
-      .map((lang) => (name as Record<LanguageEnum, string>)[lang])
-      .find((text) => text !== undefined) ?? ''
-  );
+  return '';
 };

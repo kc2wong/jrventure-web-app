@@ -28,7 +28,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import { useDialog } from '../../hooks/use-dialog';
 import { useFormDirty } from '../../contexts/FormDirty';
 import { constructMessage } from '../../utils/string-util';
-import { EmptyCell } from '../../components/EmptyCell';
+import { EmptyCell } from '../../components/Container';
 import { asArray } from '../../utils/array-util';
 import { useParams } from 'react-router-dom';
 import { hasMissingRequiredField } from '../../utils/form-util';

@@ -101,11 +101,8 @@ const searchOrRefresh = async (
         id: 'S000000571',
         classId: '4E',
         studentNumber: 1,
-        lastName: {
-          English: 'Chu',
-        },
-        firstName: {
-          English: 'Connor',
+        name: {
+          English: 'Connor Chu',
         },
       },
       approvedProducts: result,

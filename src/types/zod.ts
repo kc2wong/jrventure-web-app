@@ -52,3 +52,17 @@ export const zodOptionalDate = () => {
   let schema = z.date();
   return schema.optional();
 };
+
+export const zodInt = (options?: { minValue?: number; maxValue?: number }) => {
+  let schema = z.number();
+
+  if (options?.minValue !== undefined) {
+    schema = schema.min(options.minValue, { message: 'zod.error.too_small' });
+  }
+
+  if (options?.maxValue !== undefined) {
+    schema = schema.max(options.maxValue, { message: 'zod.error.too_large' });
+  }
+
+  return schema;
+};

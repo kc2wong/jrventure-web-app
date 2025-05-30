@@ -8,7 +8,10 @@ import {
   ActivityStatus,
   ActivityPayload,
   AchievementSubmissionRole,
+  AchievementStatus,
   FindActivityResult,
+  AchievementCreation,
+  Achievement,
   OrderByDirection,
 } from '../__generated__/linkedup-web-api-client';
 
@@ -52,7 +55,7 @@ export enum ApprovalCommentType {
 export enum SubmissionRoleEnum {
   Teacher = 'Teacher',
   Student = 'Student',
-  Both = 'Both'
+  Both = 'Both',
 }
 
 export enum ActivityStatusEnum {
@@ -62,12 +65,23 @@ export enum ActivityStatusEnum {
   Scheduled = 'Scheduled',
 }
 
+export enum AchievementStatusEnum {
+  Pending = 'Pending',
+  Approved = 'Approved',
+  Rejected = 'Rejected',
+  Published = 'Published',
+}
+
 export const roleToEnum = (role: UserRole): UserRoleEnum => UserRoleEnum[role];
 export const statusToEnum = (status: UserStatus): UserStatusEnum => UserStatusEnum[status];
 export const approvalStatusToEnum = (status: ApprovalStatusEnum): ApprovalStatusEnum =>
   ApprovalStatusEnum[status];
 export const languageToEnum = (language: Language): LanguageEnum => LanguageEnum[language];
-export const activityStatusToEnum = (activityStatus: ActivityStatus): ActivityStatusEnum => ActivityStatusEnum[activityStatus];
+export const activityStatusToEnum = (activityStatus: ActivityStatus): ActivityStatusEnum =>
+  ActivityStatusEnum[activityStatus];
+export const achievementStatusToEnum = (
+  achievementStatus: AchievementStatus,
+): AchievementStatusEnum => AchievementStatusEnum[achievementStatus];
 
 // export type { Language, UserRole, UserStatus };
 export type {
@@ -85,4 +99,6 @@ export type {
   ActivityPayload,
   AchievementSubmissionRole,
   FindActivityResult,
+  Achievement,
+  AchievementCreation
 };

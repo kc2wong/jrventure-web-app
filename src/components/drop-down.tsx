@@ -9,14 +9,13 @@ export type DropdownProps = FluentDropdownProps & {
 };
 
 export const Dropdown = React.forwardRef<HTMLButtonElement, DropdownProps>(
-  ({ readOnly = false, appearance, open, expandIcon, onChange, children, ...rest }, ref) => {
+  // ({ readOnly = false, appearance, open, expandIcon, onChange, children, ...rest }, ref) => {
+  ({ readOnly = false, appearance, onOptionSelect, children, ...rest }, ref) => {
     return (
       <FluentDropdown
         ref={ref}
         appearance={readOnly ? 'underline' : appearance}
-        expandIcon={readOnly ? <></> : expandIcon}
-        onChange={readOnly ? undefined : onChange}
-        open={readOnly ? false : open}
+        onOptionSelect={readOnly ? () => {} : onOptionSelect}
         {...rest}
       >
         {children}

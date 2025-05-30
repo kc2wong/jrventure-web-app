@@ -197,10 +197,41 @@
       }
     }
   },
+  "achievementSubmission": {
+    "studentInfo": "Student Information",
+    "studentId": "Student ID",
+    "studentName": "Name",
+    "activityDetail": "Activity Detail",
+    "activityName": "Name",
+    "activityDescription": "Description",
+    "title": "Achievement Submission",
+    "eCoin": "e-Coin",
+    "achievement": "Achievement",
+    "rating": "Rating",
+    "comment": "Comment",
+    "attachment": "Attachment",
+    "addAchievement": "Add Achievement",
+    "getAchievement": "Get Achievement",
+    "status": {
+      "label": "Status",
+      "value": {
+        "Open": "Open",
+        "Closed": "Closed",
+        "Cancelled": "Cancelled",
+        "Scheduled": "Scheduled"
+      }
+    },
+    "message": {
+      "confirmSubmission": "Do you want to submit the achievement",
+      "submittedSuccess": "Achievement is submitted successfully",
+      "submittedForApproval": "Achievement is submitted for approval"
+    }
+  },
   "zod": {
     "error": {
       "Required": "必須填寫",
       "Invalid email": "無效的電子郵件",
+      "invalidStudentId": "Invalid Student Id",
       "user": {
         "invalidStudentId": "Invalid Student Id"
       }

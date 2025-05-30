@@ -8,7 +8,7 @@ import {
   ToolbarButton,
   typographyStyles,
 } from '@fluentui/react-components';
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { ReactElement } from 'react';
 import { Pagination } from './pagination';
 import { PageTitle } from './page-title';
@@ -174,6 +174,17 @@ export const Form: React.FC<FormProps> = ({
       <DeviceComponent desktop={<></>} mobile={pagination ?? <></>}></DeviceComponent>
     </div>
   );
+};
+
+type EmptyCellProps = {
+  colSpan?: number;
+};
+export const EmptyCell: React.FC<EmptyCellProps> = ({ colSpan }) => {
+  const mergedStyle: CSSProperties = {
+    ...(colSpan ? { gridColumn: `span ${colSpan}` } : {}),
+  };
+
+  return <div style={mergedStyle}></div>;
 };
 
 export const Row: React.FC<{

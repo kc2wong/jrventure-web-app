@@ -32,6 +32,7 @@ import { MobileParentUserPage } from './pages/mobile/parent';
 import { MarketPlaceProductDetail } from './pages/market/market-place-product-detail';
 import { StudentShoproductDetail } from './pages/market/student-shop-product-detail';
 import { ActivityMaintenancePage } from './pages/activity/activity-maintenance-page';
+import { AchievementEditPage } from './pages/achievement/achievement-edit-page';
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
@@ -237,6 +238,7 @@ export const Main: React.FC = () => {
                   }
                   path="/setting"
                 />
+                <Route element={<AchievementEditPage />} path="/achievement" />
                 <Route element={<MobileUserProfilePage />} path="/profile" />
                 <Route element={<MobileParentUserPage />} path="/parent" />
               </Routes>

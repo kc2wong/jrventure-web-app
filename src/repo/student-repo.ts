@@ -5,9 +5,15 @@ import {
 } from '../__generated__/linkedup-web-api-client';
 import { callRepo } from './repo-util';
 
-export const findStudent = async (id: string[]): Promise<Student[] | ErrorModel> => {
+export const findStudentByIds = async (id: string[]): Promise<Student[] | ErrorModel> => {
   return await callRepo(() => {
     return findStudentRepo({ query: { id } });
+  });
+};
+
+export const findStudentByClassIdStudentNumber = async (classIdStudentNumber: string): Promise<Student[] | ErrorModel> => {
+  return await callRepo(() => {
+    return findStudentRepo({ query: { classIdStudentNumber } });
   });
 };
 
