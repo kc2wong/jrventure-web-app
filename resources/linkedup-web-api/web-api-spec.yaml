@@ -834,7 +834,8 @@ components:
       - Pending
       - Approved
       - Rejected
-      - Published      
+      - Published
+      - New      
     AuditControl:
       type: object
       required:
@@ -1241,3 +1242,20 @@ components:
               $ref: "#/components/schemas/AchievementSubmissionRole"
             status:
               $ref: "#/components/schemas/AchievementStatus"
+            review:
+              type: array
+              items:
+                $ref: '#/components/schemas/AchievementApprovalReview'
+    AchievementApprovalReview:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AuditControl"
+        - type: object
+          required:
+            - id
+            - comment
+          properties:
+            id:
+              type: string
+            comment:
+              type: string

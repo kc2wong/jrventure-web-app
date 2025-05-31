@@ -66,6 +66,7 @@ export enum ActivityStatusEnum {
 }
 
 export enum AchievementStatusEnum {
+  New = 'New',
   Pending = 'Pending',
   Approved = 'Approved',
   Rejected = 'Rejected',

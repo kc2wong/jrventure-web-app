@@ -215,10 +215,11 @@
     "status": {
       "label": "Status",
       "value": {
-        "Open": "Open",
-        "Closed": "Closed",
-        "Cancelled": "Cancelled",
-        "Scheduled": "Scheduled"
+        "New": "New",
+        "Pending": "Pending",
+        "Rejected": "Rejected",
+        "Approved": "Approved",
+        "Published": "Published"
       }
     },
     "message": {

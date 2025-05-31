@@ -28,6 +28,7 @@ interface StatusIconProps {
 }
 
 const statusIcons: Record<AchievementStatusEnum, FC<{ fontSize?: number }>> = {
+  New: PauseCircleRegular,
   Pending: PauseCircleRegular,
   Rejected: DismissCircleRegular,
   Approved: CheckmarkCircleRegular,

@@ -9,6 +9,10 @@ import {
   tokens,
   Body1,
   Caption1,
+  makeStyles,
+  TabList,
+  Tab,
+  TabValue,
 } from '@fluentui/react-components';
 import { Field } from '../../components/Field';
 import { Input } from '../../components/Input';
@@ -18,12 +22,17 @@ import {
   DismissRegular,
   EraserRegular,
   SearchRegular,
+  CommentRegular,
+  AppsListDetailFilled,
+  AppsListDetailRegular,
+  bundleIcon,
+  CommentFilled,
 } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Form, Root, Row } from '../../components/Container';
 import { zodInt, zodOptionalString, zodString } from '../../types/zod';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMessage } from '../../hooks/use-message';
 import { useAtom, useAtomValue } from 'jotai';
@@ -48,6 +57,43 @@ import { Dropdown } from '../../components/drop-down';
 import { useLocation } from 'react-router-dom';
 import { Message, MessageType } from '../../models/system';
 import { constructErrorMessage, constructMessage } from '../../utils/string-util';
+import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
+import { formatDistanceToNow } from 'date-fns';
+import React from 'react';
+import { ReviewPanel } from '../../components/review-panel';
+
+const useStyles = makeStyles({
+  row: {
+    display: 'flex',
+    width: '100%',
+  },
+  col25: {
+    width: '25%',
+    textAlign: 'left',
+  },
+  col50Right: {
+    width: '50%',
+    textAlign: 'right',
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  panels: {
+    padding: '0 10px',
+    '& th': {
+      textAlign: 'left',
+      padding: '0 30px 0 0',
+    },
+  },
+  iconText: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: tokens.spacingHorizontalXS, // small space between icon and text
+  },
+  commentWrapper: {
+    marginLeft: tokens.spacingHorizontalL,
+    marginBottom: tokens.spacingVerticalXL,
+  },
+});
 
 type AchievementEditPageProps = {};
 
@@ -59,14 +105,15 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
   }: AchievementEditPageProps,
 ) => {
   const { t, i18n } = useTranslation();
+  const styles = useStyles();
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
   const { useStartBreadcrumb } = useBreadcrumb();
 
+  const [selectedTab, setSelectedTab] = React.useState<TabValue>('tab1');
   const { showConfirmationDialog } = useDialog();
   const { markDirty, resetDirty } = useFormDirty();
 
   const [state, action] = useAtom(achievementDetailAtom);
-
   const authentication = useAtomValue(authenticationAtom);
 
   const baselineTimestamp = useRef<number>(Date.now());
@@ -102,6 +149,7 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
    * Reset the form and state
    */
   const _resetAll = () => {
+    setSelectedTab('tab1');
     resetForm(_achievement2FormData());
     const role = authentication.login?.user.role;
     action({
@@ -269,7 +317,7 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
   const saveButton = (
     <Button
       appearance="primary"
-      disabled={hasMissingRequiredField(formValues, schema)}
+      disabled={hasMissingRequiredField(formValues, schema) || selectedTab !== 'tab1'}
       icon={<CheckmarkRegular />}
       onClick={handleSubmit(() => {
         showConfirmationDialog({
@@ -290,6 +338,68 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
     </Button>
   );
 
+  const AppsListDetail = bundleIcon(AppsListDetailFilled, AppsListDetailRegular);
+  const Comment = bundleIcon(CommentFilled, CommentRegular);
+
+  const AchievementDetail = React.memo(() => {
+    return (
+      <>
+        {selectedActivity?.activity.ratable === true ? (
+          <>
+            <Controller
+              control={control}
+              name="rating"
+              render={({ field }) => {
+                const { onChange, onBlur, ...rest } = field;
+                return (
+                  <Field label={t('achievementSubmission.rating')}>
+                    <Rating
+                      {...rest}
+                      color="brand"
+                      onChange={(_, data) => onChange(data.value)}
+                      style={{ marginLeft: tokens.spacingHorizontalL }}
+                    />
+                  </Field>
+                );
+              }}
+            />
+            <EmptyCell colSpan={2} />
+          </>
+        ) : (
+          <></>
+        )}
+        <Controller
+          control={control}
+          name="comment"
+          render={({ field }) => {
+            return (
+              <Field colSpan={3} label={t('achievementSubmission.comment')}>
+                <Textarea {...field} rows={4}></Textarea>
+              </Field>
+            );
+          }}
+        />
+      </>
+    );
+  });
+
+  const AchievementReview = memo(() => (
+    <div aria-labelledby="AchievementReview" role="tabpanel">
+      <Form numColumn={1}>
+        {(selectedAchievement?.review ?? []).map((r) => {
+          return (
+            <ReviewPanel
+              key={r.id}
+              author={useNameInPreferredLanguage(r.createdBy)}
+              comment={r.comment}
+              reviewDateTime={new Date(r.createdAt)}
+            />
+          );
+        })}
+      </Form>
+    </div>
+  ));
+
   const selectedStudent = state.student;
   const studentInfo = selectedStudent
     ? `P${selectedStudent?.classId}-${selectedStudent?.studentNumber} ${getFieldValueInPreferredLanguage(i18n.language, 'name', selectedStudent)}`
@@ -298,6 +408,9 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
     (item) => item.activity.id === formValues.activityId,
   );
   const selectedAchievement = state.achievement;
+  const selectedAchievementStatusText = selectedAchievement
+    ? t(`achievementSubmission.status.value.${selectedAchievement?.status}`)
+    : '';
 
   // Student not found yet - Reset
   // Activity with achievement - Reset, Get
@@ -460,46 +573,32 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
               }}
             >
               <Divider>
-                <Caption1>{`${t('achievementSubmission.achievement')} (New)`}</Caption1>
+                <Caption1>{`${t('achievementSubmission.achievement')} (${selectedAchievementStatusText})`}</Caption1>
               </Divider>
             </div>
 
-            {selectedActivity?.activity.ratable === true ? (
-              <>
-                <Controller
-                  control={control}
-                  name="rating"
-                  render={({ field }) => {
-                    const { onChange, onBlur, ...rest } = field;
-                    return (
-                      <Field label={t('achievementSubmission.rating')}>
-                        <Rating
-                          {...rest}
-                          color="brand"
-                          onChange={(_, data) => onChange(data.value)}
-                          style={{ marginLeft: tokens.spacingHorizontalL }}
-                        />
-                      </Field>
-                    );
-                  }}
-                />
-                <EmptyCell colSpan={2} />
-              </>
-            ) : (
-              <></>
+            {(selectedAchievement.status === 'Pending' ||
+              selectedAchievement.status === 'Rejected') && (
+              <TabList
+                onTabSelect={(_ev, data) => {
+                  setSelectedTab(data.value);
+                }}
+                selectedValue={selectedTab}
+                style={{ gridColumn: 'span 3', marginBottom: '10px', justifyContent: 'flex-end' }}
+              >
+                <Tab icon={<AppsListDetail />} value="tab1">
+                  Detail
+                </Tab>
+                <Tab icon={<Comment />} value="tab2">
+                  Review
+                </Tab>
+              </TabList>
             )}
 
-            <Controller
-              control={control}
-              name="comment"
-              render={({ field }) => {
-                return (
-                  <Field colSpan={3} label={t('achievementSubmission.comment')}>
-                    <Textarea {...field} rows={4}></Textarea>
-                  </Field>
-                );
-              }}
-            />
+            <div style={{ gridColumn: 'span 3' }}>
+              {selectedTab === 'tab1' && <AchievementDetail />}
+              {selectedTab === 'tab2' && <AchievementReview />}
+            </div>
           </>
         ) : (
           <></>
