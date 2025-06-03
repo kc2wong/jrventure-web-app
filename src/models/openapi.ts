@@ -11,6 +11,7 @@ import {
   AchievementStatus,
   FindActivityResult,
   AchievementCreation,
+  AchievementAttachmentCreation,
   Achievement,
   OrderByDirection,
 } from '../__generated__/linkedup-web-api-client';
@@ -101,5 +102,6 @@ export type {
   AchievementSubmissionRole,
   FindActivityResult,
   Achievement,
-  AchievementCreation
+  AchievementCreation,
+  AchievementAttachmentCreation
 };

@@ -17,6 +17,8 @@ tags:
     description: Activity
   - name: Achievement
     description: Student Achievement
+  - name: Media
+    description: Media
 
 servers:
   - url: http://localhost:8080
@@ -727,15 +729,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AchievementCreation'
+              allOf:
+                - $ref: "#/components/schemas/AchievementCreation"
+                - type: object
+                  required:
+                    - attachment
+                  properties:
+                    attachment:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/AchievementAttachmentCreation"                    
       responses:
         '201':
           description: OK
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/Achievement'
+                $ref: '#/components/schemas/Achievement'
         '400':
           description: Validation error
           content:
@@ -754,6 +764,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /media/presigned-urls:
+    post:
+      summary: Generate presigned urls for file upload
+      operationId: generatePresignedUrl
+      tags:
+        - Media
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - contentType
+              properties:
+                contentType:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - objectKey
+                  - putUrl
+                  - getUrl
+                  - deleteUrl
+                properties:
+                  objectKey:
+                    type: string
+                  putUrl:
+                    type: string
+                  getUrl:
+                    type: string
+                  deleteUrl:
+                    type: string
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                
 components:
   securitySchemes:
     jwtCookieAuth:
@@ -1210,6 +1264,26 @@ components:
       allOf:
         - $ref: "#/components/schemas/Activity"
         - $ref: "#/components/schemas/AuditControl"
+    AchievementAttachmentCreation:
+      type: object
+      required:
+        - fileName
+        - objectKey
+      properties:
+        fileName:
+          type: string
+        objectKey:
+          type: string
+    AchievementAttachment:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AchievementAttachmentCreation"
+        - type: object
+          required:
+            - getUrl
+          properties:
+            getUrl:
+              type: string
     AchievementCreation:
       type: object
       required:
@@ -1235,6 +1309,7 @@ components:
             - id
             - submissionRole
             - status
+            - attachment
           properties:
             id:
               type: string
@@ -1246,6 +1321,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/AchievementApprovalReview'
+            attachment:
+              type: array
+              items:
+                $ref: '#/components/schemas/AchievementAttachment'
     AchievementApprovalReview:
       type: object
       allOf:

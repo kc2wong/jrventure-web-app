@@ -16,8 +16,9 @@ import { DeviceComponent } from './device-component';
 
 const useStyles = makeStyles({
   root: {
-    ...shorthands.overflow('hidden'),
+    // ...shorthands.overflow('hidden'),
     display: 'flex',
+    flexDirection: 'column',
     marginLeft: tokens.spacingHorizontalXXL,
     marginRight: tokens.spacingHorizontalXXL,
     '@media (max-width: 600px)': {
@@ -27,7 +28,7 @@ const useStyles = makeStyles({
       marginLeft: tokens.spacingHorizontalM,
       marginRight: tokens.spacingHorizontalM,
     },
-    ...shorthands.flex(1),
+    // ...shorthands.flex(1),
   },
   mobileRoot: {
     '@media (max-width: 600px)': {

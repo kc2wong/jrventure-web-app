@@ -1,5 +1,6 @@
 import { Error, Achievement, AchievementCreation } from '../models/openapi';
 import {
+  AchievementAttachmentCreation,
   createAchievement as createAchievementApi,
   findAchievementByStudentActivityId as findAchievementByStudentActivityIdApi,
 } from '../__generated__/linkedup-web-api-client';
@@ -16,8 +17,9 @@ export const findAchievementByStudentActivityIdRepo = async (
 
 export const createAchievementRepo = async (
   args: AchievementCreation,
+  attachment: AchievementAttachmentCreation[],
 ): Promise<Achievement | Error> => {
   return await callRepo(() => {
-    return createAchievementApi({ body: args });
+    return createAchievementApi({ body: { ...args, attachment } });
   });
 };

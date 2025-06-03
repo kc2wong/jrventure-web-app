@@ -1,11 +1,7 @@
-import {
-  Text,
-  tokens,
-  makeStyles,
-  shorthands,
-} from '@fluentui/react-components';
+import { Text, tokens, makeStyles, shorthands } from '@fluentui/react-components';
 import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
   dropzone: {
@@ -17,11 +13,7 @@ const useStyles = makeStyles({
     textAlign: 'center',
     cursor: 'pointer',
     transition: 'border-color 0.2s ease-in-out',
-    selectors: {
-      '&:hover': {
-        // borderColor: tokens.colorBrandStroke1,
-      },
-    },
+    marginBottom: tokens.spacingVerticalM
   },
 });
 
@@ -31,6 +23,7 @@ type DropzoneBoxProps = {
 
 export const DropzoneBox: React.FC<DropzoneBoxProps> = ({ onFilesAccepted }) => {
   const styles = useStyles();
+  const { t } = useTranslation();
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -47,7 +40,7 @@ export const DropzoneBox: React.FC<DropzoneBoxProps> = ({ onFilesAccepted }) => 
     <div {...getRootProps()} className={styles.dropzone}>
       <input {...getInputProps()} />
       <Text>
-        {isDragActive ? 'Drop the files here...' : 'Drag and drop files here or click to upload'}
+        {isDragActive ? t('system.message.dropZoneDrop') : t('system.message.dropZoneSelect')}
       </Text>
     </div>
   );

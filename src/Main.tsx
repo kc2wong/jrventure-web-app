@@ -72,7 +72,7 @@ const useStyles = makeStyles({
   content: {
     flex: 1,
     overflowY: 'auto',
-    height: '100vh',
+    // height: '100vh',
   },
 
   spacer: {

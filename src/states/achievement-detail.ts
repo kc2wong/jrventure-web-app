@@ -6,6 +6,7 @@ import {
   Student,
   Achievement,
   AchievementCreation,
+  AchievementAttachmentCreation,
 } from '../models/openapi';
 import { OneOnly } from '../utils/object-util';
 import { EmptyObject } from '../models/common';
@@ -120,8 +121,7 @@ type AchievementDetailPayload = {
   search: { id: string };
   reset: { student?: Student };
   newAchievement: { studentId: string; activityId: string };
-  create: AchievementCreation;
-  // update: { id: string; version: number; activity: ActivityPayload };
+  create: { achievement: AchievementCreation; attachment: AchievementAttachmentCreation[] };
 };
 
 const _setProgress = (current: AchievementDetailState, set: Setter) => {
@@ -217,9 +217,10 @@ const _createOrUpdate = async (
   current: AchievementDetailState,
   set: Setter,
   achievementCreation: AchievementCreation,
+  attachment: AchievementAttachmentCreation[],
 ) => {
   const stateProgress = _setProgress(current, set);
-  const result = await createAchievementRepo(achievementCreation);
+  const result = await createAchievementRepo(achievementCreation, attachment);
 
   if (isError(result)) {
     const failure: Message = {
@@ -270,7 +271,7 @@ export const achievementDetailAtom = atom<
         _searchStudent(nextState, get, set, { student: reset.student });
       }
     } else if (create) {
-      _createOrUpdate(current, set, create);
+      _createOrUpdate(current, set, create.achievement, create.attachment);
     }
   },
 );

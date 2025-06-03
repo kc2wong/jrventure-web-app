@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import { Achievement, AchievementCreation } from '../../models/openapi';
+import {
+  Achievement,
+  AchievementAttachmentCreation,
+  AchievementCreation,
+} from '../../models/openapi';
 import {
   Button,
   Divider,
@@ -13,6 +17,11 @@ import {
   TabList,
   Tab,
   TabValue,
+  Image,
+  Skeleton,
+  SkeletonItem,
+  Caption2,
+  shorthands,
 } from '@fluentui/react-components';
 import { Field } from '../../components/Field';
 import { Input } from '../../components/Input';
@@ -27,12 +36,13 @@ import {
   AppsListDetailRegular,
   bundleIcon,
   CommentFilled,
+  Dismiss24Regular,
 } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { Form, Root, Row } from '../../components/Container';
 import { zodInt, zodOptionalString, zodString } from '../../types/zod';
-import { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMessage } from '../../hooks/use-message';
 import { useAtom, useAtomValue } from 'jotai';
@@ -58,58 +68,58 @@ import { useLocation } from 'react-router-dom';
 import { Message, MessageType } from '../../models/system';
 import { constructErrorMessage, constructMessage } from '../../utils/string-util';
 import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
-import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
 import { ReviewPanel } from '../../components/review-panel';
+import { DropzoneBox } from '../../components/drop-zone';
+import { deleteMedia, uploadMedia } from '../../repo/media-repo';
 
 const useStyles = makeStyles({
-  row: {
-    display: 'flex',
+  imageWrapper: {
+    position: 'relative',
     width: '100%',
+    marginBottom: '1rem',
+    // ...shorthands.overflow('hidden'),
+    borderRadius: '8px',
   },
-  col25: {
-    width: '25%',
-    textAlign: 'left',
-  },
-  col50Right: {
-    width: '50%',
-    textAlign: 'right',
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    padding: '4px 8px',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // increased transparency
+    color: 'white',
+    fontSize: '12px',
     display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  panels: {
-    padding: '0 10px',
-    '& th': {
-      textAlign: 'left',
-      padding: '0 30px 0 0',
-    },
-  },
-  iconText: {
-    display: 'flex',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: tokens.spacingHorizontalXS, // small space between icon and text
+    zIndex: 1,
   },
-  commentWrapper: {
-    marginLeft: tokens.spacingHorizontalL,
-    marginBottom: tokens.spacingVerticalXL,
+  deleteButton: {
+    color: 'white',
+    background: 'transparent',
+    ...shorthands.border('none'),
+    cursor: 'pointer',
+  },
+  image: {
+    width: '100%',
+    height: 'auto',
+    display: 'block',
   },
 });
 
 type AchievementEditPageProps = {};
 
-export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
-  {
-    // mode,
-    // onBackButtonClick,
-    // onSave,
-  }: AchievementEditPageProps,
-) => {
+export const AchievementEditPage: React.FC<
+  AchievementEditPageProps
+> = ({}: AchievementEditPageProps) => {
   const { t, i18n } = useTranslation();
   const styles = useStyles();
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
   const { useStartBreadcrumb } = useBreadcrumb();
 
-  const [selectedTab, setSelectedTab] = React.useState<TabValue>('tab1');
+  const [selectedTab, setSelectedTab] = useState<TabValue>('tab1');
+  const [uploadInProgress, setUploadInProgress] = useState<File[]>([]);
   const { showConfirmationDialog } = useDialog();
   const { markDirty, resetDirty } = useFormDirty();
 
@@ -120,10 +130,13 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
 
   const _achievement2FormData = (achievement?: Achievement): FormData => {
     if (achievement) {
-      const { rating, ...rest } = achievement;
+      const { rating, attachment, ...rest } = achievement;
       return {
         ...rest,
         rating: rating ?? 0,
+        attachment: attachment.map(({ fileName, objectKey, getUrl }) => {
+          return { fileName, objectKey, getUrl };
+        }),
       };
     } else {
       return {
@@ -131,17 +144,25 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
         activityId: '',
         comment: '',
         rating: 0,
+        attachment: [],
       };
     }
   };
 
-  const _formData2AchievementCreation = (formData: FormData): AchievementCreation => {
-    const { studentId, activityId, rating, comment } = formData;
+  const _formData2AchievementCreation = (
+    formData: FormData,
+  ): { achievement: AchievementCreation; attachment: AchievementAttachmentCreation[] } => {
+    const { studentId, activityId, rating, comment, attachment } = formData;
     return {
-      studentId,
-      activityId,
-      rating,
-      comment,
+      achievement: {
+        studentId,
+        activityId,
+        rating,
+        comment,
+      },
+      attachment: attachment.map(({ objectKey, fileName }) => {
+        return { objectKey, fileName };
+      }),
     };
   };
 
@@ -169,6 +190,12 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
     }
   };
 
+  const attachmentSchema = z.object({
+    fileName: z.string(),
+    objectKey: z.string(),
+    getUrl: z.string().url(),
+    deleteUrl: z.string().url().optional(),
+  });
   const schema = z
     .object({
       id: zodOptionalString(),
@@ -176,15 +203,21 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
       activityId: zodString(),
       comment: zodString(),
       rating: zodInt(),
+      attachment: z.array(attachmentSchema),
     })
     .refine((data) => data.studentId?.trim().length ?? 0 > 0, {
       message: 'zod.error.Required',
       path: ['studentId'],
     })
+    .refine((data) => data.rating > 0, {
+      message: 'zod.error.Required',
+      path: ['rating'],
+    })
     .refine((data) => data.comment.trim().length ?? 0 > 0, {
       message: 'zod.error.Required',
       path: ['comment'],
     });
+  type AttachmentType = z.infer<typeof attachmentSchema>;
   type FormData = z.infer<typeof schema>;
 
   const {
@@ -341,65 +374,6 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
   const AppsListDetail = bundleIcon(AppsListDetailFilled, AppsListDetailRegular);
   const Comment = bundleIcon(CommentFilled, CommentRegular);
 
-  const AchievementDetail = React.memo(() => {
-    return (
-      <>
-        {selectedActivity?.activity.ratable === true ? (
-          <>
-            <Controller
-              control={control}
-              name="rating"
-              render={({ field }) => {
-                const { onChange, onBlur, ...rest } = field;
-                return (
-                  <Field label={t('achievementSubmission.rating')}>
-                    <Rating
-                      {...rest}
-                      color="brand"
-                      onChange={(_, data) => onChange(data.value)}
-                      style={{ marginLeft: tokens.spacingHorizontalL }}
-                    />
-                  </Field>
-                );
-              }}
-            />
-            <EmptyCell colSpan={2} />
-          </>
-        ) : (
-          <></>
-        )}
-        <Controller
-          control={control}
-          name="comment"
-          render={({ field }) => {
-            return (
-              <Field colSpan={3} label={t('achievementSubmission.comment')}>
-                <Textarea {...field} rows={4}></Textarea>
-              </Field>
-            );
-          }}
-        />
-      </>
-    );
-  });
-
-  const AchievementReview = memo(() => (
-    <div aria-labelledby="AchievementReview" role="tabpanel">
-      <Form numColumn={1}>
-        {(selectedAchievement?.review ?? []).map((r) => {
-          return (
-            <ReviewPanel
-              key={r.id}
-              author={useNameInPreferredLanguage(r.createdBy)}
-              comment={r.comment}
-              reviewDateTime={new Date(r.createdAt)}
-            />
-          );
-        })}
-      </Form>
-    </div>
-  ));
-
   const selectedStudent = state.student;
   const studentInfo = selectedStudent
     ? `P${selectedStudent?.classId}-${selectedStudent?.studentNumber} ${getFieldValueInPreferredLanguage(i18n.language, 'name', selectedStudent)}`
@@ -509,7 +483,14 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
                       {...rest}
                       multiselect={false}
                       onOptionSelect={(_ev, data) => {
-                        field.onChange(data.selectedOptions[0] ?? '');
+                        const activityId = data.selectedOptions[0] ?? '';
+                        const selectedActivity = state.activity.find(
+                          (item) => item.activity.id === activityId,
+                        );
+                        field.onChange(activityId);
+                        if (selectedActivity && selectedActivity.activity.ratable) {
+                          setValue('rating', -1);
+                        }
                       }}
                       readOnly={selectedAchievement !== undefined}
                       selectedOptions={value.length > 0 ? [value] : []}
@@ -596,8 +577,152 @@ export const AchievementEditPage: React.FC<AchievementEditPageProps> = (
             )}
 
             <div style={{ gridColumn: 'span 3' }}>
-              {selectedTab === 'tab1' && <AchievementDetail />}
-              {selectedTab === 'tab2' && <AchievementReview />}
+              {selectedTab === 'tab1' && (
+                <>
+                  {selectedActivity?.activity.ratable === true ? (
+                    <>
+                      <Controller
+                        control={control}
+                        name="rating"
+                        render={({ field }) => {
+                          const { onChange, onBlur, ...rest } = field;
+                          return (
+                            <Field
+                              label={t('achievementSubmission.rating')}
+                              validationMessage={errors.rating?.message}
+                            >
+                              <Rating
+                                {...rest}
+                                color="brand"
+                                onChange={(_, data) => onChange(data.value)}
+                                style={{ marginLeft: tokens.spacingHorizontalL }}
+                              />
+                            </Field>
+                          );
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                  <Controller
+                    control={control}
+                    name="comment"
+                    render={({ field }) => {
+                      return (
+                        <Field
+                          label={t('achievementSubmission.comment')}
+                          validationMessage={errors?.comment?.message}
+                        >
+                          <Textarea {...field} rows={4}></Textarea>
+                        </Field>
+                      );
+                    }}
+                  />
+
+                  <Controller
+                    control={control}
+                    name="attachment"
+                    render={({ field }) => {
+                      return (
+                        <Field label="Attachment">
+                          <>
+                            {uploadInProgress.map((item, i) => (
+                              <>
+                                <Caption1>{item.name}</Caption1>
+                                <Skeleton
+                                  key={`skeleton.${i}`}
+                                  style={{
+                                    width: '100%',
+                                    marginTop: tokens.spacingVerticalS,
+                                    marginBottom: tokens.spacingVerticalL,
+                                  }}
+                                >
+                                  <SkeletonItem animation="pulse" shape="rectangle" size={40} />
+                                </Skeleton>
+                              </>
+                            ))}
+                            {field.value.map((v, idx) => {
+                              const filename = v.fileName;
+                              return (
+                                <div key={`image.${idx}`} className={styles.imageWrapper}>
+                                  <div className={styles.overlay}>
+                                    <Caption2>{filename}</Caption2>
+                                    <Button
+                                      appearance="transparent"
+                                      className={styles.deleteButton}
+                                      icon={<Dismiss24Regular />}
+                                      onClick={async () => {
+                                        const updated = [...field.value];
+                                        const removedItem = updated.splice(idx, 1)[0];
+                                        if (removedItem.deleteUrl !== undefined) {
+                                          await deleteMedia({
+                                            ...removedItem,
+                                            deleteUrl: removedItem.deleteUrl as string,
+                                          });
+                                        }
+                                        setValue('attachment', updated);
+                                      }}
+                                    />
+                                  </div>
+                                  <Image className={styles.image} fit='contain' src={v.getUrl} />
+                                </div>
+                              );
+                            })}
+                            <DropzoneBox
+                              onFilesAccepted={async (files: File[]) => {
+                                setUploadInProgress(files);
+                                const doneFiles: AttachmentType[] = [];
+                                for (const f of files) {
+                                  const result = await uploadMedia(f);
+                                  if (
+                                    typeof result === 'object' &&
+                                    result !== null &&
+                                    'code' in result
+                                  ) {
+                                    // error occurred
+                                    continue;
+                                  }
+                                  doneFiles.push(result);
+
+                                  // Remove from upload progress
+                                  setUploadInProgress((prev) => prev.filter((uip) => uip !== f));
+
+                                  // Add result to attachment
+                                  const currentAttachments = field.value || [];
+                                  const newAttachments = new Set([
+                                    ...currentAttachments,
+                                    ...doneFiles,
+                                  ]);
+                                  setValue('attachment', Array.from(newAttachments), {
+                                    shouldDirty: true,
+                                  });
+                                }
+                              }}
+                            />
+                          </>
+                        </Field>
+                      );
+                    }}
+                  />
+                </>
+              )}
+              {selectedTab === 'tab2' && (
+                <div aria-labelledby="AchievementReview" role="tabpanel">
+                  <Form numColumn={1}>
+                    {(selectedAchievement?.review ?? []).map((r) => {
+                      return (
+                        <ReviewPanel
+                          key={r.id}
+                          author={useNameInPreferredLanguage(r.createdBy)}
+                          comment={r.comment}
+                          reviewDateTime={new Date(r.createdAt)}
+                        />
+                      );
+                    })}
+                  </Form>
+                </div>
+              )}
             </div>
           </>
         ) : (

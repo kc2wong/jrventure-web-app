@@ -501,7 +501,6 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
           name="eCoin"
           render={({ field }) => {
             const { onChange, ...others } = field;
-            // console.log(`onChange = ${onChange}`);
             return (
               <Field
                 label={t('activityMaintenance.eCoin')}

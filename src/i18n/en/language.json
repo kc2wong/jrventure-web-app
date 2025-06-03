@@ -36,6 +36,8 @@
       "doYouWantToSaveChange": "Do you want to save the changes",
       "discardChange": "Discard change",
       "dismiss": "Dismiss",
+      "dropZoneDrop": "Drop the files here...",
+      "dropZoneSelect": "Drag and drop files here or click to upload",
       "edit": "Edit",
       "error": "Error",
       "next": "Next",
