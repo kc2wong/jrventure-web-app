@@ -44,7 +44,8 @@ i18next.use(initReactI18next).init({
 const bottomBarHeight = '56px';
 
 const useStyles = makeStyles({
-  app: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
+  // app: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
+  app: { position: 'relative', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
   header: {
     // position: 'sticky',
     top: 0,
@@ -72,7 +73,7 @@ const useStyles = makeStyles({
   content: {
     flex: 1,
     overflowY: 'auto',
-    // height: '100vh',
+    height: '100%',
   },
 
   spacer: {
