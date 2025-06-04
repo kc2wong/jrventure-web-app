@@ -30,7 +30,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {} from '../../models/system';
 import { SearchCriteriaDrawer } from '../../components/drawer';
-import { Form, Root } from '../../components/Container';
+import { Form, Root, Row } from '../../components/Container';
 import { Field } from '../../components/Field';
 import { logger } from '../../utils/logging-util';
 import {
@@ -399,66 +399,68 @@ export const UserSearchPage: React.FC<UserSearchPageProps> = ({
 
   return (
     <Root>
-      <SearchDrawer isOpen={isDrawerOpen} onOpenChange={(open) => setIsDrawerOpen(open)} t={t} />
-
-      <Form
-        numColumn={1}
-        title={t('userMaintenance.title')}
-        toolbarSlot={[
-          toolbarButtonFilter,
-          toolbarButtonRefresh,
-          toolbarButtonAdd,
-          toolbarButtonEdit,
-          toolbarButtonView,
-        ]}
-      >
-        <Table
-          style={{ width: '100%', tableLayout: 'fixed', minWidth: '500px', maxWidth: '1200px' }}
+      {/* <Row> to make search drawer inline */}
+      <Row>
+        <SearchDrawer isOpen={isDrawerOpen} onOpenChange={(open) => setIsDrawerOpen(open)} t={t} />
+        <Form
+          numColumn={1}
+          title={t('userMaintenance.title')}
+          toolbarSlot={[
+            toolbarButtonFilter,
+            toolbarButtonRefresh,
+            toolbarButtonAdd,
+            toolbarButtonEdit,
+            toolbarButtonView,
+          ]}
         >
-          <TableHeader>
-            <TableRow>
-              <TableSelectionCell
-                invisible
-                style={{ pointerEvents: 'none', width: '40px', padding: 0 }}
-                type="radio"
-              />
-              {columns.map((col) => col.renderHeaderCell())}
-            </TableRow>
-          </TableHeader>
+          <Table
+            style={{ width: '100%', tableLayout: 'fixed', minWidth: '500px', maxWidth: '1200px' }}
+          >
+            <TableHeader>
+              <TableRow>
+                <TableSelectionCell
+                  invisible
+                  style={{ pointerEvents: 'none', width: '40px', padding: 0 }}
+                  type="radio"
+                />
+                {columns.map((col) => col.renderHeaderCell())}
+              </TableRow>
+            </TableHeader>
 
-          <TableBody>
-            {!state.getResult() ? (
-              <TableRow>
-                <TableCell colSpan={columns.length + 1}>
-                  <Body1>{t('system.message.noSearchPerformed')}</Body1>
-                </TableCell>
-              </TableRow>
-            ) : rows.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={columns.length + 1}>
-                  <Body1>{t('system.message.noMatchedData')}</Body1>
-                </TableCell>
-              </TableRow>
-            ) : (
-              rows.map(({ item, selected, onClick, appearance }) => (
-                <TableRow
-                  key={item.id}
-                  appearance={appearance}
-                  aria-selected={selected}
-                  onClick={onClick}
-                >
-                  <TableSelectionCell
-                    checked={selected}
-                    style={{ width: '40px', padding: 0 }}
-                    type="radio"
-                  />
-                  {columns.map((col) => col.renderCell(item))}
+            <TableBody>
+              {!state.getResult() ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length + 1}>
+                    <Body1>{t('system.message.noSearchPerformed')}</Body1>
+                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Form>
+              ) : rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length + 1}>
+                    <Body1>{t('system.message.noMatchedData')}</Body1>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                rows.map(({ item, selected, onClick, appearance }) => (
+                  <TableRow
+                    key={item.id}
+                    appearance={appearance}
+                    aria-selected={selected}
+                    onClick={onClick}
+                  >
+                    <TableSelectionCell
+                      checked={selected}
+                      style={{ width: '40px', padding: 0 }}
+                      type="radio"
+                    />
+                    {columns.map((col) => col.renderCell(item))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </Form>
+      </Row>
     </Root>
   );
 };

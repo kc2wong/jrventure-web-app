@@ -31,7 +31,7 @@ import { atom, useAtom, useAtomValue } from 'jotai';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SearchCriteriaDrawer } from '../../components/drawer';
-import { Form, Root } from '../../components/Container';
+import { Form, Root, Row } from '../../components/Container';
 import { Field } from '../../components/Field';
 import {
   Filter,
@@ -411,7 +411,7 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
       onSort: (direction) => {
         action({
           orderBy: {
-            ordering: direction === 'asc' ? ActivityOrdering.NameAsc :  ActivityOrdering.NameDesc
+            ordering: direction === 'asc' ? ActivityOrdering.NameAsc : ActivityOrdering.NameDesc,
           },
         });
       },
@@ -436,7 +436,8 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
       onSort: (direction) => {
         action({
           orderBy: {
-            ordering: direction === 'asc' ? ActivityOrdering.StartDateAsc :  ActivityOrdering.StartDateDesc
+            ordering:
+              direction === 'asc' ? ActivityOrdering.StartDateAsc : ActivityOrdering.StartDateDesc,
           },
         });
       },
@@ -455,7 +456,8 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
       onSort: (direction) => {
         action({
           orderBy: {
-            ordering: direction === 'asc' ? ActivityOrdering.EndDateAsc :  ActivityOrdering.EndDateDesc
+            ordering:
+              direction === 'asc' ? ActivityOrdering.EndDateAsc : ActivityOrdering.EndDateDesc,
           },
         });
       },
@@ -614,67 +616,69 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
 
   return (
     <Root>
-      <SearchDrawer isOpen={isDrawerOpen} onOpenChange={(open) => setIsDrawerOpen(open)} t={t} />
+      <Row>
+        <SearchDrawer isOpen={isDrawerOpen} onOpenChange={(open) => setIsDrawerOpen(open)} t={t} />
 
-      <Form
-        numColumn={1}
-        pagination={pagination}
-        title={t('activityMaintenance.title')}
-        toolbarSlot={[
-          toolbarButtonFilter,
-          toolbarButtonRefresh,
-          toolbarButtonAdd,
-          toolbarButtonEdit,
-          toolbarButtonView,
-        ]}
-      >
-        <Table
-          style={{ width: '100%', tableLayout: 'fixed', minWidth: '500px', maxWidth: '1200px' }}
+        <Form
+          numColumn={1}
+          pagination={pagination}
+          title={t('activityMaintenance.title')}
+          toolbarSlot={[
+            toolbarButtonFilter,
+            toolbarButtonRefresh,
+            toolbarButtonAdd,
+            toolbarButtonEdit,
+            toolbarButtonView,
+          ]}
         >
-          <TableHeader>
-            <TableRow>
-              <TableSelectionCell
-                invisible
-                style={{ pointerEvents: 'none', width: '40px', padding: 0 }}
-                type="radio"
-              />
-              {columns.map((col) => col.renderHeaderCell())}
-            </TableRow>
-          </TableHeader>
+          <Table
+            style={{ width: '100%', tableLayout: 'fixed', minWidth: '500px', maxWidth: '1200px' }}
+          >
+            <TableHeader>
+              <TableRow>
+                <TableSelectionCell
+                  invisible
+                  style={{ pointerEvents: 'none', width: '40px', padding: 0 }}
+                  type="radio"
+                />
+                {columns.map((col) => col.renderHeaderCell())}
+              </TableRow>
+            </TableHeader>
 
-          <TableBody>
-            {!state.getResult() ? (
-              <TableRow>
-                <TableCell colSpan={columns.length + 1}>
-                  <Body1>{t('system.message.noSearchPerformed')}</Body1>
-                </TableCell>
-              </TableRow>
-            ) : rows.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={columns.length + 1}>
-                  <Body1>{t('system.message.noMatchedData')}</Body1>
-                </TableCell>
-              </TableRow>
-            ) : (
-              rows.map(({ item, selected, onClick, appearance }) => (
-                <TableRow
-                  key={item.id}
-                  appearance={appearance}
-                  aria-selected={selected}
-                  onClick={onClick}
-                >
-                  <TableSelectionCell
-                    checked={selected}
-                    style={{ width: '40px', padding: 0 }}
-                    type="radio"
-                  />
-                  {columns.map((col) => col.renderCell(item))}
+            <TableBody>
+              {!state.getResult() ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length + 1}>
+                    <Body1>{t('system.message.noSearchPerformed')}</Body1>
+                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Form>
+              ) : rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length + 1}>
+                    <Body1>{t('system.message.noMatchedData')}</Body1>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                rows.map(({ item, selected, onClick, appearance }) => (
+                  <TableRow
+                    key={item.id}
+                    appearance={appearance}
+                    aria-selected={selected}
+                    onClick={onClick}
+                  >
+                    <TableSelectionCell
+                      checked={selected}
+                      style={{ width: '40px', padding: 0 }}
+                      type="radio"
+                    />
+                    {columns.map((col) => col.renderCell(item))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </Form>
+      </Row>
     </Root>
   );
 };

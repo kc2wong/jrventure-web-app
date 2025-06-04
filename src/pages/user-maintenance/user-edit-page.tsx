@@ -19,7 +19,7 @@ import {
 } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { Form, Root } from '../../components/Container';
+import { Form, Root, Row } from '../../components/Container';
 import { zodEmail, zodOptionalString, zodString } from '../../types/zod';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -380,307 +380,313 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
 
   return (
     <Root>
-      <Form
-        buttons={[backButton, resetPasswordButton, saveButton]}
-        numColumn={3}
-        styles={{ width: '690px' }}
-        title={
-          isToAddParentUser
-            ? t('userMaintenance.titleAddParent')
-            : constructMessage(t, 'userMaintenance.titleEdit', [
-                mode ? `system.message.${mode}` : '',
-              ])
-        }
-      >
-        {mode !== 'add' ? (
-          <>
-            <Controller
-              control={control}
-              name="id"
-              render={({ field }) => (
-                <Field colSpan={2} label={t('userMaintenance.id')} required>
-                  <Input {...field} readOnly={true} />
-                </Field>
-              )}
-            />
-            <EmptyCell colSpan={1} />
-          </>
-        ) : (
-          <></>
-        )}
-
-        <Controller
-          control={control}
-          name="email"
-          render={({ field }) => (
-            <Field
-              colSpan={2}
-              label={t('userMaintenance.email')}
-              required
-              validationMessage={errors?.email?.message}
-            >
-              <Input {...field} readOnly={readOnly || mode !== 'add'} />
-            </Field>
+      {/* <Row> to make MultiLangDrawer inline */}
+      <Row>
+        <Form
+          buttons={[backButton, resetPasswordButton, saveButton]}
+          numColumn={3}
+          styles={{ width: '690px' }}
+          title={
+            isToAddParentUser
+              ? t('userMaintenance.titleAddParent')
+              : constructMessage(t, 'userMaintenance.titleEdit', [
+                  mode ? `system.message.${mode}` : '',
+                ])
+          }
+        >
+          {mode !== 'add' ? (
+            <>
+              <Controller
+                control={control}
+                name="id"
+                render={({ field }) => (
+                  <Field colSpan={2} label={t('userMaintenance.id')} required>
+                    <Input {...field} readOnly={true} />
+                  </Field>
+                )}
+              />
+              <EmptyCell colSpan={1} />
+            </>
+          ) : (
+            <></>
           )}
-        />
-        <EmptyCell colSpan={1} />
 
-        <Controller
-          control={control}
-          name="name"
-          render={({ field }) => {
-            return (
+          <Controller
+            control={control}
+            name="email"
+            render={({ field }) => (
               <Field
-                colSpan={3}
-                label={t('userMaintenance.name')}
+                colSpan={2}
+                label={t('userMaintenance.email')}
                 required
-                validationMessage={errors?.name?.en?.message}
+                validationMessage={errors?.email?.message}
               >
-                <Input
-                  contentAfter={
-                    <MultiLangButton
-                      isOpen={isDrawerOpen}
-                      onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                    />
-                  }
-                  name={field.name}
-                  onChange={(evt, data) => {
-                    handleNameFieldChange(field.name, evt.target.name, data.value);
-                  }}
-                  readOnly={readOnly}
-                  value={field.value[LanguageEnum.English]}
-                />
+                <Input {...field} readOnly={readOnly || mode !== 'add'} />
               </Field>
-            );
-          }}
-        />
+            )}
+          />
+          <EmptyCell colSpan={1} />
 
-        <Controller
-          control={control}
-          name="role"
-          render={({ field }) => {
-            const { value, ...others } = field;
-            const selectedValue = value ?? '';
-            return (
-              <Field
-                label={t('userMaintenance.role.label')}
-                orientation="horizontal"
-                required={true}
-                validationMessage={errors?.role?.message}
-              >
-                {readOnly || isToAddParentUser ? (
+          <Controller
+            control={control}
+            name="name"
+            render={({ field }) => {
+              return (
+                <Field
+                  colSpan={3}
+                  label={t('userMaintenance.name')}
+                  required
+                  validationMessage={errors?.name?.en?.message}
+                >
                   <Input
-                    appearance="underline"
-                    contentBefore={<RoleIcon role={value} />}
-                    value={value ? t(`userMaintenance.role.value.${value}`) : ''}
-                  />
-                ) : (
-                  <Dropdown
-                    {...others}
-                    multiselect={false}
-                    onOptionSelect={(_ev, data) => {
-                      field.onChange(data.selectedOptions[0] ?? '');
-                      // clear entitledStudentId if role is not Student / Parent
-                      const optionValue = data.optionValue;
-                      if (optionValue !== UserRoleEnum.Student && optionValue !== UserRoleEnum.Parent) {
-                        setValue('entitledStudentId', '');
-                        setValue('entitledStudentId2', '');
-                      }
-                      if (
-                        optionValue !== UserRoleEnum.Teacher &&
-                        formValues.withApprovalRight === true
-                      ) {
-                        setValue('withApprovalRight', false);
-                      }
+                    contentAfter={
+                      <MultiLangButton
+                        isOpen={isDrawerOpen}
+                        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                      />
+                    }
+                    name={field.name}
+                    onChange={(evt, data) => {
+                      handleNameFieldChange(field.name, evt.target.name, data.value);
                     }}
-                    selectedOptions={asArray(selectedValue)}
-                    value={selectedValue}
-                  >
-                    {roleList.map((role) => (
-                      <Option
-                        key={role.toString()}
-                        disabled={role === UserRoleEnum.Alumni}
-                        text={t(`userMaintenance.role.value.${role}`)}
-                        value={`${role}`}
-                      >
-                        <RoleLabel role={role}></RoleLabel>
-                      </Option>
-                    ))}
-                  </Dropdown>
-                )}
-              </Field>
-            );
-          }}
-        />
+                    readOnly={readOnly}
+                    value={field.value[LanguageEnum.English]}
+                  />
+                </Field>
+              );
+            }}
+          />
 
-        {formValues.role == UserRoleEnum.Student || formValues.role == UserRoleEnum.Parent ? (
-          <>
-            <Controller
-              control={control}
-              name="entitledStudentId"
-              render={({ field }) => {
-                const { value, ...others } = field;
-                const student = value
-                  ? studentListState.result.find((s) => s.id === value)
-                  : undefined;
-                return (
-                  <Field
-                    colSpan={2}
-                    infoMessage={useNameInPreferredLanguage(student)}
-                    label={t('userMaintenance.studentId')}
-                    labelHint="P[1 to 6]-[1 to 30] e.g. P1A-1, P1A-2, .... P6E-30"
-                    orientation="horizontal"
-                    required={true}
-                    validationMessage={errors?.entitledStudentId?.message}
-                  >
+          <Controller
+            control={control}
+            name="role"
+            render={({ field }) => {
+              const { value, ...others } = field;
+              const selectedValue = value ?? '';
+              return (
+                <Field
+                  label={t('userMaintenance.role.label')}
+                  orientation="horizontal"
+                  required={true}
+                  validationMessage={errors?.role?.message}
+                >
+                  {readOnly || isToAddParentUser ? (
                     <Input
+                      appearance="underline"
+                      contentBefore={<RoleIcon role={value} />}
+                      value={value ? t(`userMaintenance.role.value.${value}`) : ''}
+                    />
+                  ) : (
+                    <Dropdown
                       {...others}
-                      contentAfter={
-                        studentListState instanceof StudentListStateProgress ? (
-                          <Spinner size="extra-tiny" />
-                        ) : undefined
-                      }
-                      onBlur={() => {
-                        const entitledStudentIds = [
-                          formValues.entitledStudentId,
-                          formValues.entitledStudentId2,
-                        ].filter((s) => s !== undefined);
-                        if (entitledStudentIds.length > 0) {
-                          studentListAction({ search: { id: entitledStudentIds } });
+                      multiselect={false}
+                      onOptionSelect={(_ev, data) => {
+                        field.onChange(data.selectedOptions[0] ?? '');
+                        // clear entitledStudentId if role is not Student / Parent
+                        const optionValue = data.optionValue;
+                        if (
+                          optionValue !== UserRoleEnum.Student &&
+                          optionValue !== UserRoleEnum.Parent
+                        ) {
+                          setValue('entitledStudentId', '');
+                          setValue('entitledStudentId2', '');
+                        }
+                        if (
+                          optionValue !== UserRoleEnum.Teacher &&
+                          formValues.withApprovalRight === true
+                        ) {
+                          setValue('withApprovalRight', false);
                         }
                       }}
-                      readOnly={readOnly || isToAddParentUser}
-                      value={value}
+                      selectedOptions={asArray(selectedValue)}
+                      value={selectedValue}
+                    >
+                      {roleList.map((role) => (
+                        <Option
+                          key={role.toString()}
+                          disabled={role === UserRoleEnum.Alumni}
+                          text={t(`userMaintenance.role.value.${role}`)}
+                          value={`${role}`}
+                        >
+                          <RoleLabel role={role}></RoleLabel>
+                        </Option>
+                      ))}
+                    </Dropdown>
+                  )}
+                </Field>
+              );
+            }}
+          />
+
+          {formValues.role == UserRoleEnum.Student || formValues.role == UserRoleEnum.Parent ? (
+            <>
+              <Controller
+                control={control}
+                name="entitledStudentId"
+                render={({ field }) => {
+                  const { value, ...others } = field;
+                  const student = value
+                    ? studentListState.result.find((s) => s.id === value)
+                    : undefined;
+                  return (
+                    <Field
+                      colSpan={2}
+                      infoMessage={useNameInPreferredLanguage(student)}
+                      label={t('userMaintenance.studentId')}
+                      labelHint="P[1 to 6]-[1 to 30] e.g. P1A-1, P1A-2, .... P6E-30"
+                      orientation="horizontal"
+                      required={true}
+                      validationMessage={errors?.entitledStudentId?.message}
+                    >
+                      <Input
+                        {...others}
+                        contentAfter={
+                          studentListState instanceof StudentListStateProgress ? (
+                            <Spinner size="extra-tiny" />
+                          ) : undefined
+                        }
+                        onBlur={() => {
+                          const entitledStudentIds = [
+                            formValues.entitledStudentId,
+                            formValues.entitledStudentId2,
+                          ].filter((s) => s !== undefined);
+                          if (entitledStudentIds.length > 0) {
+                            studentListAction({ search: { id: entitledStudentIds } });
+                          }
+                        }}
+                        readOnly={readOnly || isToAddParentUser}
+                        value={value}
+                      />
+                    </Field>
+                  );
+                }}
+              />
+            </>
+          ) : formValues.role === UserRoleEnum.Teacher ? (
+            <>
+              <Controller
+                control={control}
+                name="withApprovalRight"
+                render={({ field }) => {
+                  const { value, ...others } = field;
+                  return (
+                    <Field label={t('userMaintenance.withApprovalRight')}>
+                      <Switch {...others} checked={value} readOnly={readOnly} />
+                    </Field>
+                  );
+                }}
+              />
+              <EmptyCell />
+            </>
+          ) : (
+            <EmptyCell colSpan={2} />
+          )}
+
+          {formValues.role == UserRoleEnum.Parent && !isToAddParentUser ? (
+            <>
+              <EmptyCell />
+              <Controller
+                control={control}
+                name="entitledStudentId2"
+                render={({ field }) => {
+                  const { value, ...others } = field;
+                  const student = value
+                    ? studentListState.result.find((s) => s.id === value)
+                    : undefined;
+                  return (
+                    <Field
+                      colSpan={2}
+                      infoMessage={useNameInPreferredLanguage(student)}
+                      label={t('userMaintenance.studentId')}
+                      orientation="horizontal"
+                      validationMessage={errors?.entitledStudentId2?.message}
+                    >
+                      <Input
+                        {...others}
+                        contentAfter={
+                          studentListState instanceof StudentListStateProgress ? (
+                            <Spinner size="extra-tiny" />
+                          ) : undefined
+                        }
+                        onBlur={() => {
+                          const entitledStudentIds = [
+                            formValues.entitledStudentId,
+                            formValues.entitledStudentId2,
+                          ].filter((s) => s !== undefined);
+                          if (entitledStudentIds.length > 0) {
+                            studentListAction({ search: { id: entitledStudentIds } });
+                          }
+                        }}
+                        readOnly={readOnly || isToAddParentUser}
+                        value={value}
+                      />
+                    </Field>
+                  );
+                }}
+              />
+            </>
+          ) : (
+            <></>
+          )}
+
+          <Controller
+            control={control}
+            name="status"
+            render={({ field }) => {
+              const { value, ...others } = field;
+              const selectedValue = value ?? '';
+              return (
+                <Field
+                  label={t('userMaintenance.status.label')}
+                  orientation="horizontal"
+                  required={true}
+                  validationMessage={errors?.status?.message}
+                >
+                  {readOnly || isToAddParentUser ? (
+                    <Input
+                      appearance="underline"
+                      contentBefore={<StatusIcon status={value} />}
+                      value={value ? t(`userMaintenance.status.value.${value}`) : ''}
                     />
-                  </Field>
-                );
-              }}
-            />
-          </>
-        ) : formValues.role === UserRoleEnum.Teacher ? (
-          <>
-            <Controller
-              control={control}
-              name="withApprovalRight"
-              render={({ field }) => {
-                const { value, ...others } = field;
-                return (
-                  <Field label={t('userMaintenance.withApprovalRight')}>
-                    <Switch {...others} checked={value} readOnly={readOnly} />
-                  </Field>
-                );
-              }}
-            />
-            <EmptyCell />
-          </>
-        ) : (
+                  ) : (
+                    <Dropdown
+                      {...others}
+                      multiselect={false}
+                      onOptionSelect={(_ev, data) => {
+                        field.onChange(data.selectedOptions[0] ?? '');
+                      }}
+                      selectedOptions={asArray(selectedValue)}
+                      value={selectedValue}
+                    >
+                      {statusList.map((status) => (
+                        <Option
+                          key={status.toString()}
+                          text={t(`userMaintenance.status.value.${status}`)}
+                          value={`${status}`}
+                        >
+                          <StatusLabel status={status}></StatusLabel>
+                        </Option>
+                      ))}
+                    </Dropdown>
+                  )}
+                </Field>
+              );
+            }}
+          />
           <EmptyCell colSpan={2} />
-        )}
+        </Form>
+        <div style={{ flex: 1 }}></div>
 
-        {formValues.role == UserRoleEnum.Parent && !isToAddParentUser ? (
-          <>
-            <EmptyCell />
-            <Controller
-              control={control}
-              name="entitledStudentId2"
-              render={({ field }) => {
-                const { value, ...others } = field;
-                const student = value
-                  ? studentListState.result.find((s) => s.id === value)
-                  : undefined;
-                return (
-                  <Field
-                    colSpan={2}
-                    infoMessage={useNameInPreferredLanguage(student)}
-                    label={t('userMaintenance.studentId')}
-                    orientation="horizontal"
-                    validationMessage={errors?.entitledStudentId2?.message}
-                  >
-                    <Input
-                      {...others}
-                      contentAfter={
-                        studentListState instanceof StudentListStateProgress ? (
-                          <Spinner size="extra-tiny" />
-                        ) : undefined
-                      }
-                      onBlur={() => {
-                        const entitledStudentIds = [
-                          formValues.entitledStudentId,
-                          formValues.entitledStudentId2,
-                        ].filter((s) => s !== undefined);
-                        if (entitledStudentIds.length > 0) {
-                          studentListAction({ search: { id: entitledStudentIds } });
-                        }
-                      }}
-                      readOnly={readOnly || isToAddParentUser}
-                      value={value}
-                    />
-                  </Field>
-                );
-              }}
-            />
-          </>
-        ) : (
-          <></>
-        )}
-
-        <Controller
-          control={control}
-          name="status"
-          render={({ field }) => {
-            const { value, ...others } = field;
-            const selectedValue = value ?? '';
-            return (
-              <Field
-                label={t('userMaintenance.status.label')}
-                orientation="horizontal"
-                required={true}
-                validationMessage={errors?.status?.message}
-              >
-                {readOnly || isToAddParentUser ? (
-                  <Input
-                    appearance="underline"
-                    contentBefore={<StatusIcon status={value} />}
-                    value={value ? t(`userMaintenance.status.value.${value}`) : ''}
-                  />
-                ) : (
-                  <Dropdown
-                    {...others}
-                    multiselect={false}
-                    onOptionSelect={(_ev, data) => {
-                      field.onChange(data.selectedOptions[0] ?? '');
-                    }}
-                    selectedOptions={asArray(selectedValue)}
-                    value={selectedValue}
-                  >
-                    {statusList.map((status) => (
-                      <Option
-                        key={status.toString()}
-                        text={t(`userMaintenance.status.value.${status}`)}
-                        value={`${status}`}
-                      >
-                        <StatusLabel status={status}></StatusLabel>
-                      </Option>
-                    ))}
-                  </Dropdown>
-                )}
-              </Field>
-            );
-          }}
+        <MultiLangDrawer
+          initialData={formValues.name}
+          isOpen={isDrawerOpen}
+          isReadOnly={readOnly}
+          onDrawerClose={() => setIsDrawerOpen(false)}
+          onValueChange={(ev, data) => handleNameFieldChange('name', ev, data)}
+          t={t}
+          title={t('userMaintenance.name')}
         />
-        <EmptyCell colSpan={2} />
-      </Form>
-      <div style={{ flex: 1 }}></div>
-
-      <MultiLangDrawer
-        initialData={formValues.name}
-        isOpen={isDrawerOpen}
-        isReadOnly={readOnly}
-        onDrawerClose={() => setIsDrawerOpen(false)}
-        onValueChange={(ev, data) => handleNameFieldChange('name', ev, data)}
-        t={t}
-        title={t('userMaintenance.name')}
-      />
+      </Row>
     </Root>
   );
 };

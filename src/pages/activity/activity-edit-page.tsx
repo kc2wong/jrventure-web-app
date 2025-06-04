@@ -295,349 +295,351 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
 
   return (
     <Root>
-      <Form
-        buttons={[backButton, saveButton]}
-        numColumn={3}
-        styles={{ width: '750px' }}
-        title={constructMessage(t, 'activityMaintenance.titleEdit', [
-          mode ? `system.message.${mode}` : '',
-        ])}
-      >
-        {mode !== 'add' ? (
-          <>
-            <Controller
-              control={control}
-              name="id"
-              render={({ field }) => (
-                <Field label={t('activityMaintenance.id')} required>
-                  <Input {...field} readOnly={true} />
-                </Field>
-              )}
-            />
-            <EmptyCell colSpan={2} />
-          </>
-        ) : (
-          <></>
-        )}
+      <Row>
+        <Form
+          buttons={[backButton, saveButton]}
+          numColumn={3}
+          styles={{ width: '750px' }}
+          title={constructMessage(t, 'activityMaintenance.titleEdit', [
+            mode ? `system.message.${mode}` : '',
+          ])}
+        >
+          {mode !== 'add' ? (
+            <>
+              <Controller
+                control={control}
+                name="id"
+                render={({ field }) => (
+                  <Field label={t('activityMaintenance.id')} required>
+                    <Input {...field} readOnly={true} />
+                  </Field>
+                )}
+              />
+              <EmptyCell colSpan={2} />
+            </>
+          ) : (
+            <></>
+          )}
 
-        <Controller
-          control={control}
-          name="categoryCode"
-          render={({ field }) => {
-            const { value, ...others } = field;
-            const selectedValue = value ?? '';
-            const activityCategoryList = activityCategoryState.getResult() ?? [];
-            return (
-              <Field
-                label={t('activityMaintenance.category')}
-                orientation="horizontal"
-                required={true}
-                validationMessage={errors?.categoryCode?.message}
-              >
-                <Dropdown
-                  {...others}
-                  className={styles.field}
-                  multiselect={false}
-                  onOptionSelect={(_ev, data) => {
-                    field.onChange(data.selectedOptions[0] ?? '');
-                  }}
-                  readOnly={readOnly}
-                  selectedOptions={asArray(selectedValue)}
-                  value={useNameInPreferredLanguage(
-                    activityCategoryList.find((ac) => ac.code === selectedValue),
-                  )}
+          <Controller
+            control={control}
+            name="categoryCode"
+            render={({ field }) => {
+              const { value, ...others } = field;
+              const selectedValue = value ?? '';
+              const activityCategoryList = activityCategoryState.getResult() ?? [];
+              return (
+                <Field
+                  label={t('activityMaintenance.category')}
+                  orientation="horizontal"
+                  required={true}
+                  validationMessage={errors?.categoryCode?.message}
                 >
-                  {activityCategoryList.map((ac) => (
-                    <Option key={ac.code} text={useNameInPreferredLanguage(ac)} value={ac.code}>
-                      <Body1>{useNameInPreferredLanguage(ac)}</Body1>
-                    </Option>
-                  ))}
-                </Dropdown>
-              </Field>
-            );
-          }}
-        />
+                  <Dropdown
+                    {...others}
+                    className={styles.field}
+                    multiselect={false}
+                    onOptionSelect={(_ev, data) => {
+                      field.onChange(data.selectedOptions[0] ?? '');
+                    }}
+                    readOnly={readOnly}
+                    selectedOptions={asArray(selectedValue)}
+                    value={useNameInPreferredLanguage(
+                      activityCategoryList.find((ac) => ac.code === selectedValue),
+                    )}
+                  >
+                    {activityCategoryList.map((ac) => (
+                      <Option key={ac.code} text={useNameInPreferredLanguage(ac)} value={ac.code}>
+                        <Body1>{useNameInPreferredLanguage(ac)}</Body1>
+                      </Option>
+                    ))}
+                  </Dropdown>
+                </Field>
+              );
+            }}
+          />
 
-        <Controller
-          control={control}
-          name="name"
-          render={({ field }) => {
-            return (
-              <Field
-                colSpan={2}
-                label={t('activityMaintenance.name')}
-                required
-                validationMessage={errors?.name?.en?.message}
-              >
-                <Input
-                  contentAfter={
-                    <MultiLangButton
-                      isOpen={isDrawerOpen}
-                      onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                    />
-                  }
-                  name={field.name}
-                  onChange={(evt, data) => {
-                    handleNameFieldChange(field.name, evt.target.name, data.value);
-                  }}
-                  readOnly={readOnly}
-                  value={field.value[LanguageEnum.English]}
-                />
-              </Field>
-            );
-          }}
-        />
-
-        <Controller
-          control={control}
-          name="description"
-          render={({ field }) => {
-            const { name, ...others } = field;
-            return (
-              <Field
-                colSpan={3}
-                label={t('activityMaintenance.description')}
-                required
-                validationMessage={errors?.description?.message}
-              >
-                <Textarea readOnly={readOnly} rows={5} {...others}></Textarea>
-              </Field>
-            );
-          }}
-        />
-
-        <Controller
-          control={control}
-          name="participantGrade"
-          render={({ field }) => {
-            const { value, onChange } = field;
-            const handleCheckboxToggle = (num: number) => {
-              const newValue = value.includes(num)
-                ? value.filter((e) => e !== num)
-                : [...value, num];
-              onChange(newValue); // This keeps RHF in sync
-            };
-
-            return (
-              <Field
-                colSpan={2}
-                label={t('activityMaintenance.forClass')}
-                required
-                validationMessage={errors?.participantGrade?.message}
-              >
-                <Row>
-                  {gradeList.map((num) => {
-                    const checked = value.includes(num);
-                    return (
-                      <Checkbox
-                        key={num}
-                        checked={checked}
-                        label={`P${num}`}
-                        onChange={() => handleCheckboxToggle(num)}
-                        readOnly={readOnly}
+          <Controller
+            control={control}
+            name="name"
+            render={({ field }) => {
+              return (
+                <Field
+                  colSpan={2}
+                  label={t('activityMaintenance.name')}
+                  required
+                  validationMessage={errors?.name?.en?.message}
+                >
+                  <Input
+                    contentAfter={
+                      <MultiLangButton
+                        isOpen={isDrawerOpen}
+                        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                       />
-                    );
-                  })}
-                </Row>
-              </Field>
-            );
-          }}
-        />
-
-        <EmptyCell />
-
-        <Controller
-          control={control}
-          name="startDate"
-          render={({ field }) => {
-            const { onChange, ...others } = field;
-            return (
-              <Field
-                label={t('activityMaintenance.startDate')}
-                required
-                validationMessage={errors?.startDate?.message}
-              >
-                <DatePicker
-                  formatDate={(date) => {
-                    return date ? formatDate(date) : '';
-                  }}
-                  onSelectDate={(data) => {
-                    onChange(data ? data : null);
-                  }}
-                  readOnly={readOnly}
-                  {...others}
-                />
-              </Field>
-            );
-          }}
-        />
-
-        <Controller
-          control={control}
-          name="endDate"
-          render={({ field }) => {
-            const { onChange, ...others } = field;
-            return (
-              <Field
-                label={t('activityMaintenance.endDate')}
-                required
-                validationMessage={errors?.endDate?.message}
-              >
-                <DatePicker
-                  formatDate={(date) => (date ? formatDate(date) : '')}
-                  onSelectDate={(data) => {
-                    onChange(data ? data : null);
-                  }}
-                  readOnly={readOnly}
-                  {...others}
-                />
-              </Field>
-            );
-          }}
-        />
-
-        <Controller
-          control={control}
-          name="eCoin"
-          render={({ field }) => {
-            const { onChange, ...others } = field;
-            return (
-              <Field
-                label={t('activityMaintenance.eCoin')}
-                required
-                validationMessage={errors?.eCoin?.message}
-              >
-                <SpinButton
-                  min={0}
-                  onChange={(_ev, data) => {
-                    if (data.value) {
-                      setValue(field.name, data.value);
                     }
-                  }}
-                  readOnly={readOnly}
-                  {...others}
-                />
-              </Field>
-            );
-          }}
-        />
+                    name={field.name}
+                    onChange={(evt, data) => {
+                      handleNameFieldChange(field.name, evt.target.name, data.value);
+                    }}
+                    readOnly={readOnly}
+                    value={field.value[LanguageEnum.English]}
+                  />
+                </Field>
+              );
+            }}
+          />
 
-        <Controller
-          control={control}
-          name="submissionRole"
-          render={({ field }) => {
-            const { name, ...others } = field;
-            return (
-              <Field
-                colSpan={2}
-                label={t('activityMaintenance.submissionRole.label')}
-                required={true}
-                validationMessage={errors?.submissionRole?.message}
-              >
-                <Row>
-                  <RadioGroup layout="horizontal" readOnly={readOnly} {...others}>
-                    {roleList.map((role) => {
+          <Controller
+            control={control}
+            name="description"
+            render={({ field }) => {
+              const { name, ...others } = field;
+              return (
+                <Field
+                  colSpan={3}
+                  label={t('activityMaintenance.description')}
+                  required
+                  validationMessage={errors?.description?.message}
+                >
+                  <Textarea readOnly={readOnly} rows={5} {...others}></Textarea>
+                </Field>
+              );
+            }}
+          />
+
+          <Controller
+            control={control}
+            name="participantGrade"
+            render={({ field }) => {
+              const { value, onChange } = field;
+              const handleCheckboxToggle = (num: number) => {
+                const newValue = value.includes(num)
+                  ? value.filter((e) => e !== num)
+                  : [...value, num];
+                onChange(newValue); // This keeps RHF in sync
+              };
+
+              return (
+                <Field
+                  colSpan={2}
+                  label={t('activityMaintenance.forClass')}
+                  required
+                  validationMessage={errors?.participantGrade?.message}
+                >
+                  <Row>
+                    {gradeList.map((num) => {
+                      const checked = value.includes(num);
                       return (
-                        <Radio
-                          key={role}
-                          label={t(`activityMaintenance.submissionRole.value.${role}`)}
-                          value={role}
+                        <Checkbox
+                          key={num}
+                          checked={checked}
+                          label={`P${num}`}
+                          onChange={() => handleCheckboxToggle(num)}
+                          readOnly={readOnly}
                         />
                       );
                     })}
-                  </RadioGroup>
-                </Row>
-              </Field>
-            );
-          }}
-        />
-
-        <Row style={{ justifyContent: 'space-around' }}>
-          <Controller
-            control={control}
-            name="sharable"
-            render={({ field }) => {
-              const { value, ...others } = field;
-              return (
-                <Field
-                  label={t('activityMaintenance.sharable')}
-                  required
-                  validationMessage={errors?.sharable?.message}
-                >
-                  <Switch checked={value} readOnly={readOnly} {...others} />
+                  </Row>
                 </Field>
               );
             }}
           />
+
+          <EmptyCell />
+
           <Controller
             control={control}
-            name="ratable"
+            name="startDate"
             render={({ field }) => {
-              const { value, ...others } = field;
+              const { onChange, ...others } = field;
               return (
                 <Field
-                  label={t('activityMaintenance.ratable')}
+                  label={t('activityMaintenance.startDate')}
                   required
-                  validationMessage={errors?.sharable?.message}
+                  validationMessage={errors?.startDate?.message}
                 >
-                  <Switch checked={value} readOnly={readOnly} {...others} />
+                  <DatePicker
+                    formatDate={(date) => {
+                      return date ? formatDate(date) : '';
+                    }}
+                    onSelectDate={(data) => {
+                      onChange(data ? data : null);
+                    }}
+                    readOnly={readOnly}
+                    {...others}
+                  />
                 </Field>
               );
             }}
           />
-        </Row>
 
-        <Controller
-          control={control}
-          name="status"
-          render={({ field }) => {
-            const { value, ...others } = field;
-            const selectedValue = value ?? '';
-            return (
-              <Field
-                label={t('activityMaintenance.status.label')}
-                required={true}
-                validationMessage={errors?.status?.message}
-              >
-                <Dropdown
-                  {...others}
-                  className={styles.field}
-                  multiselect={false}
-                  onOptionSelect={(_ev, data) => {
-                    field.onChange(data.selectedOptions[0] ?? '');
-                  }}
-                  readOnly={readOnly}
-                  selectedOptions={asArray(selectedValue)}
-                  value={
-                    selectedValue ? t(`activityMaintenance.status.value.${selectedValue}`) : ''
-                  }
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field }) => {
+              const { onChange, ...others } = field;
+              return (
+                <Field
+                  label={t('activityMaintenance.endDate')}
+                  required
+                  validationMessage={errors?.endDate?.message}
                 >
-                  {statusList.map((status) => (
-                    <Option
-                      key={status.toString()}
-                      text={t(`activityMaintenance.status.value.${status}`)}
-                      value={`${status}`}
-                    >
-                      <StatusLabel status={status}></StatusLabel>
-                    </Option>
-                  ))}
-                </Dropdown>
-              </Field>
-            );
-          }}
-        />
-      </Form>
-      <div style={{ flex: 1 }}></div>
+                  <DatePicker
+                    formatDate={(date) => (date ? formatDate(date) : '')}
+                    onSelectDate={(data) => {
+                      onChange(data ? data : null);
+                    }}
+                    readOnly={readOnly}
+                    {...others}
+                  />
+                </Field>
+              );
+            }}
+          />
 
-      <MultiLangDrawer
-        initialData={formValues.name}
-        isOpen={isDrawerOpen}
-        isReadOnly={readOnly}
-        onDrawerClose={() => setIsDrawerOpen(false)}
-        onValueChange={(ev, data) => handleNameFieldChange('name', ev, data)}
-        t={t}
-        title={t('activityMaintenance.name')}
-      />
+          <Controller
+            control={control}
+            name="eCoin"
+            render={({ field }) => {
+              const { onChange, ...others } = field;
+              return (
+                <Field
+                  label={t('activityMaintenance.eCoin')}
+                  required
+                  validationMessage={errors?.eCoin?.message}
+                >
+                  <SpinButton
+                    min={0}
+                    onChange={(_ev, data) => {
+                      if (data.value) {
+                        setValue(field.name, data.value);
+                      }
+                    }}
+                    readOnly={readOnly}
+                    {...others}
+                  />
+                </Field>
+              );
+            }}
+          />
+
+          <Controller
+            control={control}
+            name="submissionRole"
+            render={({ field }) => {
+              const { name, ...others } = field;
+              return (
+                <Field
+                  colSpan={2}
+                  label={t('activityMaintenance.submissionRole.label')}
+                  required={true}
+                  validationMessage={errors?.submissionRole?.message}
+                >
+                  <Row>
+                    <RadioGroup layout="horizontal" readOnly={readOnly} {...others}>
+                      {roleList.map((role) => {
+                        return (
+                          <Radio
+                            key={role}
+                            label={t(`activityMaintenance.submissionRole.value.${role}`)}
+                            value={role}
+                          />
+                        );
+                      })}
+                    </RadioGroup>
+                  </Row>
+                </Field>
+              );
+            }}
+          />
+
+          <Row style={{ justifyContent: 'space-around' }}>
+            <Controller
+              control={control}
+              name="sharable"
+              render={({ field }) => {
+                const { value, ...others } = field;
+                return (
+                  <Field
+                    label={t('activityMaintenance.sharable')}
+                    required
+                    validationMessage={errors?.sharable?.message}
+                  >
+                    <Switch checked={value} readOnly={readOnly} {...others} />
+                  </Field>
+                );
+              }}
+            />
+            <Controller
+              control={control}
+              name="ratable"
+              render={({ field }) => {
+                const { value, ...others } = field;
+                return (
+                  <Field
+                    label={t('activityMaintenance.ratable')}
+                    required
+                    validationMessage={errors?.sharable?.message}
+                  >
+                    <Switch checked={value} readOnly={readOnly} {...others} />
+                  </Field>
+                );
+              }}
+            />
+          </Row>
+
+          <Controller
+            control={control}
+            name="status"
+            render={({ field }) => {
+              const { value, ...others } = field;
+              const selectedValue = value ?? '';
+              return (
+                <Field
+                  label={t('activityMaintenance.status.label')}
+                  required={true}
+                  validationMessage={errors?.status?.message}
+                >
+                  <Dropdown
+                    {...others}
+                    className={styles.field}
+                    multiselect={false}
+                    onOptionSelect={(_ev, data) => {
+                      field.onChange(data.selectedOptions[0] ?? '');
+                    }}
+                    readOnly={readOnly}
+                    selectedOptions={asArray(selectedValue)}
+                    value={
+                      selectedValue ? t(`activityMaintenance.status.value.${selectedValue}`) : ''
+                    }
+                  >
+                    {statusList.map((status) => (
+                      <Option
+                        key={status.toString()}
+                        text={t(`activityMaintenance.status.value.${status}`)}
+                        value={`${status}`}
+                      >
+                        <StatusLabel status={status}></StatusLabel>
+                      </Option>
+                    ))}
+                  </Dropdown>
+                </Field>
+              );
+            }}
+          />
+        </Form>
+        <div style={{ flex: 1 }}></div>
+
+        <MultiLangDrawer
+          initialData={formValues.name}
+          isOpen={isDrawerOpen}
+          isReadOnly={readOnly}
+          onDrawerClose={() => setIsDrawerOpen(false)}
+          onValueChange={(ev, data) => handleNameFieldChange('name', ev, data)}
+          t={t}
+          title={t('activityMaintenance.name')}
+        />
+      </Row>
     </Root>
   );
 };
