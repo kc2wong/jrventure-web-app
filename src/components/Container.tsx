@@ -2,7 +2,6 @@ import {
   Button,
   makeStyles,
   MessageBar,
-  shorthands,
   tokens,
   Toolbar,
   ToolbarButton,
@@ -23,6 +22,7 @@ const useStyles = makeStyles({
     marginRight: tokens.spacingHorizontalXXL,
     '@media (max-width: 600px)': {
       minHeight: 'calc(100vh - 56px)', // adjust 56px if your bottom bar height changes
+      overflowY: 'hidden',
       marginTop: tokens.spacingVerticalL,
       marginBottom: tokens.spacingVerticalL,
       marginLeft: tokens.spacingHorizontalM,
