@@ -52,6 +52,7 @@
       "saveObjectSuccess": "${1} [${2}] is saved successfully",
       "search": "Search",
       "searchCriteria": "Search Criteria",
+      "selectOption": "Select an Option",
       "signOut": "Sign Out",
       "site": "Site",
       "start": "Start",
