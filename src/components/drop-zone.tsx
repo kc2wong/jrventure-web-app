@@ -13,7 +13,7 @@ const useStyles = makeStyles({
     textAlign: 'center',
     cursor: 'pointer',
     transition: 'border-color 0.2s ease-in-out',
-    marginBottom: tokens.spacingVerticalM
+    marginBottom: tokens.spacingVerticalM,
   },
 });
 
@@ -33,6 +33,9 @@ export const DropzoneBox: React.FC<DropzoneBoxProps> = ({ onFilesAccepted }) => 
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      'image/*': [],
+    },
     onDrop,
   });
 

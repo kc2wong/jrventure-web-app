@@ -13,22 +13,15 @@ import { useIsMobile } from '../hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
-  drawerSpacer: {
-    height: '16px',
+  drawerBody: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
   },
-  scrollableDrawerBody: {
-    position: 'relative',
-    padding: 0,
-    height: '33vh',
-  },
+  drawerSpacer: { flex: 1 },
   listContainer: {
-    position: 'absolute',
-    top: '16px', // match the fixed top space
-    bottom: '16px', // match the fixed bottom space
-    left: 0,
-    right: 0,
+    flex: 8,
     overflowY: 'auto',
-    paddingInline: '16px',
   },
 });
 
@@ -81,29 +74,27 @@ export const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             <DrawerHeader>
               <DrawerHeaderTitle>{t('system.message.selectOption')}</DrawerHeaderTitle>
             </DrawerHeader>
-            <DrawerBody className={styles.scrollableDrawerBody}>
-              {/* Fixed top space */}
-              <div className={styles.drawerSpacer} />
-
-              {/* Scrollable list container */}
-              <div className={styles.listContainer}>
-                <Listbox
-                  onOptionSelect={(ev, data) => {
-                    if (onOptionSelect) {
-                      onOptionSelect(ev, data);
-                    }
-                    setDrawerOpen(false);
-                  }}
-                  selectedOptions={selectedOptions}
-                  tabIndex={0}
-                >
-                  {optionChildren.map((child: any) =>
-                    cloneElement(child, { key: child.key ?? child.props.value }),
-                  )}
-                </Listbox>
+            <DrawerBody>
+              <div className={styles.drawerBody}>
+                <div className={styles.drawerSpacer}></div>
+                <div className={styles.listContainer}>
+                  <Listbox
+                    onOptionSelect={(ev, data) => {
+                      if (onOptionSelect) {
+                        onOptionSelect(ev, data);
+                      }
+                      setDrawerOpen(false);
+                    }}
+                    selectedOptions={selectedOptions}
+                    tabIndex={0}
+                  >
+                    {optionChildren.map((child: any) =>
+                      cloneElement(child, { key: child.key ?? child.props.value }),
+                    )}
+                  </Listbox>
+                </div>
+                <div className={styles.drawerSpacer}></div>
               </div>
-
-              <div className={styles.drawerSpacer} />
             </DrawerBody>
           </Drawer>
         </>
