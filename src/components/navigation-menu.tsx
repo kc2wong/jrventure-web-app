@@ -16,8 +16,8 @@ import {
   WalletRegular,
   BoxCheckmarkRegular,
   StoreMicrosoftRegular,
-  PeopleCheckmarkRegular,
-  TrophyRegular,
+  StarCheckmarkRegular,
+  StarRegular,
 } from '@fluentui/react-icons';
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { useAtomValue } from 'jotai';
@@ -91,7 +91,7 @@ const navigationMenu: NavigationMenuItem[] = [
     type: 'item',
     id: 'mnuAchievement',
     label: 'Achievement',
-    icon: TrophyRegular,
+    icon: StarRegular,
     path: '/achievement',
     showInSidebar: true,
     showInBottomBar: true,
@@ -110,11 +110,11 @@ const navigationMenu: NavigationMenuItem[] = [
   },
   {
     type: 'item',
-    id: 'mnuBannerApproval',
-    label: 'Banner Approval',
-    icon: PeopleCheckmarkRegular,
-    path: '/approval',
-    roles: [UserRoleEnum.Teacher],
+    id: 'mnuAchievementApproval',
+    label: 'Achievement Approval',
+    icon: StarCheckmarkRegular,
+    path: '/achievement-approval',
+    // roles: [UserRoleEnum.Teacher],
     showInSidebar: true,
   },
 

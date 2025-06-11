@@ -239,6 +239,26 @@
       "submittedForApproval": "Achievement is submitted for approval"
     }
   },
+  "achievementApproval": {
+    "activityName": "Activity Name",
+    "approve": "Approve",
+    "classId": "Class ID",
+    "comment": "Comment",
+    "confirmCommentSubmission": "Leave your comment",
+    "rating": "Rating",
+    "submissionRole": "Role",
+    "studentId": "Student ID",
+    "studentNo": "Student No",
+    "studentName": "Student Name",
+    "status": {
+      "label": "Status",
+      "value": { "Pending": "Pending", "Rejected": "Rejected" }
+    },
+    "reject": "Reject",
+    "submissionDate": "Submission Date",
+    "title": "Achievement Approval",
+    "titleReview": "Review Achievement"
+  },  
   "zod": {
     "error": {
       "Required": "Mandatory Field",

@@ -45,7 +45,6 @@ const useStyles = makeStyles({
 const commentTypeComponents: Record<ApprovalCommentType, FC> = {
   Conversation: () => <ChatRegular color={tokens.colorPaletteBlueBackground2} fontSize={20} />,
   Rejection: () => <ChatDismissRegular color={tokens.colorPaletteRedForeground2} fontSize={20} />,
-  Approval: () => <ChatSparkleRegular color={tokens.colorPaletteGreenForeground2} fontSize={20} />,
 };
 
 export const ProductApprovalDetailPage: React.FC = () => {

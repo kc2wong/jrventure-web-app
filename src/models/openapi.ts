@@ -74,6 +74,12 @@ export enum AchievementStatusEnum {
   Published = 'Published',
 }
 
+export enum AchievementApprovalPendingSubmissionDateEnum {
+  lastSevenDays = 'lastSevenDays',
+  lastFourteenDays = 'lastFourteenDays',
+  lastThirtyDays = 'lastThirtyDays',
+}
+
 export const roleToEnum = (role: UserRole): UserRoleEnum => UserRoleEnum[role];
 export const statusToEnum = (status: UserStatus): UserStatusEnum => UserStatusEnum[status];
 export const approvalStatusToEnum = (status: ApprovalStatusEnum): ApprovalStatusEnum =>

@@ -39,7 +39,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: tokens.spacingVerticalM,
+    marginTop: tokens.spacingVerticalXXS,
     marginBottom: tokens.spacingVerticalM,
     minHeight: '40px',
     gap: tokens.spacingVerticalS,
@@ -89,7 +89,7 @@ const useStyles = makeStyles({
   },
 });
 
-type FormProps = {
+export type FormProps = {
   numColumn: 1 | 2 | 3 | 4;
   buttons?: React.ReactElement<typeof Button>[];
   toolbarSlot?: React.ReactElement<typeof ToolbarButton>[] | React.ReactElement<typeof MessageBar>;
@@ -100,10 +100,17 @@ type FormProps = {
 };
 
 export const Root: React.FC<{
+  withDrawerSupport?: boolean;
   children: ReactElement | ReactElement[];
-}> = ({ children }) => {
+}> = ({ children, withDrawerSupport = false }) => {
   const styles = useStyles();
-  return <div className={styles.root}>{children}</div>;
+  return withDrawerSupport ? (
+    <div className={styles.root}>
+      <Row>{children}</Row>
+    </div>
+  ) : (
+    <div className={styles.root}>{children}</div>
+  );
 };
 
 export const MobileRoot: React.FC<{

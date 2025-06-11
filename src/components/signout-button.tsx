@@ -35,10 +35,12 @@ export const SignoutButton: FC<SignoutButtonProps> = ({ showCaption }: SignoutBu
       icon={<DoorArrowLeftRegular />}
       onClick={() =>
         showConfirmationDialog({
-          confirmType: t('system.message.signOut'),
-          message: isDirty()
-            ? t('userProfile.discardChangeAndSignOut')
-            : t('userProfile.doYouWantToSignOut'),
+          title: { confirmType: t('system.message.signOut') },
+          content: {
+            message: isDirty()
+              ? t('userProfile.discardChangeAndSignOut')
+              : t('userProfile.doYouWantToSignOut'),
+          },
           primaryButton: {
             label: t('userProfile.signOut'),
             icon: <CheckmarkRegular />,

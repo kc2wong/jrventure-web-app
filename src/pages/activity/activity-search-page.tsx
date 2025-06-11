@@ -202,8 +202,8 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
             <Field
               label={t('activityMaintenance.forClass')}
               validationMessage={
-                errors.categoryCode?.message
-                  ? constructErrorMessage(t, errors.categoryCode?.message)
+                errors.participantGrade?.message
+                  ? constructErrorMessage(t, errors.participantGrade?.message)
                   : undefined
               }
             >
@@ -231,8 +231,11 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
       <Field
         label={t('activityMaintenance.startDate')}
         validationMessage={
-          errors.categoryCode?.message
-            ? constructErrorMessage(t, errors.categoryCode?.message)
+          errors.startDateFrom?.message !== undefined || errors.startDateTo?.message !== undefined
+            ? constructErrorMessage(
+                t,
+                errors.startDateFrom?.message ?? errors.startDateTo?.message ?? '',
+              )
             : undefined
         }
       >
@@ -270,8 +273,11 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
       <Field
         label={t('activityMaintenance.endDate')}
         validationMessage={
-          errors.categoryCode?.message
-            ? constructErrorMessage(t, errors.categoryCode?.message)
+          errors.endDateFrom?.message !== undefined || errors.endDateTo?.message !== undefined
+            ? constructErrorMessage(
+                t,
+                errors.endDateFrom?.message ?? errors.endDateTo?.message ?? '',
+              )
             : undefined
         }
       >

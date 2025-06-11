@@ -351,8 +351,8 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
       icon={<SaveRegular />}
       onClick={handleSubmit(() => {
         showConfirmationDialog({
-          confirmType: 'save',
-          message: t('system.message.doYouWantToSaveChange'),
+          title: { confirmType: 'save' },
+          content: { message: t('system.message.doYouWantToSaveChange') },
           primaryButton: {
             label: t('system.message.save'),
             icon: <CheckmarkRegular />,

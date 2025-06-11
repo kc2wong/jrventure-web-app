@@ -1,9 +1,5 @@
 import { z } from 'zod';
-import {
-  Achievement,
-  AchievementAttachmentCreation,
-  AchievementCreation,
-} from '../../models/openapi';
+import { AchievementAttachmentCreation, AchievementCreation } from '../../models/openapi';
 import {
   Body1,
   Button,
@@ -57,12 +53,21 @@ import { Message, MessageType } from '../../models/system';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { authenticationAtom } from '../../states/authentication';
 import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
-import { achievementDetailAtom, AchievementDetailStateFail, AchievementDetailStateSearchAchievementSuccess, AchievementDetailStateSearchProgress, AchievementDetailStateSearchStudentSuccess, AchievementDetailStateSearchSuccess, AchievementDetailStateUpdateSuccess } from '../../states/achievement-detail';
+import {
+  achievementDetailAtom,
+  AchievementDetailStateFail,
+  AchievementDetailStateSearchAchievementSuccess,
+  AchievementDetailStateSearchProgress,
+  AchievementDetailStateSearchStudentSuccess,
+  AchievementDetailStateSearchSuccess,
+  AchievementDetailStateUpdateSuccess,
+} from '../../states/achievement-detail';
 import { getFieldValueInPreferredLanguage } from '../../utils/language-util';
 import { AchievementStatusIcon } from './achievement-status-label';
 import { ReviewPanel } from '../../components/review-panel';
 import { DropzoneBox } from '../../components/drop-zone';
 import { deleteMedia, uploadMedia } from '../../repo/media-repo';
+import { AchievementDetail } from '../../__generated__/linkedup-web-api-client';
 
 const useStyles = makeStyles({
   imageWrapper: {
@@ -150,7 +155,7 @@ export const AchievementEditPage: React.FC<
 
   const baselineTimestamp = useRef<number>(Date.now());
 
-  const _achievement2FormData = (achievement?: Achievement): FormData => {
+  const _achievement2FormData = (achievement?: AchievementDetail): FormData => {
     if (achievement) {
       const { rating, attachment, ...rest } = achievement;
       return {
@@ -335,8 +340,8 @@ export const AchievementEditPage: React.FC<
       icon={<CheckmarkRegular />}
       onClick={handleSubmit(() => {
         showConfirmationDialog({
-          confirmType: 'save',
-          message: t('achievementSubmission.message.confirmSubmission'),
+          title: { confirmType: 'save' },
+          content: { message: t('achievementSubmission.message.confirmSubmission') },
           primaryButton: {
             label: t('system.message.submit'),
             icon: <CheckmarkRegular />,

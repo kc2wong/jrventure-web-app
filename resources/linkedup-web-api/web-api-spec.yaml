@@ -191,7 +191,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Achievement"
+                $ref: "#/components/schemas/AchievementDetail"
         "400":
           description: Validation fails, e.g. student or activity not found, or student is not a particpant of the activity
           content:
@@ -764,6 +764,227 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /achievements/{id}:
+    get:
+      summary: Get achievement detail with id
+      operationId: getAchievementById
+      tags:
+        - Achievement
+      parameters:
+        - in: path
+          name: id
+          required: true          
+          schema:
+            type: string
+          description: Achievement ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AchievementDetail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /achievements/{id}/approval:
+    post:
+      summary: Approve an pending achievement
+      operationId: approveAchievement
+      tags:
+        - Achievement
+      parameters:
+        - in: path
+          name: id
+          required: true          
+          schema:
+            type: string
+          description: Achievement ID
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AchievementDetail'
+        '400':
+          description: Invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /achievements/{id}/rejection:
+    post:
+      summary: Reject an pending achievement
+      operationId: rejectAchievement
+      tags:
+        - Achievement
+      parameters:
+        - in: path
+          name: id
+          required: true          
+          schema:
+            type: string
+          description: Achievement ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - comment
+              properties:
+                comment:
+                  type: string
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AchievementDetail'
+        '400':
+          description: Invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /achievements/{id}/review:
+    post:
+      summary: Add an comment to pending achievement
+      operationId: reviewAchievement
+      tags:
+        - Achievement
+      parameters:
+        - in: path
+          name: id
+          required: true          
+          schema:
+            type: string
+          description: Achievement ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - comment
+              properties:
+                comment:
+                  type: string
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AchievementDetail'
+        '400':
+          description: Invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /achievements/status/pending:
+    get:
+      summary: Search pending achievements
+      operationId: findPendingAchievement
+      tags:
+        - Achievement
+      parameters:
+        - in: query
+          name: activityName
+          schema:
+            type: string
+        - in: query
+          name: role
+          schema:
+            $ref: '#/components/schemas/AchievementSubmissionRole'
+        - in: query
+          name: submissionDateFrom
+          schema:
+            type: string
+            enum:
+              - lastSevenDays
+              - lastFourteenDays
+              - lastThirtyDays
+        - in: query
+          name: offset
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: limit
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: orderByDirection
+          schema:
+            $ref: '#/components/schemas/OrderByDirection'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindAchievementApprovalResult'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error' 
   /media/presigned-urls:
     post:
       summary: Generate presigned urls for file upload
@@ -868,7 +1089,6 @@ components:
       enum:
       - Conversation
       - Rejection
-      - Approval
     ActivityStatus:
       type: string
       enum:
@@ -1309,14 +1529,37 @@ components:
             - id
             - submissionRole
             - status
-            - attachment
+            - activity
+            - student
+            - numberOfAttachment
           properties:
             id:
               type: string
+            activity:
+              $ref: "#/components/schemas/Activity"
+            student:
+              $ref: "#/components/schemas/Student"
             submissionRole:
               $ref: "#/components/schemas/AchievementSubmissionRole"
+            submissionDate:
+              type: string
+              format: datetime
+            numberOfAttachment:
+              type: number
             status:
               $ref: "#/components/schemas/AchievementStatus"
+    AchievementDetail:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Achievement"
+        - type: object
+          required:
+            - status
+            - attachment            
+          properties:
+            submittedBy:
+              $ref: '#/components/schemas/SimpleUser'
+              description: User who submits this achievement for approval
             review:
               type: array
               items:
@@ -1332,9 +1575,24 @@ components:
         - type: object
           required:
             - id
+            - commentType
             - comment
           properties:
             id:
               type: string
+            commentType:
+              $ref: "#/components/schemas/ApprovalCommentType"
             comment:
               type: string
+    FindAchievementApprovalResult:
+      type: object
+      allOf:
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Achievement'
+        - $ref: '#/components/schemas/Pagination'              

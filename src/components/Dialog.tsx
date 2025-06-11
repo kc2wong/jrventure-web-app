@@ -7,18 +7,19 @@ import {
   DialogContent,
   DialogActions,
 } from '@fluentui/react-components';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 type DialogButton = {
   label: string;
   icon?: React.ReactElement;
+  disabled?: boolean;
   isCta?: boolean;
   action?: () => void;
 };
 
 export type DialogProps = {
   title: string;
-  message: string;
+  content: ReactNode;
   buttons: DialogButton[];
 };
 
@@ -27,7 +28,7 @@ type HideShowDialogProps = DialogProps & {
 };
 export const Dialog: React.FC<HideShowDialogProps> = ({
   title,
-  message,
+  content,
   open,
   buttons,
 }: HideShowDialogProps) => {
@@ -36,13 +37,14 @@ export const Dialog: React.FC<HideShowDialogProps> = ({
       <DialogSurface>
         <DialogBody>
           <DialogTitle>{title}</DialogTitle>
-          <DialogContent>{`${message} ?`}</DialogContent>
+          <DialogContent>{content}</DialogContent>
           <DialogActions>
             {buttons.map((b, index) => {
               return (
                 <Button
                   key={index}
                   appearance={(b.isCta ?? false) ? 'primary' : 'secondary'}
+                  disabled={b.disabled}
                   icon={b.icon}
                   onClick={b.action}
                 >

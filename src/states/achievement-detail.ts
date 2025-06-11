@@ -4,7 +4,6 @@ import {
   AchievementStatusEnum,
   Activity,
   Student,
-  Achievement,
   AchievementCreation,
   AchievementAttachmentCreation,
 } from '../models/openapi';
@@ -18,6 +17,7 @@ import {
   findAchievementByStudentActivityIdRepo,
   createAchievementRepo,
 } from '../repo/achievement-repo';
+import { AchievementDetail } from '../__generated__/linkedup-web-api-client';
 
 type ActivityWithAchievementStatus = {
   activity: Activity;
@@ -27,7 +27,7 @@ type AchievementDetailStateArgs = {
   studentId?: string;
   student?: Student;
   activity: ActivityWithAchievementStatus[];
-  achievement?: Achievement;
+  achievement?: AchievementDetail;
   updateSuccessTime?: number;
 };
 
@@ -35,7 +35,7 @@ class AchievementDetailState implements BaseState {
   studentId?: string;
   student?: Student;
   activity: ActivityWithAchievementStatus[];
-  achievement?: Achievement;
+  achievement?: AchievementDetail;
   eventTime: number;
 
   constructor({ studentId, student, activity, achievement }: AchievementDetailStateArgs) {
@@ -86,16 +86,17 @@ class AchievementDetailStateSearchActivitySuccess extends AchievementDetailState
 }
 
 class AchievementDetailStateSearchAchievementSuccess extends AchievementDetailStateSearchSuccess {
-  override achievement: Achievement;
-  constructor(achievement: Achievement, args: AchievementDetailState) {
+  override achievement: AchievementDetail;
+  constructor(achievement: AchievementDetail, args: AchievementDetailState) {
     super({ ...args, achievement });
     this.achievement = achievement;
   }
 }
 
 class AchievementDetailStateUpdateSuccess extends AchievementDetailState {
-  override achievement: Achievement;
-  constructor(achievement: Achievement, args: AchievementDetailState) {
+  override achievement: AchievementDetail;
+  result: any;
+  constructor(achievement: AchievementDetail, args: AchievementDetailState) {
     super({ ...args, achievement });
     this.achievement = achievement;
   }
@@ -207,7 +208,10 @@ const _searchAchievement = async (
     set(achievementDetailBaseAtom, nextState);
     return;
   } else {
-    const nextState = new AchievementDetailStateSearchAchievementSuccess(result, stateProgress);
+    const nextState = new AchievementDetailStateSearchAchievementSuccess(
+      { ...result, attachment: [] },
+      stateProgress,
+    );
     set(achievementDetailBaseAtom, nextState);
     return;
   }
@@ -232,7 +236,10 @@ const _createOrUpdate = async (
     set(achievementDetailBaseAtom, nextState);
     return;
   } else {
-    const nextState = new AchievementDetailStateUpdateSuccess(result, stateProgress);
+    const nextState = new AchievementDetailStateUpdateSuccess(
+      { ...result, attachment: [] },
+      stateProgress,
+    );
     set(achievementDetailBaseAtom, nextState);
     return;
   }
