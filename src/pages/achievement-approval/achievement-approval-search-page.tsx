@@ -227,23 +227,10 @@ export const AchievementApprovalSearchPage: React.FC<AchievementApprovalSearchPa
   const { t } = useTranslation();
 
   const { useStartBreadcrumb } = useBreadcrumb();
-  const { dispatchMessage } = useMessage();
   const [state, action] = useAtom(achievementApprovalListAtom);
 
   const { formatDate } = useTimezone();
   const styles = useStyles();
-
-  useEffect(() => {
-    if (state instanceof AchievementApprovalListStateSuccess) {
-    } else if (state instanceof AchievementApprovalListStateFail) {
-      // stopSpinner();
-      const failure = state.failure;
-      dispatchMessage({
-        type: failure.type,
-        text: constructErrorMessage(t, failure.key, failure.parameters)!,
-      });
-    }
-  }, [state]);
 
   useEffect(() => {
     useStartBreadcrumb('achievementApproval.title');
