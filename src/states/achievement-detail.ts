@@ -11,7 +11,7 @@ import { OneOnly } from '../utils/object-util';
 import { EmptyObject } from '../models/common';
 import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
-import { getStudentById as getStudentByIdRepo } from '../repo/student-repo';
+import { getStudentByIdRepo } from '../repo/student-repo';
 import { findActivityByStudentIdRepo } from '../repo/activity-repo';
 import {
   findAchievementByStudentActivityIdRepo,

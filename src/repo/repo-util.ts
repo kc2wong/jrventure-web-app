@@ -1,10 +1,10 @@
 import { client } from '../__generated__/linkedup-web-api-client/client.gen';
 import { createSystemError } from './error-util';
-import type { Error } from '../models/openapi';
-import { delay } from '../utils/date-util';
+import type { _Error as Error } from '@webapi/';
+import { delay } from '@utils/date-util';
 
 client.setConfig({
-  baseURL: process.env.REACT_APP_WEB_API_URL,
+  baseURL: import.meta.env.REACT_APP_WEB_API_URL,
   withCredentials: true,
 });
 
@@ -14,14 +14,6 @@ export const callRepo = async <T>(
   authorizationToken?: string,
 ): Promise<T | Error> => {
   const startTime = Date.now();
-//   const result = await promise;
-//   const elapsed = endTime - startTime;
-//   if (elapsed < minDurationMs) {
-//     await delay(minDurationMs - elapsed);
-//   }
-//   return result;
-
-
   if (authorizationToken) {
     client.instance.interceptors.request.use((config) => {
       config.headers.set('Authorization', `Bearer ${authorizationToken}`);

@@ -1,24 +1,21 @@
-import { Student, Error as ErrorModel } from '../models/openapi';
-import {
-  findStudent as findStudentRepo,
-  getStudentById as getStudentByIdRepo,
-} from '../__generated__/linkedup-web-api-client';
+import { Student, _Error as ErrorModel } from '@webapi/types'
+import { findStudent, getStudentById }  from '@webapi/sdk'
 import { callRepo } from './repo-util';
 
-export const findStudentByIds = async (id: string[]): Promise<Student[] | ErrorModel> => {
+export const findStudentByIdsRepo = async (id: string[]): Promise<Student[] | ErrorModel> => {
   return await callRepo(() => {
-    return findStudentRepo({ query: { id } });
+    return findStudent({ query: { id } });
   });
 };
 
-export const findStudentByClassIdStudentNumber = async (classIdStudentNumber: string): Promise<Student[] | ErrorModel> => {
+export const findStudentByClassIdStudentNumberRepo = async (classIdStudentNumber: string): Promise<Student[] | ErrorModel> => {
   return await callRepo(() => {
-    return findStudentRepo({ query: { classIdStudentNumber } });
+    return findStudent({ query: { classIdStudentNumber } });
   });
 };
 
-export const getStudentById = async (id: string): Promise<Student | undefined | ErrorModel> => {
+export const getStudentByIdRepo = async (id: string): Promise<Student | undefined | ErrorModel> => {
   return await callRepo(() => {
-    return getStudentByIdRepo({ path: { id } });
+    return getStudentById({ path: { id } });
   });
 };

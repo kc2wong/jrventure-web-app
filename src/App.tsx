@@ -41,7 +41,7 @@ const App: React.FC = () => {
         <TimezoneProvider>
           <MessageProvider>
             <DialogProvider>
-              <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || ''}>
+              <GoogleOAuthProvider clientId={import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID || ''}>
                 {authenticationState.login ? (
                   <FormDirtyProvider>
                     <Main />

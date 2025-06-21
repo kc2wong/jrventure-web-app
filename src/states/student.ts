@@ -1,12 +1,12 @@
 import { atom } from 'jotai';
-import { getStudentById as getStudentEntityById } from '../repo/student-repo';
-import { BaseState } from './base-state';
-import { Student } from '../models/openapi';
+import { getStudentByIdRepo } from '@repo/student-repo';
+import { BaseState } from '@states/base-state';
+import { Student } from '@webapi/types';
 import { isError, Message, MessageType } from '../models/system';
 import { atomWithReset, RESET } from 'jotai/utils';
 import { EmptyObject } from '../models/common';
-import { OneOnly } from '../utils/object-util';
-import { delay } from '../utils/date-util';
+import { OneOnly } from '@utils/object-util';
+import { delay } from '@utils/date-util';
 
 class StudentListState implements BaseState {
   result: Student[];
@@ -65,7 +65,7 @@ export const studentListAtom = atom<StudentListState, [OneOnly<StudentListPayloa
 
       const startTime = Date.now();
       const result = await Promise.all(search.id.map(async (id) => {
-        return await getStudentEntityById(id);
+        return await getStudentByIdRepo(id);
       }));
 
       const endTime = Date.now();

@@ -1,6 +1,4 @@
-import { _Error as Error } from '../__generated__/linkedup-web-api-client';
-import { UserCreation, SimpleUser } from '../__generated__/linkedup-web-api-client';
-import { User } from '../__generated__/linkedup-web-api-client';
+import { _Error as Error, UserCreation, SimpleUser, User } from '@webapi/';
 import {
   Activity,
   ActivityDetail,

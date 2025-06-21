@@ -105,7 +105,7 @@ export const LoginPage = (props: LoginPageProps) => {
         {/* Left side: Login Form */}
         <div className={styles.formSection}>
           <Body1>
-            {t('login.greeting')} <b>{process.env.REACT_APP_NAME}</b>
+            {t('login.greeting')} <b>{import.meta.env.REACT_APP_NAME}</b>
           </Body1>
 
           <div style={{ marginTop: '30px' }}>
@@ -115,38 +115,41 @@ export const LoginPage = (props: LoginPageProps) => {
             </Divider>
           </div>
 
-          <Field
-            label={t('login.email')}
-            labelHint={t('login.emailHint')}
-            required
-            validationMessage={getErrorMessage(errors.email?.message)}
-          >
-            <Input type="email" {...register('email')} />
-          </Field>
-          <Field
-            label={t('login.password')}
-            labelHint={t('login.passwordHint')}
-            required
-            validationMessage={getErrorMessage(errors.password?.message)}
-          >
-            <>
-              <Input type="password" {...register('password')} />
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Link inline>{t('login.forgotPassword')}</Link>{' '}
-              </div>
-            </>
-          </Field>
-          <div className={styles.buttonRow}>
-            <Button
-              appearance="primary"
-              className={styles.signInButton}
-              disabled={hasMissingRequiredField(formValues, schema)}
-              icon={<PersonPasskeyRegular />}
-              onClick={handleSubmit(handleLogin)}
+          {/* ✅ Wrap fields in a form */}
+          <form noValidate onSubmit={handleSubmit(handleLogin)}>
+            <Field
+              label={t('login.email')}
+              labelHint={t('login.emailHint')}
+              required
+              validationMessage={getErrorMessage(errors.email?.message)}
             >
-              {t('login.signIn')}
-            </Button>
-          </div>
+              <Input autoComplete="email" type="email" {...register('email')} />
+            </Field>
+            <Field
+              label={t('login.password')}
+              labelHint={t('login.passwordHint')}
+              required
+              validationMessage={getErrorMessage(errors.password?.message)}
+            >
+              <>
+                <Input autoComplete="current-password" type="password" {...register('password')} />
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Link inline>{t('login.forgotPassword')}</Link>{' '}
+                </div>
+              </>
+            </Field>
+            <div className={styles.buttonRow}>
+              <Button
+                appearance="primary"
+                className={styles.signInButton}
+                disabled={hasMissingRequiredField(formValues, schema)}
+                icon={<PersonPasskeyRegular />}
+                type="submit"
+              >
+                {t('login.signIn')}
+              </Button>
+            </div>
+          </form>
         </div>
 
         {/* Right side: Icon */}
