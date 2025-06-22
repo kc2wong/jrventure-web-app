@@ -9,7 +9,7 @@ import {
   SubmissionRoleEnum,
 } from '../../models/openapi';
 import { Body1, Button, Option, Radio, Textarea } from '@fluentui/react-components';
-import { Field } from '../../components/Field';
+import { Field } from '../../components/field';
 import { Input } from '../../components/Input';
 import {
   ArrowTurnUpLeftRegular,
@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useMessage } from '../../hooks/use-message';
 import { useAtom, useAtomValue } from 'jotai';
 import { useDialog } from '../../hooks/use-dialog';
-import { useFormDirty } from '../../contexts/FormDirty';
+import { useFormDirtiness } from '@hooks/use-form-dirtiness';
 import { constructMessage } from '../../utils/string-util';
 import { EmptyCell } from '../../components/Container';
 import { asArray } from '../../utils/array-util';
@@ -79,7 +79,7 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
   const { useAppendBreadcrumb } = useBreadcrumb();
 
   const { showConfirmationDialog } = useDialog();
-  const { markDirty, resetDirty } = useFormDirty();
+  const { markDirty, resetDirty } = useFormDirtiness();
   const styles = useCommonStyles();
 
   const { id } = useParams<{ id: string }>();

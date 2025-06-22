@@ -7,7 +7,7 @@ import {
   UserStatusEnum,
 } from '../../models/openapi';
 import { Button, Dropdown, Option, Spinner } from '@fluentui/react-components';
-import { Field } from '../../components/Field';
+import { Field } from '../../components/field';
 import { Input } from '../../components/Input';
 import { Switch } from '../../components/switch';
 import {
@@ -31,7 +31,7 @@ import {
 } from '../../states/user-detail';
 import { useAtom, useAtomValue } from 'jotai';
 import { useDialog } from '../../hooks/use-dialog';
-import { useFormDirty } from '../../contexts/FormDirty';
+import { useFormDirtiness } from '@hooks/use-form-dirtiness';
 import { constructMessage } from '../../utils/string-util';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
 import { EmptyCell } from '../../components/Container';
@@ -71,7 +71,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
   const { useStartBreadcrumb, useAppendBreadcrumb } = useBreadcrumb();
 
   const { showConfirmationDialog } = useDialog();
-  const { markDirty, resetDirty } = useFormDirty();
+  const { markDirty, resetDirty } = useFormDirtiness();
 
   const { id } = useParams<{ id: string }>();
   const userFromParentPage = useLocation().state?.user;

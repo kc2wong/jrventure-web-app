@@ -2,11 +2,11 @@ import { Button } from '@fluentui/react-components';
 import { DoorArrowLeftRegular, CheckmarkRegular, DismissRegular } from '@fluentui/react-icons';
 import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useFormDirty } from '../contexts/FormDirty';
-import { useNavigationHelpers } from '../hooks/use-delay-navigate';
-import { useDialog } from '../hooks/use-dialog';
-import { useMessage } from '../hooks/use-message';
-import { authenticationAtom } from '../states/authentication';
+import { useFormDirtiness } from '@hooks/use-form-dirtiness';
+import { useNavigationHelpers } from '../../../hooks/use-delay-navigate';
+import { useDialog } from '../../../hooks/use-dialog';
+import { useMessage } from '../../../hooks/use-message';
+import { authenticationAtom } from '../../../states/authentication';
 import { FC } from 'react';
 
 type SignoutButtonProps = {
@@ -17,7 +17,7 @@ export const SignoutButton: FC<SignoutButtonProps> = ({ showCaption }: SignoutBu
   const action = useSetAtom(authenticationAtom);
   const { t } = useTranslation();
   const { showConfirmationDialog } = useDialog();
-  const { isDirty } = useFormDirty();
+  const { isDirty } = useFormDirtiness();
   const { showSpinner, stopSpinner } = useMessage();
   const { navigateWithSpinner } = useNavigationHelpers();
 

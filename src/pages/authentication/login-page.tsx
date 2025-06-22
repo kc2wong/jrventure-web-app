@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Field } from '../../components/Field';
+import { Field } from '../../components/field';
 import { hasMissingRequiredField } from '../../utils/form-util';
 import { logger } from '../../utils/logging-util';
 import { constructErrorMessage } from '../../utils/string-util';
@@ -105,7 +105,7 @@ export const LoginPage = (props: LoginPageProps) => {
         {/* Left side: Login Form */}
         <div className={styles.formSection}>
           <Body1>
-            {t('login.greeting')} <b>{import.meta.env.REACT_APP_NAME}</b>
+            {t('login.greeting')} <b>{import.meta.env.VITE_REACT_APP_NAME}</b>
           </Body1>
 
           <div style={{ marginTop: '30px' }}>

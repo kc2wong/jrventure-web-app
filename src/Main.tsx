@@ -10,9 +10,8 @@ import i18next from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
 import { authenticationAtom } from './states/authentication';
 import { useAtomValue } from 'jotai';
-import { useTheme } from './contexts/Theme';
+import { useTheme } from '@hooks/use-theme';
 import { LanguageEnum } from './models/openapi';
-import { PageTransitionProvider } from './contexts/PageTransition';
 import HomePage from './pages/home-page';
 import { UserMaintenancePage } from './pages/user-maintenance/user-maintenance-page';
 import { Breadcrumb } from './components/breadcrumb';
@@ -22,7 +21,6 @@ import { MarketPlaceShowcase } from './pages/market/market-place';
 import { StudentShopPage } from './pages/market/student-shop';
 import { ProductApprovalPage } from './pages/product-approval/product-approval-page';
 import { useDialog } from './hooks/use-dialog';
-import { useFormDirty } from './contexts/FormDirty';
 import { DeviceComponent } from './components/device-component';
 import { MobileSettingsPage } from './pages/mobile/setting';
 import { useScrollDirection } from './hooks/use-scroll-direction';
@@ -34,6 +32,8 @@ import { StudentShoproductDetail } from './pages/market/student-shop-product-det
 import { ActivityMaintenancePage } from './pages/activity/activity-maintenance-page';
 import { AchievementEditPage } from './pages/achievement/achievement-edit-page';
 import { AchievementApprovalPage } from './pages/achievement-approval/achievement-approval-page';
+import { PageTransition } from '@pages/page-transition';
+import { useFormDirtiness } from '@hooks/use-form-dirtiness';
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
@@ -119,7 +119,7 @@ export const Main: React.FC = () => {
   const { i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
   const login = useAtomValue(authenticationAtom).login;
-  const { isDirty, resetDirty } = useFormDirty();
+  const { isDirty, resetDirty } = useFormDirtiness();
   const { showDiscardChangeDialog } = useDialog();
   const isMobile = useIsMobile();
 
@@ -200,7 +200,7 @@ export const Main: React.FC = () => {
           ></DeviceComponent>
 
           <main ref={contentRef} className={styles.content}>
-            <PageTransitionProvider>
+            <PageTransition>
               <Routes>
                 <Route element={<HomePage />} path="/" />
                 <Route element={<MarketPlaceShowcase />} path="/market" />
@@ -246,7 +246,7 @@ export const Main: React.FC = () => {
                 <Route element={<MobileUserProfilePage />} path="/profile" />
                 <Route element={<MobileParentUserPage />} path="/parent" />
               </Routes>
-            </PageTransitionProvider>
+            </PageTransition>
             <div className={styles.spacer} /> {/* Reserve space for bottom bar */}
           </main>
         </div>

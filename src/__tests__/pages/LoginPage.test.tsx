@@ -66,7 +66,7 @@ import { PersonPasskeyRegular } from '@fluentui/react-icons';
 import { LoginPage } from '../../pages/authentication/login-page';
 
 import * as FluentUiModule from '@fluentui/react-components';
-import * as FieldModule from '../../components/Field';
+import * as FieldModule from '../../components/field';
 
 import { findElementByTestId, findElementByText, findInputByLabel } from '../utils/test-utils';
 import userEvent from '@testing-library/user-event';

@@ -31,7 +31,7 @@ import {
 import React, { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LanguageEnum, Student, UserRoleEnum } from '../models/openapi';
-import { Theme } from '../contexts/Theme';
+import { Theme } from '../contexts/theme';
 import { useAtom, useAtomValue } from 'jotai';
 import { authenticationAtom } from '../states/authentication';
 import { useNavigationHelpers } from '../hooks/use-delay-navigate';
@@ -43,7 +43,7 @@ import { RoleIcon } from '../pages/user-maintenance/role-label';
 import { DeviceComponent } from './device-component';
 import { useBreadcrumb } from '../hooks/use-breadcrumb';
 import { useIsMobile } from '../hooks/use-mobile';
-import { SignoutButton } from './signout-button';
+import { SignoutButton } from '../pages/authentication/components/signout-button';
 
 const useStyles = makeStyles({
   toolbar: {

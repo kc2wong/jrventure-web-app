@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useRef } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 
-import { Field } from '../../components/Field';
+import { Field } from '../../components/field';
 import { useMessage } from '../../hooks/use-message';
 import { hasMissingRequiredField } from '../../utils/form-util';
 import { constructErrorMessage, constructMessage } from '../../utils/string-util';

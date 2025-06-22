@@ -36,7 +36,7 @@ import { useDialog } from '../../hooks/use-dialog';
 import { getFieldValueInPreferredLanguage } from '../../utils/language-util';
 import { z } from 'zod';
 import { zodString } from '../../types/zod';
-import { Field } from '../../components/Field';
+import { Field } from '../../components/field';
 import { Input } from '../../components/Input';
 import { MultiLangText } from '../../components/multi-lang-field';
 import { Rating } from '../../components/rating';

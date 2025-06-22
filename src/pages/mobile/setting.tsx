@@ -6,7 +6,7 @@ import {
   DarkThemeRegular,
   WeatherSunnyRegular,
 } from '@fluentui/react-icons';
-import { Theme } from '../../contexts/Theme';
+import { Theme } from '../../contexts/theme';
 import { LanguageEnum } from '../../models/openapi';
 import { useTranslation } from 'react-i18next';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';

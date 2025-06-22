@@ -29,7 +29,7 @@ import {
 } from '@fluentui/react-components';
 import { t } from 'i18next';
 import { EmptyCell } from '../../components/Container';
-import { Field } from '../../components/Field';
+import { Field } from '../../components/field';
 import { useTimezone } from '../../hooks/use-timezone';
 import { BsCoin } from 'react-icons/bs';
 import { ImageCarousel } from '../../components/image-carousell';

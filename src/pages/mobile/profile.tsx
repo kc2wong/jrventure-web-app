@@ -7,7 +7,7 @@ import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 import { useTimezone } from '../../hooks/use-timezone';
 import { useAtomValue } from 'jotai';
 import { authenticationAtom } from '../../states/authentication';
-import { SignoutButton } from '../../components/signout-button';
+import { SignoutButton } from '../authentication/components/signout-button';
 
 const useStyles = makeStyles({
   content: {

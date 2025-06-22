@@ -6,9 +6,9 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { Main } from './Main';
 import { useAtomValue } from 'jotai';
-import { ThemedAppProvider } from './contexts/Theme';
+import { ThemedAppProvider } from '@providers/theme-provider';
 import { authenticationAtom } from './states/authentication';
-import { FormDirtyProvider } from './contexts/FormDirty';
+import { FormDirtinessProvider } from '@providers/form-dirtiness-provider';
 import { traceManager } from './utils/trace-manager';
 import { DialogProvider } from './providers/dialog-provider';
 import { MessageProvider } from './providers/message-provider';
@@ -43,9 +43,9 @@ const App: React.FC = () => {
             <DialogProvider>
               <GoogleOAuthProvider clientId={import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID || ''}>
                 {authenticationState.login ? (
-                  <FormDirtyProvider>
+                  <FormDirtinessProvider>
                     <Main />
-                  </FormDirtyProvider>
+                  </FormDirtinessProvider>
                 ) : (
                   <AuthenticationContainer />
                 )}

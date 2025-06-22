@@ -19,7 +19,7 @@ import {
   Skeleton,
   SkeletonItem,
 } from '@fluentui/react-components';
-import { Field } from '../../components/Field';
+import { Field } from '../../components/field';
 import { Input } from '../../components/Input';
 import { Dropdown } from '../../components/drop-down';
 import {
@@ -44,7 +44,7 @@ import { useTranslation } from 'react-i18next';
 import { useMessage } from '../../hooks/use-message';
 import { useAtom, useAtomValue } from 'jotai';
 import { useDialog } from '../../hooks/use-dialog';
-import { useFormDirty } from '../../contexts/FormDirty';
+import { useFormDirtiness } from '@hooks/use-form-dirtiness';
 import { constructErrorMessage, constructMessage } from '../../utils/string-util';
 import { EmptyCell } from '../../components/Container';
 import { useLocation } from 'react-router-dom';
@@ -148,7 +148,7 @@ export const AchievementEditPage: React.FC<
   const { showConfirmationDialog } = useDialog();
   const [selectedTab, setSelectedTab] = useState<TabValue>('tab1');
   const [uploadInProgress, setUploadInProgress] = useState<File[]>([]);
-  const { markDirty, resetDirty } = useFormDirty();
+  const { markDirty, resetDirty } = useFormDirtiness();
 
   const [state, action] = useAtom(achievementDetailAtom);
   const authentication = useAtomValue(authenticationAtom);

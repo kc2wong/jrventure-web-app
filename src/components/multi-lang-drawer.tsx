@@ -1,5 +1,5 @@
 import { Input } from './Input';
-import { Field } from './Field';
+import { Field } from './field';
 import { Form } from './Container';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
