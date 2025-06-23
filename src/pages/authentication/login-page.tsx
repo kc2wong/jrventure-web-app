@@ -1,7 +1,6 @@
-import { Button, Divider, Input, Link } from '@fluentui/react-components';
+import { Button, Divider, Link, tokens } from '@fluentui/react-components';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useGoogleLogin } from '@react-oauth/google';
-import { zodEmail, zodString } from '@t/zod';
 import { useAtom } from 'jotai';
 import { useContext, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
@@ -10,6 +9,7 @@ import { FcGoogle } from 'react-icons/fc'; // Google "G" icon
 import { z } from 'zod';
 
 import { Field } from '@components/field';
+import { Input } from '@components/input';
 import { TimezoneContext } from '@contexts/timezone-context';
 import { useMessage } from '@hooks/use-message';
 import {
@@ -18,6 +18,7 @@ import {
   AuthenticationStateProgress,
   AuthenticationStateSuccess,
 } from '@states/authentication';
+import { zodEmail, zodString } from '@t/zod';
 import { hasMissingRequiredField } from '@utils/form-util';
 import { logger } from '@utils/logging-util';
 import { constructErrorMessage } from '@utils/string-util';
@@ -33,7 +34,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 type LoginPageProps = { onNavigateToSignup: () => void };
 
-function GoogleSignInButton() {
+const GoogleSignInButton = () => {
   const { t } = useTranslation();
   const [, action] = useAtom(authenticationAtom);
   const { dispatchMessage } = useMessage();
@@ -55,7 +56,7 @@ function GoogleSignInButton() {
       {t('login.signInWithGoogle')}
     </Button>
   );
-}
+};
 
 export const LoginPage = (props: LoginPageProps) => {
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
@@ -65,7 +66,6 @@ export const LoginPage = (props: LoginPageProps) => {
 
   const {
     control,
-    register,
     handleSubmit,
     watch,
     formState: { errors },
@@ -93,17 +93,15 @@ export const LoginPage = (props: LoginPageProps) => {
   const formValues = watch();
   const getErrorMessage = (key?: string) => (key ? constructErrorMessage(t, key) : undefined);
 
-  const handleLogin = hasMissingRequiredField(formValues, schema)
-    ? undefined
-    : handleSubmit(async (data: FormData) => {
-        logger.info(`Start sign in for user ${data.email}`);
-        await action({ signIn: { email: data.email, password: data.password } });
-      });
+  const handleLogin = handleSubmit(async (data: FormData) => {
+    logger.info(`Start sign in for user ${data.email}`);
+    await action({ signIn: { email: data.email, password: data.password } });
+  });
 
   return (
     <AuthPage
       greetingKey={t('login.greeting')}
-      onSubmit={handleLogin}
+      onSubmit={hasMissingRequiredField(formValues, schema) ? undefined : handleLogin}
       submitLabelKey={t('login.signIn')}
       switchLink={{
         prefix: `${t('login.newUser')}?`,
@@ -121,32 +119,37 @@ export const LoginPage = (props: LoginPageProps) => {
       <Controller
         control={control}
         name="email"
-        render={({ field }) => (
+        render={({ field: { ref, ...rest } }) => (
           <Field
-            {...field}
             label={t('login.email')}
             labelHint={t('login.emailHint')}
             required
             validationMessage={getErrorMessage(errors.email?.message)}
           >
-            <Input autoComplete="email" type="email" {...register('email')} />
+            <Input {...rest} ref={ref} autoComplete="email" type="email" />
           </Field>
         )}
       />
       <Controller
         control={control}
         name="password"
-        render={({ field }) => (
+        render={({ field: { ref, ...rest } }) => (
           <Field
-            {...field}
             label={t('login.password')}
             labelHint={t('login.passwordHint')}
             required
             validationMessage={getErrorMessage(errors.password?.message)}
           >
             <>
-              <Input autoComplete="current-password" type="password" {...register('password')} />
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Input {...rest} ref={ref} autoComplete="current-password" type="password" />
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginTop: tokens.spacingVerticalXS,
+                  marginBottom: tokens.spacingVerticalXL,
+                }}
+              >
                 <Link inline>{t('login.forgotPassword')}</Link>
               </div>
             </>
