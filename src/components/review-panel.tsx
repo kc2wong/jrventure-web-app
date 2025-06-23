@@ -1,42 +1,44 @@
 import React from 'react';
-import { RatingDisplay, Text, makeStyles, tokens } from '@fluentui/react-components';
+import {
+  Avatar,
+  Divider,
+  RatingDisplay,
+  Text,
+  makeStyles,
+  tokens,
+} from '@fluentui/react-components';
 import { formatDistanceToNow } from 'date-fns';
+import { MultiLangText } from './multi-lang-field';
+import { useNameInPreferredLanguage } from '@hooks/use-preferred-language';
 
 const useStyles = makeStyles({
   row: {
     display: 'flex',
     width: '100%',
+    alignItems: 'center',
   },
   col25: {
     width: '25%',
     textAlign: 'left',
   },
-  col50Right: {
+  col50: {
+    width: '50%',
+    textAlign: 'left',
+  },
+  col25Right: {
     width: '50%',
     textAlign: 'right',
     display: 'flex',
     justifyContent: 'flex-end',
   },
-  panels: {
-    padding: '0 10px',
-    '& th': {
-      textAlign: 'left',
-      padding: '0 30px 0 0',
-    },
-  },
-  iconText: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: tokens.spacingHorizontalXS, // small space between icon and text
-  },
   commentWrapper: {
-    marginLeft: tokens.spacingHorizontalL,
-    marginBottom: tokens.spacingVerticalXL,
+    marginTop: tokens.spacingVerticalL,
+    marginBottom: tokens.spacingVerticalL,
   },
 });
 
 interface ReviewPanelProps {
-  author: string;
+  author: any;
   reviewDateTime: Date;
   rating?: number;
   comment: string;
@@ -50,15 +52,23 @@ export const ReviewPanel: React.FC<ReviewPanelProps> = ({
 }) => {
   const styles = useStyles();
 
+  const name = useNameInPreferredLanguage(author);
+
   return (
     <React.Fragment>
       <div className={styles.row}>
-        <div className={styles.col25}>
-          <Text>{author}</Text>
+        <div className={`${styles.col50} ${styles.row}`}>
+          <Avatar
+            color="colorful"
+            name={name}
+            size={24}
+            style={{ marginRight: tokens.spacingHorizontalS }}
+          />
+          <Text>{name}</Text>
         </div>
         <div className={styles.col25}>{formatDistanceToNow(reviewDateTime)}</div>
         {rating ? (
-          <div className={styles.col50Right}>
+          <div className={styles.col25Right}>
             <RatingDisplay color="brand" value={rating} />
           </div>
         ) : (
@@ -70,6 +80,7 @@ export const ReviewPanel: React.FC<ReviewPanelProps> = ({
           {comment}
         </Text>
       </div>
+      <Divider appearance="subtle" style={{ marginBottom: tokens.spacingVerticalL }} />
     </React.Fragment>
   );
 };

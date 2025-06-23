@@ -1,13 +1,15 @@
-import { FC } from 'react';
 import { Body1, makeStyles, shorthands } from '@fluentui/react-components';
-import { useTranslation } from 'react-i18next';
-import { SubmissionRoleEnum } from '../../models/openapi';
-import { getEnumValueByRawValue } from '../../utils/enum-util';
 import {
   BookRegular,
   PeopleCommunityRegular,
   PersonFeedbackRegular,
 } from '@fluentui/react-icons';
+import { SubmissionRoleEnum } from '@schemas/webapi';
+import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { getEnumValueByRawValue } from '@utils/enum-util';
+
 
 interface RoleLabelProps {
   role: SubmissionRoleEnum;

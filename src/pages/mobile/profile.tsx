@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import { SignoutButton } from '@components/signout-button';
 import { makeStyles, tokens, Subtitle2, Avatar, Title3 } from '@fluentui/react-components';
+import { useAtomValue } from 'jotai';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { MobileRoot } from '../../components/container';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
-import { MobileRoot } from '../../components/Container';
 import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 import { useTimezone } from '../../hooks/use-timezone';
-import { useAtomValue } from 'jotai';
 import { authenticationAtom } from '../../states/authentication';
-import { SignoutButton } from '../authentication/components/signout-button';
+// Update the import path below if the actual location is different
 
 const useStyles = makeStyles({
   content: {

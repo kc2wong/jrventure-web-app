@@ -1,4 +1,3 @@
-import React, { cloneElement, SVGProps } from 'react';
 import {
   Caption1,
   Caption2,
@@ -19,11 +18,13 @@ import {
   StarCheckmarkRegular,
   StarRegular,
 } from '@fluentui/react-icons';
-import { useNavigationHelpers } from '../hooks/use-delay-navigate';
 import { useAtomValue } from 'jotai';
-import { authenticationAtom } from '../states/authentication';
-import { UserRoleEnum } from '../models/openapi';
-import { RoleBaseComponent } from './role-based-component';
+import React, { cloneElement, SVGProps } from 'react';
+
+import { RoleBaseComponent } from '@components/role-based-component';
+import { useNavigationHelpers } from '@hooks/use-delay-navigate';
+import { authenticationAtom } from '@states/authentication';
+import { UserRoleEnum } from 'schemas/webapi';
 
 type NavigationMenuItem =
   | {

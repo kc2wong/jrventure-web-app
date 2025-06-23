@@ -54,7 +54,7 @@ export const findAchievementApprovalRepo = async ({
 export const findAchievementByStudentActivityIdRepo = async (
   studentId: string,
   activityId: string,
-): Promise<Achievement | Error> => {
+): Promise<AchievementDetail | Error> => {
   return await callRepo(() => {
     return findAchievementByStudentActivityIdApi({ path: { id: studentId, activityId } });
   });

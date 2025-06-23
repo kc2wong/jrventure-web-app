@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Caption2, Body1, Text, TextProps } from '@fluentui/react-components';
+import { Caption2, Body1, Text, TextProps, Label } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 import { getFieldValueInPreferredLanguage } from '../utils/language-util';
 
@@ -50,6 +50,10 @@ export const MultiLangBody1: React.FC<MultiLangTextProps> = (props) => (
 
 export const MultiLangText: React.FC<MultiLangTextProps> = (props) => (
   <MultiLangTypography {...props} Component={Text} />
+);
+
+export const MultiLangLabel: React.FC<MultiLangTextProps> = (props) => (
+  <MultiLangTypography {...props} Component={Label} />
 );
 
 const isRecord = (value: unknown): value is Record<string, any> => {

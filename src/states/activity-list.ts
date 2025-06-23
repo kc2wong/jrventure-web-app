@@ -6,7 +6,7 @@ import { EmptyObject } from '../models/common';
 import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
 import { delay } from '../utils/date-util';
-import { findActivity as findActivityRepo } from '../repo/activity-repo';
+import { findActivity as findActivityRepo } from '../repos/activity-repo';
 import {
   FindActivityOrderByField,
   OrderByDirection,

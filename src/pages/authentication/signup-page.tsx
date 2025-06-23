@@ -1,27 +1,27 @@
 import { Body1, Button, Input, Image, Link, Card } from '@fluentui/react-components';
-import { useGoogleLogin } from '@react-oauth/google';
-import { useAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useGoogleLogin } from '@react-oauth/google';
+import { zodString } from '@t/zod';
+import { useAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { FcGoogle } from 'react-icons/fc';
+import { z } from 'zod';
 
-import { Field } from '../../components/field';
-import { useMessage } from '../../hooks/use-message';
-import { hasMissingRequiredField } from '../../utils/form-util';
-import { constructErrorMessage, constructMessage } from '../../utils/string-util';
-import { zodString } from '../../types/zod';
-import { MessageType } from '../../models/system';
+import { Field } from '@components/field';
+import { useMessage } from '@hooks/use-message';
 import {
   userRegistrationAtom,
   UserRegistrationStateFail,
   UserRegistrationStateProgress,
   UserRegistrationStateSuccess,
-} from '../../states/user-registration';
+} from '@states/user-registration';
+import { hasMissingRequiredField } from '@utils/form-util';
+import { constructErrorMessage, constructMessage } from '@utils/string-util';
 
-import { z } from 'zod';
-import { useAuthPageStyles } from './auth-styles';
+import { useAuthPageStyles } from './shared/auth-styles';
+import { MessageType } from '../../models/system';
 
 const schema = z.object({
   studentId: zodString(),

@@ -39,7 +39,7 @@ import {
   ShopStateProgress,
   ShopStateSuccess,
 } from '../../states/student-shop';
-import { Root } from '../../components/Container';
+import { Root } from '../../components/container';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { PageTitle } from '../../components/page-title';
 import { Pagination } from '../../components/pagination';

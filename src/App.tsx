@@ -4,7 +4,7 @@ import languageEn from './i18n/en/language.json';
 import languageZhHant from './i18n/zhHant/language.json';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { Main } from './Main';
+import { Main } from './pages/main/main';
 import { useAtomValue } from 'jotai';
 import { ThemedAppProvider } from '@providers/theme-provider';
 import { authenticationAtom } from './states/authentication';

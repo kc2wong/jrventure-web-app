@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { getStudentByIdRepo } from '@repo/student-repo';
+import { getStudentByIdRepo } from 'repos/student-repo';
 import { BaseState } from '@states/base-state';
 import { Student } from '@webapi/types';
 import { isError, Message, MessageType } from '../models/system';

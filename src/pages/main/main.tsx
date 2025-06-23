@@ -1,39 +1,39 @@
+import { Button, makeStyles, shorthands, tokens } from '@fluentui/react-components';
+import { ArrowLeftFilled, RowTripleFilled } from '@fluentui/react-icons';
+import { LanguageEnum } from '@schemas/webapi';
+import i18next from 'i18next';
+import { useAtomValue } from 'jotai';
 import React, { useEffect, useRef, useState } from 'react';
+import { initReactI18next, useTranslation } from 'react-i18next';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import { Button, makeStyles, shorthands, tokens } from '@fluentui/react-components';
-import { SystemToolbar } from './components/system-toolbar';
-
-import languageEn from './i18n/en/language.json';
-import languageZhHant from './i18n/zhHant/language.json';
-import i18next from 'i18next';
-import { initReactI18next, useTranslation } from 'react-i18next';
-import { authenticationAtom } from './states/authentication';
-import { useAtomValue } from 'jotai';
-import { useTheme } from '@hooks/use-theme';
-import { LanguageEnum } from './models/openapi';
-import HomePage from './pages/home-page';
-import { UserMaintenancePage } from './pages/user-maintenance/user-maintenance-page';
-import { Breadcrumb } from './components/breadcrumb';
-import { ButtombarMenu, SidebarMenu } from './components/navigation-menu';
-import { ArrowLeftFilled, RowTripleFilled } from '@fluentui/react-icons';
-import { MarketPlaceShowcase } from './pages/market/market-place';
-import { StudentShopPage } from './pages/market/student-shop';
-import { ProductApprovalPage } from './pages/product-approval/product-approval-page';
-import { useDialog } from './hooks/use-dialog';
-import { DeviceComponent } from './components/device-component';
-import { MobileSettingsPage } from './pages/mobile/setting';
-import { useScrollDirection } from './hooks/use-scroll-direction';
-import { useIsMobile } from './hooks/use-mobile';
-import { MobileUserProfilePage } from './pages/mobile/profile';
-import { MobileParentUserPage } from './pages/mobile/parent';
-import { MarketPlaceProductDetail } from './pages/market/market-place-product-detail';
-import { StudentShoproductDetail } from './pages/market/student-shop-product-detail';
-import { ActivityMaintenancePage } from './pages/activity/activity-maintenance-page';
-import { AchievementEditPage } from './pages/achievement/achievement-edit-page';
-import { AchievementApprovalPage } from './pages/achievement-approval/achievement-approval-page';
-import { PageTransition } from '@pages/page-transition';
+import { Breadcrumb } from '@components/breadcrumb';
+import { DeviceComponent } from '@components/device-component';
+import { useDialog } from '@hooks/use-dialog';
 import { useFormDirtiness } from '@hooks/use-form-dirtiness';
+import { useIsMobile } from '@hooks/use-mobile';
+import { useScrollDirection } from '@hooks/use-scroll-direction';
+import { useTheme } from '@hooks/use-theme';
+import { AchievementEditPage } from '@pages/achievement/achievement-edit-page';
+import { AchievementApprovalPage } from '@pages/achievement-approval/achievement-approval-page';
+import { ActivityMaintenancePage } from '@pages/activity/activity-maintenance-page';
+import HomePage from '@pages/home-page';
+import { MarketPlaceShowcase } from '@pages/market/market-place';
+import { MarketPlaceProductDetail } from '@pages/market/market-place-product-detail';
+import { StudentShopPage } from '@pages/market/student-shop';
+import { StudentShoproductDetail } from '@pages/market/student-shop-product-detail';
+import { MobileParentUserPage } from '@pages/mobile/parent';
+import { MobileUserProfilePage } from '@pages/mobile/profile';
+import { MobileSettingsPage } from '@pages/mobile/setting';
+import { PageTransition } from '@pages/page-transition';
+import { ProductApprovalPage } from '@pages/product-approval/product-approval-page';
+import { UserMaintenancePage } from '@pages/user-maintenance/user-maintenance-page';
+import { authenticationAtom } from '@states/authentication';
+
+import { ButtombarMenu, SidebarMenu } from './navigation-menu';
+import { SystemToolbar } from './system-toolbar';
+import languageEn from '../../i18n/en/language.json';
+import languageZhHant from '../../i18n/zhHant/language.json';
 
 i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },

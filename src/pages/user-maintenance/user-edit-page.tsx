@@ -8,7 +8,7 @@ import {
 } from '../../models/openapi';
 import { Button, Dropdown, Option, Spinner } from '@fluentui/react-components';
 import { Field } from '../../components/field';
-import { Input } from '../../components/Input';
+import { Input } from '../../components/input';
 import { Switch } from '../../components/switch';
 import {
   ArrowTurnUpLeftRegular,
@@ -19,7 +19,7 @@ import {
 } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { Form, Root, Row } from '../../components/Container';
+import { Form, Root, Row } from '../../components/container';
 import { zodEmail, zodOptionalString, zodString } from '../../types/zod';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +34,7 @@ import { useDialog } from '../../hooks/use-dialog';
 import { useFormDirtiness } from '@hooks/use-form-dirtiness';
 import { constructMessage } from '../../utils/string-util';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
-import { EmptyCell } from '../../components/Container';
+import { EmptyCell } from '../../components/container';
 import { asArray } from '../../utils/array-util';
 import {
   studentListAtom,

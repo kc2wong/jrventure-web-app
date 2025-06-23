@@ -6,7 +6,7 @@ import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
 import { delay } from '../utils/date-util';
 import { Product, ProductApproval, Shop } from '../__generated__/linkedup-web-api-client';
-import { findProduct as findProductRepo } from '../repo/product-repo';
+import { findProduct as findProductRepo } from '../repos/product-repo';
 
 type ShopStateArgs = {
   shop?: Shop;

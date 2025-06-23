@@ -1,33 +1,36 @@
+import { Dropdown, Input, makeStyles, Textarea, Option } from '@fluentui/react-components';
+import { Message, MessageType } from '@schemas/system';
 import { useAtom, useAtomValue } from 'jotai';
 import { useEffect } from 'react';
-import { useMessage } from '../../hooks/use-message';
-import { useMode } from '../../hooks/use-mode';
-import { ActivitySearchPage } from './activity-search-page';
-import { ActivityEditPage } from './activity-edit-page';
-import { Message, MessageType } from '../../models/system';
-import { constructErrorMessage } from '../../utils/string-util';
 import { useTranslation } from 'react-i18next';
-import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
-import {
-  activityListAtom,
-  ActivityListStateFail,
-  ActivityListStateProgress,
-  ActivityListStateSuccess,
-} from '../../states/activity-list';
+
+import { useNavigationHelpers } from '@hooks/use-delay-navigate';
+import { useMessage } from '@hooks/use-message';
+import { useMode } from '@hooks/use-mode';
 import {
   activityCategoryListAtom,
   ActivityCategoryListStateFail,
   ActivityCategoryListStateProgress,
   ActivityCategoryListStateSuccess,
-} from '../../states/activity-category-list';
+} from '@states/activity-category-list';
 import {
   activityDetailAtom,
   ActivityDetailStateFail,
   ActivityDetailStateGetSuccess,
   ActivityDetailStateProgress,
   ActivityDetailStateUpdateSuccess,
-} from '../../states/activity-detail';
-import { Dropdown, Input, makeStyles, Textarea, Option } from '@fluentui/react-components';
+} from '@states/activity-detail';
+import {
+  activityListAtom,
+  ActivityListStateFail,
+  ActivityListStateProgress,
+  ActivityListStateSuccess,
+} from '@states/activity-list';
+import { constructErrorMessage } from '@utils/string-util';
+
+import { ActivityEditPage } from './activity-edit-page';
+import { ActivitySearchPage } from './activity-search-page';
+
 
 const useStyles = makeStyles({
   field: {

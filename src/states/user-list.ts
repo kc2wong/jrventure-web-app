@@ -7,7 +7,7 @@ import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
 import { delay } from '../utils/date-util';
 import { UserRoleEnum, UserStatusEnum } from '../models/openapi';
-import { findUser } from '../repo/user-repo';
+import { findUser } from '../repos/user-repo';
 
 enum UserOrdering {
   IdAsc,

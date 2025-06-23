@@ -30,7 +30,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {} from '../../models/system';
 import { SearchCriteriaDrawer } from '../../components/drawer';
-import { Form, Root, Row } from '../../components/Container';
+import { Form, Root, Row } from '../../components/container';
 import { Field } from '../../components/field';
 import { logger } from '../../utils/logging-util';
 import {
@@ -44,7 +44,7 @@ import { Student, User, UserRoleEnum, UserStatusEnum } from '../../models/openap
 import { getRawValueByEnumValue, getEnumValueByRawValue } from '../../utils/enum-util';
 import { constructErrorMessage } from '../../utils/string-util';
 import { zodOptionalEmail, zodOptionalString } from '../../types/zod';
-import { Input } from '../../components/Input';
+import { Input } from '../../components/input';
 import { createTableColumn } from '../../components/table/create-table-column-definition';
 import { useMessage } from '../../hooks/use-message';
 import { undefinedToEmptyString } from '../../utils/object-util';

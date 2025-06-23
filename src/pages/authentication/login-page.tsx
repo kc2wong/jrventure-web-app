@@ -1,29 +1,34 @@
 import { Body1, Button, Divider, Input, Image, Link } from '@fluentui/react-components';
-import { PersonPasskeyRegular } from '@fluentui/react-icons';
 import { Card } from '@fluentui/react-components';
+import { PersonPasskeyRegular } from '@fluentui/react-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useGoogleLogin } from '@react-oauth/google';
+import { zodEmail, zodString } from '@t/zod';
 import { useAtom } from 'jotai';
+import { useContext, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { FcGoogle } from 'react-icons/fc'; // Google "G" icon
+import { z } from 'zod';
+
+import { Field } from '@components/field';
+import { TimezoneContext } from '@contexts/timezone-context';
+import { useMessage } from '@hooks/use-message';
 import {
   authenticationAtom,
   AuthenticationStateFail,
   AuthenticationStateProgress,
   AuthenticationStateSuccess,
-} from '../../states/authentication';
-import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Field } from '../../components/field';
-import { hasMissingRequiredField } from '../../utils/form-util';
-import { logger } from '../../utils/logging-util';
-import { constructErrorMessage } from '../../utils/string-util';
-import { useContext, useEffect } from 'react';
-import { useMessage } from '../../hooks/use-message';
-import { FcGoogle } from 'react-icons/fc'; // Google "G" icon
+} from '@states/authentication';
+import { hasMissingRequiredField } from '@utils/form-util';
+import { logger } from '@utils/logging-util';
+import { constructErrorMessage } from '@utils/string-util';
+
+
+import { useAuthPageStyles } from './shared/auth-styles';
 import { MessageType } from '../../models/system';
-import { zodEmail, zodString } from '../../types/zod';
-import { TimezoneContext } from '../../contexts/timezone-context';
-import { useAuthPageStyles } from './auth-styles';
+
+
 
 const schema = z.object({
   email: zodEmail(),

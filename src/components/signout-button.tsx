@@ -1,13 +1,14 @@
 import { Button } from '@fluentui/react-components';
 import { DoorArrowLeftRegular, CheckmarkRegular, DismissRegular } from '@fluentui/react-icons';
 import { useSetAtom } from 'jotai';
-import { useTranslation } from 'react-i18next';
-import { useFormDirtiness } from '@hooks/use-form-dirtiness';
-import { useNavigationHelpers } from '../../../hooks/use-delay-navigate';
-import { useDialog } from '../../../hooks/use-dialog';
-import { useMessage } from '../../../hooks/use-message';
-import { authenticationAtom } from '../../../states/authentication';
 import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { useNavigationHelpers } from '@hooks/use-delay-navigate';
+import { useDialog } from '@hooks/use-dialog';
+import { useFormDirtiness } from '@hooks/use-form-dirtiness';
+import { useMessage } from '@hooks/use-message';
+import { authenticationAtom } from '@states/authentication';
 
 type SignoutButtonProps = {
   showCaption: boolean;

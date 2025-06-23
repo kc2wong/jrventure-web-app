@@ -8,7 +8,7 @@ import {
   rejectAchievementRepo,
   reviewAchievementRepo,
   approveAchievementRepo,
-} from '../repo/achievement-repo';
+} from '../repos/achievement-repo';
 import { AchievementDetail } from '../__generated__/linkedup-web-api-client';
 
 type AchievementApprovalDetailStateArgs = {

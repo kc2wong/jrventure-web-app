@@ -23,7 +23,7 @@ vi.mock('../../utils/string-util', async (importOriginal) => {
 
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import * as FluentUiModule from '@fluentui/react-components';
-import { NumericInput } from '../../components/NumericInput';
+import { NumericInput } from '../../components/numeric-input';
 import userEvent from '@testing-library/user-event';
 
 const inputSpy = vi.spyOn(FluentUiModule, 'Input');

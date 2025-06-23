@@ -1,6 +1,7 @@
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import checkFile from 'eslint-plugin-check-file';
 import react from 'eslint-plugin-react';
+import importPlugin from 'eslint-plugin-import';
 import tsParser from '@typescript-eslint/parser';
 
 export default [
@@ -14,10 +15,16 @@ export default [
       '@typescript-eslint': typescriptEslint,
       'check-file': checkFile,
       react,
+      'import': importPlugin,
     },
     settings: {
       react: {
         version: 'detect',
+      },
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+        },
       },
     },
     languageOptions: {
@@ -36,6 +43,35 @@ export default [
           // '**/*.tsx': 'PASCAL_CASE',
         },
         { ignoreMiddleExtensions: true },
+      ],
+
+      // Enforce a consistent order of import statements
+      'import/order': [
+        'warn',
+        {
+          groups: [
+            'builtin', // e.g. fs, path
+            'external', // e.g. react, lodash
+            'internal', // your aliases
+            ['parent', 'sibling', 'index'],
+          ],
+          pathGroups: [
+            {
+              pattern: '@webapi/**',
+              group: 'internal',
+            },
+            {
+              pattern: '@repo/**',
+              group: 'internal',
+            },
+          ],
+          pathGroupsExcludedImportTypes: ['builtin'],
+          'newlines-between': 'always',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+        },
       ],
 
       '@typescript-eslint/no-unused-vars': [

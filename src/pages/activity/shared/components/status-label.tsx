@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import { Body1, makeStyles, shorthands } from '@fluentui/react-components';
 import {
   BookClockRegular,
@@ -6,9 +5,11 @@ import {
   BookExclamationMarkRegular,
   BookStarRegular,
 } from '@fluentui/react-icons';
+import { ActivityStatusEnum } from '@schemas/webapi';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityStatusEnum } from '../../models/openapi';
-import { getEnumValueByRawValue } from '../../utils/enum-util';
+
+import { getEnumValueByRawValue } from '@utils/enum-util';
 
 interface StatusLabelProps {
   status: ActivityStatusEnum;

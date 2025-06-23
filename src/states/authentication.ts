@@ -8,7 +8,7 @@ import { BaseState } from './base-state';
 import {
   authenticateUser,
   googleAuthenticate as googleAuthenticateRepo,
-} from '../repo/user-authentication-repo';
+} from '../repos/user-authentication-repo';
 import { delay } from '../utils/date-util';
 import { Student } from '../models/openapi';
 

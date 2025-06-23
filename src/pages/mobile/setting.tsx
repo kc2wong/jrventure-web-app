@@ -10,7 +10,7 @@ import { Theme } from '../../contexts/theme';
 import { LanguageEnum } from '../../models/openapi';
 import { useTranslation } from 'react-i18next';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
-import { MobileRoot } from '../../components/Container';
+import { MobileRoot } from '../../components/container';
 
 type SettingOption<T> = {
   label: string;

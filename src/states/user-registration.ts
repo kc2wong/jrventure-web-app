@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 import { atomWithReset } from 'jotai/utils';
 import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
-import { registerUser as registerUserRepo } from '../repo/user-registration-repo';
+import { registerUser as registerUserRepo } from '../repos/user-registration-repo';
 import { User } from '../models/openapi';
 import { delay } from '../utils/date-util';
 

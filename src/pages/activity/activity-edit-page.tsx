@@ -1,16 +1,4 @@
-import React from 'react';
-
-import { z } from 'zod';
-import {
-  Activity,
-  ActivityPayload,
-  ActivityStatusEnum,
-  LanguageEnum,
-  SubmissionRoleEnum,
-} from '../../models/openapi';
-import { Body1, Button, Option, Radio, Textarea } from '@fluentui/react-components';
-import { Field } from '../../components/field';
-import { Input } from '../../components/Input';
+import { Body1, Button, makeStyles, Option, Radio, Textarea } from '@fluentui/react-components';
 import {
   ArrowTurnUpLeftRegular,
   CheckmarkRegular,
@@ -18,46 +6,71 @@ import {
   SaveRegular,
 } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
-import { Form, Root, Row } from '../../components/Container';
-import { zodOptionalString, zodString } from '../../types/zod';
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useMessage } from '../../hooks/use-message';
+import { MessageType } from '@schemas/system';
+import { ActivityStatusEnum, LanguageEnum, SubmissionRoleEnum } from '@schemas/webapi';
+import { zodOptionalString, zodString } from '@t/zod';
 import { useAtom, useAtomValue } from 'jotai';
-import { useDialog } from '../../hooks/use-dialog';
-import { useFormDirtiness } from '@hooks/use-form-dirtiness';
-import { constructMessage } from '../../utils/string-util';
-import { EmptyCell } from '../../components/Container';
-import { asArray } from '../../utils/array-util';
+import { useEffect, useRef, useState } from 'react';
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { hasMissingRequiredField } from '../../utils/form-util';
-import { useBreadcrumb } from '../../hooks/use-breadcrumb';
-import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
-import { activityCategoryListAtom } from '../../states/activity-category-list';
+import { z } from 'zod';
+
+import { Checkbox } from '@components/check-box';
+import { Form, Root, Row } from '@components/container';
+import { EmptyCell } from '@components/container';
+import { DatePicker } from '@components/date-picker';
+import { Dropdown } from '@components/drop-down';
+import { Field } from '@components/field';
+import { Input } from '@components/input';
+import { MultiLangButton, MultiLangDrawer } from '@components/multi-lang-drawer';
+import { RadioGroup } from '@components/radio-group';
+import { SpinButton } from '@components/spinner-button';
+import { Switch } from '@components/switch';
+import { useBreadcrumb } from '@hooks/use-breadcrumb';
+import { useDialog } from '@hooks/use-dialog';
+import { useFormDirtiness } from '@hooks/use-form-dirtiness';
+import { useMessage } from '@hooks/use-message';
+import { useNameInPreferredLanguage } from '@hooks/use-preferred-language';
+import { useTimezone } from '@hooks/use-timezone';
+import { activityCategoryListAtom } from '@states/activity-category-list';
 import {
   activityDetailAtom,
   ActivityDetailStateGetSuccess,
   ActivityDetailStateUpdateSuccess,
-} from '../../states/activity-detail';
-import { MultiLangButton, MultiLangDrawer } from '../../components/multi-lang-drawer';
-import { useTimezone } from '../../hooks/use-timezone';
-import { Switch } from '../../components/switch';
-import { StatusLabel } from './status-label';
-import { useCommonStyles } from '../common';
-import { DatePicker } from '../../components/date-picker';
-import { SpinButton } from '../../components/spinner-button';
-import { RadioGroup } from '../../components/radio-group';
-import { Dropdown } from '../../components/drop-down';
-import { Checkbox } from '../../components/check-box';
-import { getEnumValueByRawValue } from '../../utils/enum-util';
-import { MessageType } from '../../models/system';
+} from '@states/activity-detail';
+import { asArray } from '@utils/array-util';
+import { getEnumValueByRawValue } from '@utils/enum-util';
+import { hasMissingRequiredField } from '@utils/form-util';
+import { constructMessage } from '@utils/string-util';
+import { Activity, ActivityPayload } from '@webapi/types';
+
+import { StatusLabel } from './shared/components/status-label';
 
 const maxNameLength = 50;
-
 const roleList = Object.values(SubmissionRoleEnum) as SubmissionRoleEnum[];
 const statusList = Object.values(ActivityStatusEnum) as ActivityStatusEnum[];
 const gradeList = [1, 2, 3, 4, 5, 6];
+
+// === STYLES ===
+const useStyles = makeStyles({
+  field: {
+    width: '100%', // Fill full 1fr column
+    minWidth: 0, // Override Fluent UI's internal ~200px min-width
+    maxWidth: '100%', // Prevent it from overflowing
+    boxSizing: 'border-box', // Ensure padding doesn't break layout
+  },
+  formContainer: {
+    width: '750px',
+  },
+  rowSpaceAround: {
+    justifyContent: 'space-around',
+  },
+  flexSpacer: {
+    flex: 1,
+  },
+});
 
 type ActivityEditPageProps = {
   mode: string;
@@ -72,18 +85,16 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
   onBackButtonClick,
   onSave,
 }: ActivityEditPageProps) => {
+  const styles = useStyles();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { t } = useTranslation();
   const { formatDate } = useTimezone();
   const { dispatchMessage } = useMessage();
   const { useAppendBreadcrumb } = useBreadcrumb();
-
   const { showConfirmationDialog } = useDialog();
   const { markDirty, resetDirty } = useFormDirtiness();
-  const styles = useCommonStyles();
 
   const { id } = useParams<{ id: string }>();
-
   const [state, action] = useAtom(activityDetailAtom);
   const activityCategoryState = useAtomValue(activityCategoryListAtom);
 
@@ -91,36 +102,7 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
   const baselineTimestamp = useRef<number>(Date.now());
 
   const _activity2FormData = (activity?: Activity): FormData => {
-    if (activity) {
-      const {
-        id,
-        categoryCode,
-        description,
-        participantGrade,
-        name,
-        achievementSubmissionRole,
-        startDate,
-        endDate,
-        sharable,
-        ratable,
-        eCoin,
-        status,
-      } = activity;
-      return {
-        id,
-        categoryCode,
-        name: name as Record<string, string | undefined>, // Ensure correct type
-        description,
-        participantGrade,
-        submissionRole: achievementSubmissionRole,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        sharable,
-        ratable,
-        eCoin,
-        status,
-      };
-    } else {
+    if (!activity) {
       return {
         categoryCode: '',
         name: {},
@@ -135,24 +117,54 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
         status: '',
       };
     }
+
+    const {
+      id,
+      categoryCode,
+      description,
+      participantGrade,
+      name,
+      achievementSubmissionRole,
+      startDate,
+      endDate,
+      sharable,
+      ratable,
+      eCoin,
+      status,
+    } = activity;
+
+    return {
+      id,
+      categoryCode,
+      name: name as Record<string, string | undefined>,
+      description,
+      participantGrade,
+      submissionRole: achievementSubmissionRole,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      sharable,
+      ratable,
+      eCoin,
+      status,
+    };
   };
 
   const _formData2ActivityCreation = (formData: FormData): ActivityPayload => {
     const { submissionRole, status, startDate, endDate, ...rest } = formData;
-    const rtn = {
+    return {
       achievementSubmissionRole: getEnumValueByRawValue(SubmissionRoleEnum, submissionRole)!,
       status: getEnumValueByRawValue(ActivityStatusEnum, status)!,
       startDate: startDate!.toISOString(),
       endDate: endDate!.toISOString(),
       ...rest,
     };
-    return rtn;
   };
 
   const schema = z
     .object({
       id: zodOptionalString(),
       categoryCode: zodString(),
+
       name: z
         .record(zodOptionalString({ maxLength: maxNameLength }))
         .refine(
@@ -176,12 +188,10 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
     })
     .refine(
       (data) =>
-        data.startDate === null ||
-        data.endDate === null ||
-        data.endDate.getTime() >= data.startDate.getTime(),
+        !data.startDate || !data.endDate || data.endDate.getTime() >= data.startDate.getTime(),
       {
         message: 'zod.error.too_small',
-        path: ['endDate'], // path of error
+        path: ['endDate'],
       },
     );
 
@@ -199,22 +209,22 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
     resolver: zodResolver(schema),
   });
 
+  const formValues = watch();
+
   useEffect(() => {
     useAppendBreadcrumb('activityMaintenance.titleEdit', `system.message.${mode}`);
   }, []);
 
-  const formValues = watch();
   useEffect(() => {
-    // to trigger enable / disable of save button and mark dirtiness
     if (isDirty) {
       markDirty();
     }
     return () => resetDirty();
-  }, [formValues, isDirty, markDirty, resetDirty]);
+  }, [formValues, isDirty]);
 
   useEffect(() => {
     if (id) {
-      action({ search: { id: id } });
+      action({ search: { id } });
     }
   }, [id]);
 
@@ -236,16 +246,14 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
     }
   }, [state]);
 
-  const handleNameFieldChange = (fieldName: 'name', langStr: string, value: string) => {
-    const currentFieldValues = formValues[fieldName];
-
-    currentFieldValues[
-      langStr === LanguageEnum.TraditionalChinese
+  const handleNameFieldChange = (fieldName: 'name', lang: string, value: string) => {
+    const current = formValues[fieldName];
+    current[
+      lang === LanguageEnum.TraditionalChinese
         ? LanguageEnum.TraditionalChinese
         : LanguageEnum.English
     ] = value;
-
-    setValue(fieldName, currentFieldValues, { shouldDirty: true });
+    setValue(fieldName, current, { shouldDirty: true });
   };
 
   const backButton =
@@ -253,13 +261,9 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
       <Button icon={<ArrowTurnUpLeftRegular />} onClick={onBackButtonClick}>
         {t('system.message.back')}
       </Button>
-    ) : (
-      <></>
-    );
+    ) : null;
 
-  const saveButton = readOnly ? (
-    <></>
-  ) : (
+  const saveButton = readOnly ? null : (
     <Button
       appearance="primary"
       disabled={hasMissingRequiredField(formValues, schema)}
@@ -297,9 +301,9 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
     <Root>
       <Row>
         <Form
-          buttons={[backButton, saveButton]}
+          buttons={[backButton, saveButton].filter((b) => b !== null)}
+          className={styles.formContainer}
           numColumn={3}
-          styles={{ width: '750px' }}
           title={constructMessage(t, 'activityMaintenance.titleEdit', [
             mode ? `system.message.${mode}` : '',
           ])}
@@ -628,8 +632,7 @@ export const ActivityEditPage: React.FC<ActivityEditPageProps> = ({
             }}
           />
         </Form>
-        <div style={{ flex: 1 }}></div>
-
+        <div className={styles.flexSpacer} />
         <MultiLangDrawer
           initialData={formValues.name}
           isOpen={isDrawerOpen}

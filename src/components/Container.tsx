@@ -90,6 +90,7 @@ const useStyles = makeStyles({
 });
 
 export type FormProps = {
+  className?: string;
   numColumn: 1 | 2 | 3 | 4;
   buttons?: React.ReactElement<typeof Button>[];
   toolbarSlot?: React.ReactElement<typeof ToolbarButton>[] | React.ReactElement<typeof MessageBar>;
@@ -122,6 +123,7 @@ export const MobileRoot: React.FC<{
 
 export const Form: React.FC<FormProps> = ({
   buttons,
+  className,
   toolbarSlot,
   pagination,
   numColumn,
@@ -155,7 +157,7 @@ export const Form: React.FC<FormProps> = ({
     <></>
   );
   return (
-    <div style={inputStyles}>
+    <div className={className} style={inputStyles}>
       {title ? (
         <>
           <div className={styles.titleBar}>

@@ -5,23 +5,20 @@ import {
   Button,
   Caption1,
   Divider,
-  makeStyles,
   Option,
-  shorthands,
-  Image,
   TabValue,
   Textarea,
   tokens,
   TabList,
   Tab,
-  Caption2,
   Rating,
   Skeleton,
   SkeletonItem,
 } from '@fluentui/react-components';
-import { Field } from '../../components/field';
-import { Input } from '../../components/Input';
-import { Dropdown } from '../../components/drop-down';
+import { EmptyCell, Form, Root, Row } from '@components/container';
+import { Field } from '@components/field';
+import { Input } from '@components/input';
+import { Dropdown } from '@components/drop-down';
 import {
   AddRegular,
   AppsListDetailFilled,
@@ -30,29 +27,25 @@ import {
   CheckmarkRegular,
   CommentFilled,
   CommentRegular,
-  Dismiss24Regular,
   DismissRegular,
   EraserRegular,
   SearchRegular,
 } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { Form, Root, Row } from '../../components/Container';
 import { zodInt, zodOptionalString, zodString } from '../../types/zod';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMessage } from '../../hooks/use-message';
+import { useMessage } from '@hooks/use-message';
 import { useAtom, useAtomValue } from 'jotai';
-import { useDialog } from '../../hooks/use-dialog';
+import { useDialog } from '@hooks/use-dialog';
 import { useFormDirtiness } from '@hooks/use-form-dirtiness';
-import { constructErrorMessage, constructMessage } from '../../utils/string-util';
-import { EmptyCell } from '../../components/Container';
+import { constructErrorMessage, constructMessage } from '@utils/string-util';
 import { useLocation } from 'react-router-dom';
-import { hasMissingRequiredField } from '../../utils/form-util';
+import { hasMissingRequiredField } from '@utils/form-util';
 import { Message, MessageType } from '../../models/system';
-import { useBreadcrumb } from '../../hooks/use-breadcrumb';
-import { authenticationAtom } from '../../states/authentication';
-import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
+import { useBreadcrumb } from '@hooks/use-breadcrumb';
+import { authenticationAtom } from '@states/authentication';
 import {
   achievementDetailAtom,
   AchievementDetailStateFail,
@@ -66,43 +59,9 @@ import { getFieldValueInPreferredLanguage } from '../../utils/language-util';
 import { AchievementStatusIcon } from './achievement-status-label';
 import { ReviewPanel } from '../../components/review-panel';
 import { DropzoneBox } from '../../components/drop-zone';
-import { deleteMedia, uploadMedia } from '../../repo/media-repo';
+import { deleteMedia, uploadMedia } from '../../repos/media-repo';
 import { AchievementDetail } from '../../__generated__/linkedup-web-api-client';
-
-const useStyles = makeStyles({
-  imageWrapper: {
-    position: 'relative',
-    width: '100%',
-    marginBottom: '1rem',
-    // ...shorthands.overflow('hidden'),
-    borderRadius: '8px',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    padding: '4px 8px',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)', // increased transparency
-    color: 'white',
-    fontSize: '12px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  deleteButton: {
-    color: 'white',
-    background: 'transparent',
-    ...shorthands.border('none'),
-    cursor: 'pointer',
-  },
-  image: {
-    width: '100%',
-    height: 'auto',
-    display: 'block',
-  },
-});
+import { ImagePreview } from 'components/image-preview';
 
 const attachmentSchema = z.object({
   fileName: z.string(),
@@ -139,8 +98,6 @@ type AchievementEditPageProps = {};
 export const AchievementEditPage: React.FC<
   AchievementEditPageProps
 > = ({}: AchievementEditPageProps) => {
-  const styles = useStyles();
-
   const { t, i18n } = useTranslation();
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
   const { useStartBreadcrumb } = useBreadcrumb();
@@ -640,30 +597,23 @@ export const AchievementEditPage: React.FC<
                                 </>
                               ))}
                               {field.value.map((v, idx) => {
-                                const filename = v.fileName;
                                 return (
-                                  <div key={`image.${idx}`} className={styles.imageWrapper}>
-                                    <div className={styles.overlay}>
-                                      <Caption2>{filename}</Caption2>
-                                      <Button
-                                        appearance="transparent"
-                                        className={styles.deleteButton}
-                                        icon={<Dismiss24Regular />}
-                                        onClick={async () => {
-                                          const updated = [...field.value];
-                                          const removedItem = updated.splice(idx, 1)[0];
-                                          if (removedItem.deleteUrl !== undefined) {
-                                            await deleteMedia({
-                                              ...removedItem,
-                                              deleteUrl: removedItem.deleteUrl as string,
-                                            });
-                                          }
-                                          setValue('attachment', updated);
-                                        }}
-                                      />
-                                    </div>
-                                    <Image className={styles.image} fit="contain" src={v.getUrl} />
-                                  </div>
+                                  <ImagePreview
+                                    key={`image.${idx}`}
+                                    deleteAction={async () => {
+                                      const updated = [...field.value];
+                                      const removedItem = updated.splice(idx, 1)[0];
+                                      if (removedItem.deleteUrl !== undefined) {
+                                        await deleteMedia({
+                                          ...removedItem,
+                                          deleteUrl: removedItem.deleteUrl as string,
+                                        });
+                                      }
+                                      setValue('attachment', updated);
+                                    }}
+                                    fileName={v.fileName}
+                                    src={v.getUrl}
+                                  />
                                 );
                               })}
                               <DropzoneBox
@@ -711,7 +661,8 @@ export const AchievementEditPage: React.FC<
                         return (
                           <ReviewPanel
                             key={r.id}
-                            author={useNameInPreferredLanguage(r.createdBy)}
+                            // author={useNameInPreferredLanguage(r.createdBy)}
+                            author={r.createdBy}
                             comment={r.comment}
                             reviewDateTime={new Date(r.createdAt)}
                           />

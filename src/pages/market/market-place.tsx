@@ -24,7 +24,7 @@ import { useEffect, useState } from 'react';
 import { useMessage } from '../../hooks/use-message';
 import { DeviceComponent } from '../../components/device-component';
 import { useTranslation } from 'react-i18next';
-import { Root } from '../../components/Container';
+import { Root } from '../../components/container';
 import { ProductGrid } from '../product/product-grid';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
 import { PageTitle } from '../../components/page-title';

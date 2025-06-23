@@ -11,7 +11,7 @@ import {
   getActivityById as getActivityByIdRepo,
   createActivity as createActivityRepo,
   updateActivity as updateActivityRepo,
-} from '../repo/activity-repo';
+} from '../repos/activity-repo';
 
 type ActivityDetailStateArgs = { result?: ActivityDetail; updateSuccessTime?: number };
 

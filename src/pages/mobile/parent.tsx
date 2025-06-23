@@ -12,7 +12,7 @@ import { PeopleAddRegular } from '@fluentui/react-icons';
 
 import { useTranslation } from 'react-i18next';
 import { useBreadcrumb } from '../../hooks/use-breadcrumb';
-import { MobileRoot } from '../../components/Container';
+import { MobileRoot } from '../../components/container';
 import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 import { useAtomValue } from 'jotai';
 import { authenticationAtom } from '../../states/authentication';

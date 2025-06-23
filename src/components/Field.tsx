@@ -20,6 +20,12 @@ const useStyles = makeStyles({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  fromToRow: {
+    display: 'grid',
+    gridTemplateColumns: '47% 6% 47%',
+    width: '100%',
+    alignItems: 'center',
+  },
   errorMessageCell: {
     display: 'flex',
     alignItems: 'center',
@@ -149,4 +155,27 @@ export const Field: React.FC<FieldProps> = ({
       </div>
     );
   }
+};
+
+export type FromToFieldProps = Omit<FieldProps, 'children'> & {
+  fromComponent: React.ReactElement;
+  toComponent: React.ReactElement;
+};
+
+export const FromToField: React.FC<FromToFieldProps> = ({
+  fromComponent,
+  toComponent,
+  ...rest
+}) => {
+  const styles = useStyles();
+
+  return (
+    <Field {...rest}>
+      <div className={styles.fromToRow}>
+        {fromComponent}
+        <span style={{ textAlign: 'center' }}>–</span>
+        {toComponent}
+      </div>
+    </Field>
+  );
 };

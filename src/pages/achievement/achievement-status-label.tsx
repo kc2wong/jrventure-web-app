@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import { Body1, makeStyles, shorthands } from '@fluentui/react-components';
 import {
   CheckmarkCircleRegular,
@@ -6,7 +5,9 @@ import {
   DismissCircleRegular,
   PauseCircleRegular,
 } from '@fluentui/react-icons';
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { AchievementStatusEnum } from '../../models/openapi';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
 

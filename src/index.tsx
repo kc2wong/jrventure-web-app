@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import App from './app';
 import reportWebVitals from './report-web-vitals';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
 import i18next from 'i18next';

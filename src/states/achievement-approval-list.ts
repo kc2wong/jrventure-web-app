@@ -12,7 +12,7 @@ import {
   AchievementApprovalPendingSubmissionDateEnum,
   SubmissionRoleEnum,
 } from '../models/openapi';
-import { findAchievementApprovalRepo } from '../repo/achievement-repo';
+import { findAchievementApprovalRepo } from '../repos/achievement-repo';
 
 export enum AchievementOrdering {
   SubmissionDateAsc,

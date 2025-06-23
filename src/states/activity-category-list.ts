@@ -7,7 +7,7 @@ import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
 import { delay } from '../utils/date-util';
 import { UserRoleEnum, UserStatusEnum } from '../models/openapi';
-import { listActivityCategory } from '../repo/activity-category-repo';
+import { listActivityCategory } from '../repos/activity-category-repo';
 
 export type Filter = {
   id?: string;

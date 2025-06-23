@@ -10,7 +10,7 @@ import {
 } from '@fluentui/react-components';
 import { Dismiss24Regular, EraserRegular, SearchRegular } from '@fluentui/react-icons';
 import { ReactElement } from 'react';
-import { Form } from './Container';
+import { Form } from './container';
 import { useIsMobile } from '../hooks/use-mobile';
 
 const useStylesDrawer = makeStyles({

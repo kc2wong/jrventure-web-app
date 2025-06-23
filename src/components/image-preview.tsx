@@ -1,5 +1,6 @@
-import React, { FC } from 'react';
-import { Caption2, Image, makeStyles, shorthands } from '@fluentui/react-components';
+import { FC } from 'react';
+import { Button, Caption2, Image, makeStyles, shorthands } from '@fluentui/react-components';
+import { Dismiss24Regular } from '@fluentui/react-icons';
 
 const useStyles = makeStyles({
   imageWrapper: {
@@ -39,14 +40,25 @@ const useStyles = makeStyles({
 type ImagePreviewProps = {
   fileName: string;
   src: string;
+  deleteAction?: () => void;
 };
-export const ImagePreview: FC<ImagePreviewProps> = ({ fileName, src }) => {
+export const ImagePreview: FC<ImagePreviewProps> = ({ fileName, src, deleteAction }) => {
   const styles = useStyles();
 
   return (
     <div className={styles.imageWrapper}>
       <div className={styles.overlay}>
         <Caption2>{fileName}</Caption2>
+        {deleteAction ? (
+          <Button
+            appearance="transparent"
+            className={styles.deleteButton}
+            icon={<Dismiss24Regular />}
+            onClick={deleteAction}
+          />
+        ) : (
+          <></>
+        )}
       </div>
       <Image className={styles.image} fit="contain" src={src} />
     </div>

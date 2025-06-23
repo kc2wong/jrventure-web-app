@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Body1, InputProps, makeStyles, shorthands } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
-import { Input } from '../../components/Input';
+import { Input } from '../../components/input';
 import { getEnumValueByRawValue } from '../../utils/enum-util';
 import { CheckmarkRegular, DismissCircleRegular, PauseCircleRegular } from '@fluentui/react-icons';
 import { ApprovalStatusEnum } from '../../models/openapi';

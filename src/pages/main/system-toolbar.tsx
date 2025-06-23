@@ -1,3 +1,4 @@
+import { SignoutButton } from '@components/signout-button';
 import {
   makeStyles,
   Menu,
@@ -28,22 +29,25 @@ import {
   DarkThemeRegular,
   WeatherSunnyRegular,
 } from '@fluentui/react-icons';
+import { LanguageEnum, UserRoleEnum } from '@schemas/webapi';
+import { useAtom, useAtomValue } from 'jotai';
 import React, { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LanguageEnum, Student, UserRoleEnum } from '../models/openapi';
-import { Theme } from '../contexts/theme';
-import { useAtom, useAtomValue } from 'jotai';
-import { authenticationAtom } from '../states/authentication';
-import { useNavigationHelpers } from '../hooks/use-delay-navigate';
-import { SimpleUser } from '../__generated__/linkedup-web-api-client';
-import { useNameInPreferredLanguage } from '../hooks/use-preferred-language';
-import { Login } from '../models/login';
-import { useTimezone } from '../hooks/use-timezone';
-import { RoleIcon } from '../pages/user-maintenance/role-label';
-import { DeviceComponent } from './device-component';
-import { useBreadcrumb } from '../hooks/use-breadcrumb';
-import { useIsMobile } from '../hooks/use-mobile';
-import { SignoutButton } from '../pages/authentication/components/signout-button';
+
+import { DeviceComponent } from '@components/device-component';
+import { MultiLangLabel } from '@components/multi-lang-field';
+import { Theme } from '@contexts/theme';
+import { useBreadcrumb } from '@hooks/use-breadcrumb';
+import { useNavigationHelpers } from '@hooks/use-delay-navigate';
+import { useIsMobile } from '@hooks/use-mobile';
+import { useNameInPreferredLanguage } from '@hooks/use-preferred-language';
+import { useTimezone } from '@hooks/use-timezone';
+import { RoleIcon } from '@pages/user-maintenance/role-label';
+import { authenticationAtom } from '@states/authentication';
+import { Student, SimpleUser } from '@webapi/types';
+
+import { Login } from '../../models/login';
+
 
 const useStyles = makeStyles({
   toolbar: {
@@ -109,7 +113,7 @@ const AvatarInfo = forwardRef<
         <Label
           className={styles.classStudent}
         >{`${student.classId}-${student.studentNumber}`}</Label>
-        <Label className={styles.classStudent}>{useNameInPreferredLanguage(student)}</Label>
+        <MultiLangLabel object={student} />
       </div>
     </div>
   );
@@ -152,7 +156,7 @@ const ParentRoleInfo = ({
                 style={{ display: 'flex', alignItems: 'center', gap: tokens.spacingHorizontalS }}
               >
                 <Label style={{ width: 40 }}>{`${s.classId}-${s.studentNumber}`}</Label>
-                <Label>{useNameInPreferredLanguage(s)}</Label>
+                <MultiLangLabel object={s} />
               </div>
             </MenuItemRadio>
           ))}
@@ -316,7 +320,9 @@ export const SystemToolbar = ({
           <DeviceComponent
             desktop={
               <>
-                <Menu checkedValues={{ lang: [language === LanguageEnum.English ? 'en' : 'zhHant'] }}>
+                <Menu
+                  checkedValues={{ lang: [language === LanguageEnum.English ? 'en' : 'zhHant'] }}
+                >
                   <MenuTrigger disableButtonEnhancement>
                     <Button icon={<GlobeRegular />} />
                   </MenuTrigger>

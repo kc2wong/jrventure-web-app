@@ -11,12 +11,12 @@ import { OneOnly } from '../utils/object-util';
 import { EmptyObject } from '../models/common';
 import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
-import { getStudentByIdRepo } from '../repo/student-repo';
-import { findActivityByStudentIdRepo } from '../repo/activity-repo';
+import { getStudentByIdRepo } from '../repos/student-repo';
+import { findActivityByStudentIdRepo } from '../repos/activity-repo';
 import {
   findAchievementByStudentActivityIdRepo,
   createAchievementRepo,
-} from '../repo/achievement-repo';
+} from '../repos/achievement-repo';
 import { AchievementDetail } from '../__generated__/linkedup-web-api-client';
 
 type ActivityWithAchievementStatus = {
@@ -209,7 +209,7 @@ const _searchAchievement = async (
     return;
   } else {
     const nextState = new AchievementDetailStateSearchAchievementSuccess(
-      { ...result, attachment: [] },
+      { ...result },
       stateProgress,
     );
     set(achievementDetailBaseAtom, nextState);

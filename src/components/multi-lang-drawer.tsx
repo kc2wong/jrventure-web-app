@@ -1,6 +1,6 @@
-import { Input } from './Input';
+import { Input } from './input';
 import { Field } from './field';
-import { Form } from './Container';
+import { Form } from './container';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
 import { useForm } from 'react-hook-form';

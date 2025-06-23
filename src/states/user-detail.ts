@@ -11,7 +11,7 @@ import {
   getUserById,
   createUser as createUserRepo,
   updateUser as updateUserRepo,
-} from '../repo/user-repo';
+} from '../repos/user-repo';
 
 type UserDetailStateArgs = { result?: User; updateSuccessTime?: number };
 

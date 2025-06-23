@@ -1,19 +1,11 @@
-import { useEffect } from 'react';
 import {
   ToolbarButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-  TableSelectionCell,
   useTableFeatures,
   TableColumnDefinition,
   Option,
   Body1,
   useTableSelection,
   Tooltip,
-  Label,
   makeStyles,
   Dropdown,
 } from '@fluentui/react-components';
@@ -24,38 +16,43 @@ import {
   EyeRegular,
   FilterRegular,
 } from '@fluentui/react-icons';
-import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ActivityStatusEnum, SubmissionRoleEnum } from '@schemas/webapi';
+import { zodOptionalDate, zodOptionalString } from '@t/zod';
 import { TFunction } from 'i18next';
 import { atom, useAtom, useAtomValue } from 'jotai';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { SearchCriteriaDrawer } from '../../components/drawer';
-import { Form, Root, Row } from '../../components/Container';
-import { Field } from '../../components/field';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
+
+import { Form, Root, Row } from '@components/container';
+import { DatePicker } from '@components/date-picker';
+import { SearchCriteriaDrawer } from '@components/drawer';
+import { Field, FromToField } from '@components/field';
+import { Input } from '@components/input';
+import { MultiLangBody1 } from '@components/multi-lang-field';
+import { Pagination } from '@components/pagination';
+import { createTableColumn } from '@components/table/create-table-column-definition';
+import { DataTable } from '@components/table/data-table';
+import { useBreadcrumb } from '@hooks/use-breadcrumb';
+import { useNameInPreferredLanguage } from '@hooks/use-preferred-language';
+import { useTimezone } from '@hooks/use-timezone';
+import { activityCategoryListAtom } from '@states/activity-category-list';
 import {
   Filter,
   activityListAtom,
   ActivityListStateInitial,
   ActivityListStateSuccess,
   ActivityOrdering,
-} from '../../states/activity-list';
-import { Activity, ActivityStatusEnum, SubmissionRoleEnum } from '../../models/openapi';
-import { getRawValueByEnumValue, getEnumValueByRawValue } from '../../utils/enum-util';
-import { constructErrorMessage } from '../../utils/string-util';
-import { zodOptionalDate, zodOptionalString } from '../../types/zod';
-import { createTableColumn } from '../../components/table/create-table-column-definition';
-import { useBreadcrumb } from '../../hooks/use-breadcrumb';
-import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
-import { activityCategoryListAtom } from '../../states/activity-category-list';
-import { useTimezone } from '../../hooks/use-timezone';
-import { StatusLabel } from './status-label';
-import { RoleLabel } from './role-label';
-import { Pagination } from '../../components/pagination';
-import { formatParticpantGrade } from './participant-grade-formatter';
+} from '@states/activity-list';
+import { getRawValueByEnumValue, getEnumValueByRawValue } from '@utils/enum-util';
+import { constructErrorMessage } from '@utils/string-util';
+import { Activity } from '@webapi/types';
+
 import { useCommonStyles } from '../common';
-import { Input } from '../../components/Input';
-import { DatePicker } from '../../components/date-picker';
+import { RoleLabel } from './shared/components/role-label';
+import { StatusLabel } from './shared/components/status-label';
 
 const searchSchema = z.object({
   categoryCode: zodOptionalString(),
@@ -77,26 +74,19 @@ type SearchFormData = z.infer<typeof searchSchema>;
 type SearchDrawerProps = { isOpen: boolean; onOpenChange: (isOpen: boolean) => void; t: TFunction };
 
 const useStyles = makeStyles({
-  row: {
-    display: 'grid',
-    gridTemplateColumns: '47% 6% 47%',
-    width: '100%',
-    alignItems: 'center',
-  },
+  gridColumn: {
+    display: 'block',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  }
 });
-
-const toLabel = (
-  <div style={{ display: 'flex', justifyContent: 'center' }}>
-    <Label>-</Label>
-  </div>
-);
 
 const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
   const { formatDate } = useTimezone();
   const [state, action] = useAtom(activityListAtom);
   const activtyCategoryState = useAtomValue(activityCategoryListAtom);
   const commonStyles = useCommonStyles();
-  const styles = useStyles();
 
   const {
     control,
@@ -228,18 +218,8 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
         }}
       />
 
-      <Field
-        label={t('activityMaintenance.startDate')}
-        validationMessage={
-          errors.startDateFrom?.message !== undefined || errors.startDateTo?.message !== undefined
-            ? constructErrorMessage(
-                t,
-                errors.startDateFrom?.message ?? errors.startDateTo?.message ?? '',
-              )
-            : undefined
-        }
-      >
-        <div className={styles.row}>
+      <FromToField
+        fromComponent={
           <Controller
             control={control}
             name="startDateFrom"
@@ -253,7 +233,9 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
               );
             }}
           />
-          {toLabel}
+        }
+        label={t('activityMaintenance.startDate')}
+        toComponent={
           <Controller
             control={control}
             name="startDateTo"
@@ -267,21 +249,19 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
               );
             }}
           />
-        </div>
-      </Field>
-
-      <Field
-        label={t('activityMaintenance.endDate')}
+        }
         validationMessage={
-          errors.endDateFrom?.message !== undefined || errors.endDateTo?.message !== undefined
+          errors.startDateFrom?.message !== undefined || errors.startDateTo?.message !== undefined
             ? constructErrorMessage(
                 t,
-                errors.endDateFrom?.message ?? errors.endDateTo?.message ?? '',
+                errors.startDateFrom?.message ?? errors.startDateTo?.message ?? '',
               )
             : undefined
         }
-      >
-        <div className={styles.row}>
+      ></FromToField>
+
+      <FromToField
+        fromComponent={
           <Controller
             control={control}
             name="endDateFrom"
@@ -295,7 +275,9 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
               );
             }}
           />
-          {toLabel}
+        }
+        label={t('activityMaintenance.endDate')}
+        toComponent={
           <Controller
             control={control}
             name="endDateTo"
@@ -309,8 +291,16 @@ const SearchDrawer = ({ t, isOpen, onOpenChange }: SearchDrawerProps) => {
               );
             }}
           />
-        </div>
-      </Field>
+        }
+        validationMessage={
+          errors.endDateFrom?.message !== undefined || errors.endDateTo?.message !== undefined
+            ? constructErrorMessage(
+                t,
+                errors.endDateFrom?.message ?? errors.endDateTo?.message ?? '',
+              )
+            : undefined
+        }
+      ></FromToField>
 
       <Controller
         control={control}
@@ -363,6 +353,8 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
 
   const { useStartBreadcrumb } = useBreadcrumb();
   const { formatDate } = useTimezone();
+  const styles = useStyles();
+
   const [state, action] = useAtom(activityListAtom);
 
   useEffect(() => {
@@ -389,10 +381,6 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
     return <Body1>{useNameInPreferredLanguage(ac)}</Body1>;
   };
 
-  const ActivityNameInPreferredLanguage = ({ activity }: { activity: Activity }) => {
-    return <Body1>{useNameInPreferredLanguage(activity)}</Body1>;
-  };
-
   const orderBy = state.getResult() ? state.ordering : undefined;
   const columns: TableColumnDefinition<Activity>[] = [
     createTableColumn({
@@ -407,7 +395,7 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
       columnId: 'name',
       header: t('activityMaintenance.name'),
       width: 25,
-      builder: (activity) => <ActivityNameInPreferredLanguage activity={activity} />,
+      builder: (act) => <MultiLangBody1 className={styles.gridColumn} object={act} />,
       sortDirection:
         orderBy === ActivityOrdering.NameAsc
           ? 'asc'
@@ -426,7 +414,7 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
       columnId: 'participantGrade',
       header: t('activityMaintenance.forClass'),
       width: 10,
-      builder: (activity) => <Body1>{formatParticpantGrade(activity.participantGrade)}</Body1>,
+      builder: (activity) => <Body1>{_formatParticpantGrade(activity.participantGrade)}</Body1>,
     }),
     createTableColumn({
       columnId: 'startDate',
@@ -502,13 +490,13 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
     createTableColumn({
       columnId: 'eCoin',
       header: t('activityMaintenance.eCoin'),
-      width: 7,
+      width: 5,
       builder: (activity) => <Body1>{activity.eCoin}</Body1>,
     }),
     createTableColumn({
       columnId: 'status',
       header: t('activityMaintenance.status.label'),
-      width: 8,
+      width: 10,
       builder: (activity) => (
         <StatusLabel
           status={getEnumValueByRawValue(ActivityStatusEnum, activity.status) as ActivityStatusEnum}
@@ -606,6 +594,14 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
     </Tooltip>
   );
 
+  const toolbarButtons = [
+    toolbarButtonFilter,
+    toolbarButtonRefresh,
+    toolbarButtonAdd,
+    toolbarButtonEdit,
+    toolbarButtonView,
+  ];
+
   const result = state.getResult();
   const pagination = result ? (
     <Pagination
@@ -629,60 +625,16 @@ export const ActivitySearchPage: React.FC<ActivitySearchPageProps> = ({
           numColumn={1}
           pagination={pagination}
           title={t('activityMaintenance.title')}
-          toolbarSlot={[
-            toolbarButtonFilter,
-            toolbarButtonRefresh,
-            toolbarButtonAdd,
-            toolbarButtonEdit,
-            toolbarButtonView,
-          ]}
+          toolbarSlot={toolbarButtons}
         >
-          <Table
-            style={{ width: '100%', tableLayout: 'fixed', minWidth: '500px', maxWidth: '1200px' }}
-          >
-            <TableHeader>
-              <TableRow>
-                <TableSelectionCell
-                  invisible
-                  style={{ pointerEvents: 'none', width: '40px', padding: 0 }}
-                  type="radio"
-                />
-                {columns.map((col) => col.renderHeaderCell())}
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {!state.getResult() ? (
-                <TableRow>
-                  <TableCell colSpan={columns.length + 1}>
-                    <Body1>{t('system.message.noSearchPerformed')}</Body1>
-                  </TableCell>
-                </TableRow>
-              ) : rows.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={columns.length + 1}>
-                    <Body1>{t('system.message.noMatchedData')}</Body1>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                rows.map(({ item, selected, onClick, appearance }) => (
-                  <TableRow
-                    key={item.id}
-                    appearance={appearance}
-                    aria-selected={selected}
-                    onClick={onClick}
-                  >
-                    <TableSelectionCell
-                      checked={selected}
-                      style={{ width: '40px', padding: 0 }}
-                      type="radio"
-                    />
-                    {columns.map((col) => col.renderCell(item))}
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            columns={columns}
+            maxWidth="1200px"
+            minWidth="500px"
+            noSearchPerformed={!state.getResult()}
+            rows={rows}
+            t={t}
+          ></DataTable>
         </Form>
       </Row>
     </Root>
@@ -713,4 +665,35 @@ const _filter2SearchFormData = ({
     status: status?.map((s) => getRawValueByEnumValue(ActivityStatusEnum, s)!) ?? [],
     ...others,
   };
+};
+
+const _formatParticpantGrade = (numbers: number[]): string => {
+  if (numbers.length === 0) {
+    return '';
+  }
+
+  const sorted = [...numbers].sort((a, b) => a - b);
+  const result: string[] = [];
+
+  let start = sorted[0];
+  let end = sorted[0];
+
+  for (let i = 1; i < sorted.length; i++) {
+    const current = sorted[i];
+
+    if (current === end + 1) {
+      // Still consecutive
+      end = current;
+    } else {
+      // Break in the sequence
+      result.push(start === end ? `P${start}` : `P${start} - P${end}`);
+      start = current;
+      end = current;
+    }
+  }
+
+  // Push the final range
+  result.push(start === end ? `P${start}` : `P${start} - P${end}`);
+
+  return result.join(', ');
 };

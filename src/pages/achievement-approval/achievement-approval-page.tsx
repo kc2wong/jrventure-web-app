@@ -1,26 +1,28 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { useEffect } from 'react';
-import { useMessage } from '../../hooks/use-message';
-import { useMode } from '../../hooks/use-mode';
-import { Message, MessageType } from '../../models/system';
-import { constructErrorMessage } from '../../utils/string-util';
 import { useTranslation } from 'react-i18next';
-import { AchievementApprovalSearchPage } from './achievement-approval-search-page';
-import { AchievementApprovalDetailPage } from './achievement-approval-detail';
-import { useNavigationHelpers } from '../../hooks/use-delay-navigate';
-import {
-  achievementApprovalListAtom,
-  AchievementApprovalListStateFail,
-  AchievementApprovalListStateProgress,
-  AchievementApprovalListStateSuccess,
-} from '../../states/achievement-approval-list';
+
+import { useNavigationHelpers } from '@hooks/use-delay-navigate';
+import { useMessage } from '@hooks/use-message';
+import { useMode } from '@hooks/use-mode';
 import {
   achievementApprovalDetailAtom,
   AchievementApprovalDetailStateFail,
   AchievementApprovalDetailStateProgress,
   AchievementApprovalDetailStateSearchSuccess,
   AchievementApprovalDetailStateUpdateSuccess,
-} from '../../states/achievement-approval-detail';
+} from '@states/achievement-approval-detail';
+import {
+  achievementApprovalListAtom,
+  AchievementApprovalListStateFail,
+  AchievementApprovalListStateProgress,
+  AchievementApprovalListStateSuccess,
+} from '@states/achievement-approval-list';
+import { constructErrorMessage } from '@utils/string-util';
+
+import { AchievementApprovalDetailPage } from './achievement-approval-detail';
+import { AchievementApprovalSearchPage } from './achievement-approval-search-page';
+import { Message, MessageType } from '../../models/system';
 
 export const AchievementApprovalPage: React.FC = () => {
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();

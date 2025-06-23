@@ -1,6 +1,6 @@
 import React, { cloneElement } from 'react';
 import { useAtomValue } from 'jotai';
-import { Form, Root } from '../../components/Container';
+import { Form, Root } from '../../components/container';
 import {
   ArrowTurnUpLeftRegular,
   bundleIcon,
@@ -28,7 +28,7 @@ import {
   Caption1,
 } from '@fluentui/react-components';
 import { t } from 'i18next';
-import { EmptyCell } from '../../components/Container';
+import { EmptyCell } from '../../components/container';
 import { Field } from '../../components/field';
 import { useTimezone } from '../../hooks/use-timezone';
 import { BsCoin } from 'react-icons/bs';

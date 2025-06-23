@@ -19,12 +19,15 @@
     "baseUrl": "./src",
     "paths": {
       "@webapi/*": ["__generated__/linkedup-web-api-client"],
+      "@components/*": ["components/*"],      
       "@contexts/*": ["contexts/*"],      
       "@hooks/*": ["hooks/*"],
       "@pages/*": ["pages/*"],
       "@providers/*": ["providers/*"],
       "@repo/*": ["repo/*"],
+      "@schemas/*": ["schemas/*"],
       "@states/*": ["states/*"],
+      "@t/*": ["types/*"],
       "@utils/*": ["utils/*"]
     }
   },

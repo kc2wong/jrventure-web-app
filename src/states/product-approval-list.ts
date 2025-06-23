@@ -6,7 +6,7 @@ import { isError, Message, MessageType } from '../models/system';
 import { BaseState } from './base-state';
 import { delay } from '../utils/date-util';
 import { ApprovalStatus, ProductApproval } from '../__generated__/linkedup-web-api-client';
-import { findProductApproval as findProductApprovalRepo } from '../repo/product-approval-repo';
+import { findProductApproval as findProductApprovalRepo } from '../repos/product-approval-repo';
 
 export type Filter = {
   classNo?: string;
