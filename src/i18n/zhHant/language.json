@@ -83,6 +83,7 @@
     "emailHint": "admin@linkedup.org",
     "forgotPassword": "忘記密碼",
     "newUser": "不是現有用戶",
+    "orWithCredential": "或密碼登入",
     "password": "密碼",
     "passwordHint": "123456",
     "register": "登記為",

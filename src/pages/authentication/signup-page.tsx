@@ -1,12 +1,11 @@
-import { Body1, Button, Input, Image, Link, Card } from '@fluentui/react-components';
+import { Input, makeStyles } from '@fluentui/react-components';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useGoogleLogin } from '@react-oauth/google';
 import { zodString } from '@t/zod';
 import { useAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { Field } from '@components/field';
@@ -20,8 +19,17 @@ import {
 import { hasMissingRequiredField } from '@utils/form-util';
 import { constructErrorMessage, constructMessage } from '@utils/string-util';
 
-import { useAuthPageStyles } from './shared/auth-styles';
+import { AuthPage } from './authen-page';
 import { MessageType } from '../../models/system';
+
+export const useStyles = makeStyles({
+  formSpacer: {
+    height: '120px',
+    '@media (min-width: 601px)': {
+      height: '20px',
+    },
+  },
+});
 
 const schema = z.object({
   studentId: zodString(),
@@ -35,7 +43,7 @@ type SignupPageProps = {
 };
 
 export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
-  const styles = useAuthPageStyles();
+  const styles = useStyles();
 
   const { t } = useTranslation();
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
@@ -46,6 +54,7 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
@@ -103,65 +112,49 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
     },
   });
 
-  const handleGoogleLogin = () => {
-    if (!hasMissingRequiredField(formValues, schema)) {
-      login();
-    }
-  };
+  const handleGoogleLogin = hasMissingRequiredField(formValues, schema)
+    ? undefined
+    : handleSubmit(async () => {
+        login();
+      });
 
   return (
-    <div className={styles.page}>
-      <Card className={styles.card}>
-        {/* Left side: Login Form */}
-        <div className={styles.formSection}>
-          <Body1>
-            {t('signup.greeting')} <b>{process.env.REACT_APP_NAME}</b>
-          </Body1>
-
+    <AuthPage
+      greetingKey={t('signup.greeting')}
+      onSubmit={handleGoogleLogin}
+      submitLabelKey={t('signup.signUpWithGoogle')}
+      switchLink={{
+        prefix: `${t('signup.alreadyUser')}?`,
+        linkText: t('signup.login'),
+        linkAction: onNavigateToLogin,
+        suffix: t('signup.withCredential'),
+      }}
+    >
+      <Controller
+        control={control}
+        name="studentId"
+        render={({ field }) => (
           <Field
+            {...field}
             label={t('signup.studentId')}
             required
             validationMessage={errors.studentId?.message}
           >
-            <Input {...register('studentId')} />
+            <Input {...register(field.name)} />
           </Field>
+        )}
+      />
+      <Controller
+        control={control}
+        name="name"
+        render={({ field }) => (
           <Field label={t('signup.name')} required validationMessage={errors.name?.message}>
-            <Input {...register('name')} />
+            <Input {...register(field.name)} />
           </Field>
-
-          <div className={styles.buttonRow}>
-            <Button
-              className={styles.googleButton}
-              disabled={hasMissingRequiredField(formValues, schema)}
-              icon={<FcGoogle size={20} />}
-              onClick={handleSubmit(handleGoogleLogin)}
-              type="button"
-            >
-              {t('signup.signUpWithGoogle')}
-            </Button>
-          </div>
-
-          {/* Spacer to visually match login form height */}
-          <div className={styles.formSpacer} />
-        </div>
-
-        <div className={styles.icon}>
-          <Image
-            alt="Login Icon"
-            className={styles.icon}
-            src="https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/logo384.png"
-          />
-        </div>
-      </Card>
-
-      {/* Sign up link below the card */}
-      <div className={styles.signUpText}>
-        {`${t('signup.alreadyUser')} ?  `}
-        <Link inline onClick={onNavigateToLogin}>
-          {t('signup.login')}
-        </Link>{' '}
-        {t('signup.withCredential')}
-      </div>
-    </div>
+        )}
+      />
+      {/* Spacer to visually match login form height */}
+      <div className={styles.formSpacer} />
+    </AuthPage>
   );
 };

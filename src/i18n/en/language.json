@@ -83,6 +83,7 @@
     "emailHint": "Try admin@linkedup.org",
     "forgotPassword": "Forgot Password",
     "newUser": "Not a user",
+    "orWithCredential": "or with credential",
     "password": "Password",
     "passwordHint": "123456",
     "register": "Register",

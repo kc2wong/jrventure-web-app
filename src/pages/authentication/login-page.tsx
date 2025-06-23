@@ -1,12 +1,10 @@
-import { Body1, Button, Divider, Input, Image, Link } from '@fluentui/react-components';
-import { Card } from '@fluentui/react-components';
-import { PersonPasskeyRegular } from '@fluentui/react-icons';
+import { Button, Divider, Input, Link } from '@fluentui/react-components';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useGoogleLogin } from '@react-oauth/google';
 import { zodEmail, zodString } from '@t/zod';
 import { useAtom } from 'jotai';
 import { useContext, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FcGoogle } from 'react-icons/fc'; // Google "G" icon
 import { z } from 'zod';
@@ -24,11 +22,8 @@ import { hasMissingRequiredField } from '@utils/form-util';
 import { logger } from '@utils/logging-util';
 import { constructErrorMessage } from '@utils/string-util';
 
-
-import { useAuthPageStyles } from './shared/auth-styles';
+import { AuthPage } from './authen-page';
 import { MessageType } from '../../models/system';
-
-
 
 const schema = z.object({
   email: zodEmail(),
@@ -63,14 +58,13 @@ function GoogleSignInButton() {
 }
 
 export const LoginPage = (props: LoginPageProps) => {
-  const styles = useAuthPageStyles();
-
   const { showSpinner, stopSpinner, dispatchMessage } = useMessage();
   const { t } = useTranslation();
   const [authenticationState, action] = useAtom(authenticationAtom);
   const timezoneContext = useContext(TimezoneContext);
 
   const {
+    control,
     register,
     handleSubmit,
     watch,
@@ -99,82 +93,66 @@ export const LoginPage = (props: LoginPageProps) => {
   const formValues = watch();
   const getErrorMessage = (key?: string) => (key ? constructErrorMessage(t, key) : undefined);
 
-  const handleLogin = async (data: FormData) => {
-    logger.info(`Start sign in for user ${data.email}`);
-    await action({ signIn: { email: data.email, password: data.password } });
-  };
+  const handleLogin = hasMissingRequiredField(formValues, schema)
+    ? undefined
+    : handleSubmit(async (data: FormData) => {
+        logger.info(`Start sign in for user ${data.email}`);
+        await action({ signIn: { email: data.email, password: data.password } });
+      });
 
   return (
-    <div className={styles.page}>
-      <Card className={styles.card}>
-        {/* Left side: Login Form */}
-        <div className={styles.formSection}>
-          <Body1>
-            {t('login.greeting')} <b>{import.meta.env.VITE_REACT_APP_NAME}</b>
-          </Body1>
-
-          <div style={{ marginTop: '30px' }}>
-            <GoogleSignInButton />
-            <Divider style={{ marginTop: '20px', marginBottom: '10px' }}>
-              {t('system.message.or').toUpperCase()}
-            </Divider>
-          </div>
-
-          {/* ✅ Wrap fields in a form */}
-          <form noValidate onSubmit={handleSubmit(handleLogin)}>
-            <Field
-              label={t('login.email')}
-              labelHint={t('login.emailHint')}
-              required
-              validationMessage={getErrorMessage(errors.email?.message)}
-            >
-              <Input autoComplete="email" type="email" {...register('email')} />
-            </Field>
-            <Field
-              label={t('login.password')}
-              labelHint={t('login.passwordHint')}
-              required
-              validationMessage={getErrorMessage(errors.password?.message)}
-            >
-              <>
-                <Input autoComplete="current-password" type="password" {...register('password')} />
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Link inline>{t('login.forgotPassword')}</Link>{' '}
-                </div>
-              </>
-            </Field>
-            <div className={styles.buttonRow}>
-              <Button
-                appearance="primary"
-                className={styles.signInButton}
-                disabled={hasMissingRequiredField(formValues, schema)}
-                icon={<PersonPasskeyRegular />}
-                type="submit"
-              >
-                {t('login.signIn')}
-              </Button>
-            </div>
-          </form>
-        </div>
-
-        {/* Right side: Icon */}
-        <div className={styles.icon}>
-          <Image
-            alt="Login Icon"
-            className={styles.icon}
-            src="https://linkedup-web-app-media-bucket.s3.eu-west-2.amazonaws.com/logo384.png"
-          />
-        </div>
-      </Card>
-
-      {/* Sign up link below the card */}
-      <div className={styles.signUpText}>
-        {`${t('login.newUser')} ?  `}
-        <Link inline onClick={props.onNavigateToSignup}>
-          {t('login.register')}
-        </Link>{' '}
-        {t('login.studentAccount')}
+    <AuthPage
+      greetingKey={t('login.greeting')}
+      onSubmit={handleLogin}
+      submitLabelKey={t('login.signIn')}
+      switchLink={{
+        prefix: `${t('login.newUser')}?`,
+        linkText: t('login.register'),
+        linkAction: props.onNavigateToSignup,
+        suffix: t('login.studentAccount'),
+      }}
+    >
+      <div style={{ marginTop: '30px' }}>
+        <GoogleSignInButton />
+        <Divider style={{ marginTop: '30px', marginBottom: '20px' }}>
+          {t('login.orWithCredential')}
+        </Divider>
       </div>
-    </div>
+      <Controller
+        control={control}
+        name="email"
+        render={({ field }) => (
+          <Field
+            {...field}
+            label={t('login.email')}
+            labelHint={t('login.emailHint')}
+            required
+            validationMessage={getErrorMessage(errors.email?.message)}
+          >
+            <Input autoComplete="email" type="email" {...register('email')} />
+          </Field>
+        )}
+      />
+      <Controller
+        control={control}
+        name="password"
+        render={({ field }) => (
+          <Field
+            {...field}
+            label={t('login.password')}
+            labelHint={t('login.passwordHint')}
+            required
+            validationMessage={getErrorMessage(errors.password?.message)}
+          >
+            <>
+              <Input autoComplete="current-password" type="password" {...register('password')} />
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Link inline>{t('login.forgotPassword')}</Link>
+              </div>
+            </>
+          </Field>
+        )}
+      />
+    </AuthPage>
   );
 };
