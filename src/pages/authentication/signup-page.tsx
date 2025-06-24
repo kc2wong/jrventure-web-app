@@ -1,4 +1,4 @@
-import { makeStyles, Subtitle2 } from '@fluentui/react-components';
+import { makeStyles } from '@fluentui/react-components';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAtom } from 'jotai';

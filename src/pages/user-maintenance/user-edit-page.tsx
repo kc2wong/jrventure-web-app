@@ -1,15 +1,4 @@
-import { z } from 'zod';
-import {
-  LanguageEnum,
-  User,
-  UserCreation,
-  UserRoleEnum,
-  UserStatusEnum,
-} from '../../models/openapi';
 import { Button, Dropdown, Option, Spinner } from '@fluentui/react-components';
-import { Field } from '../../components/field';
-import { Input } from '../../components/input';
-import { Switch } from '../../components/switch';
 import {
   ArrowTurnUpLeftRegular,
   CheckmarkRegular,
@@ -18,39 +7,44 @@ import {
   SaveRegular,
 } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
-import { Form, Root, Row } from '../../components/container';
-import { zodEmail, zodOptionalString, zodString } from '../../types/zod';
+import { useAtom, useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useMessage } from '../../hooks/use-message';
+import { useLocation, useParams } from 'react-router-dom';
+import { z } from 'zod';
+
+import { EmptyCell } from '@components/container';
+import { Form, Root, Row } from '@components/container';
+import { Field } from '@components/field';
+import { Input } from '@components/input';
+import { MultiLangButton, MultiLangDrawer } from '@components/multi-lang-drawer';
+import { Switch } from '@components/switch';
+import { useBreadcrumb } from '@hooks/use-breadcrumb';
+import { useDialog } from '@hooks/use-dialog';
+import { useFormDirtiness } from '@hooks/use-form-dirtiness';
+import { useMessage } from '@hooks/use-message';
+import { useNameInPreferredLanguage } from '@hooks/use-preferred-language';
+import { MessageType } from '@schemas/system';
+import { LanguageEnum, UserRoleEnum, UserStatusEnum } from '@schemas/webapi';
+import { authenticationAtom } from '@states/authentication';
 import {
   userDetailAtom,
   UserDetailStateGetSuccess,
+  UserDetailStateSearchStudentProgress,
+  UserDetailStateSearchStudentSuccess,
   UserDetailStateUpdateSuccess,
-} from '../../states/user-detail';
-import { useAtom, useAtomValue } from 'jotai';
-import { useDialog } from '../../hooks/use-dialog';
-import { useFormDirtiness } from '@hooks/use-form-dirtiness';
-import { constructMessage } from '../../utils/string-util';
-import { getEnumValueByRawValue } from '../../utils/enum-util';
-import { EmptyCell } from '../../components/container';
-import { asArray } from '../../utils/array-util';
-import {
-  studentListAtom,
-  StudentListStateProgress,
-  StudentListStateSuccess,
-} from '../../states/student';
-import { useLocation, useParams } from 'react-router-dom';
-import { MultiLangButton, MultiLangDrawer } from '../../components/multi-lang-drawer';
-import { hasMissingRequiredField } from '../../utils/form-util';
-import { emptyStringToUndefined } from '../../utils/object-util';
-import { MessageType } from '../../models/system';
+} from '@states/user-detail';
+import { zodEmail, zodOptionalString, zodString } from '@t/zod';
+import { asArray } from '@utils/array-util';
+import { getEnumValueByRawValue } from '@utils/enum-util';
+import { hasMissingRequiredField } from '@utils/form-util';
+import { emptyStringToUndefined } from '@utils/object-util';
+import { constructMessage } from '@utils/string-util';
+import { User, UserCreation } from '@webapi/types';
+
 import { RoleIcon, RoleLabel } from './role-label';
 import { StatusIcon, StatusLabel } from './status-label';
-import { useBreadcrumb } from '../../hooks/use-breadcrumb';
-import { authenticationAtom } from '../../states/authentication';
-import { useNameInPreferredLanguage } from '../../hooks/use-preferred-language';
 
 // form for editing user
 const maxNameLength = 50;
@@ -77,7 +71,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
   const userFromParentPage = useLocation().state?.user;
 
   const [state, action] = useAtom(userDetailAtom);
-  const [studentListState, studentListAction] = useAtom(studentListAtom);
+  // const [studentListState, studentListAction] = useAtom(studentListAtom);
   const login = useAtomValue(authenticationAtom).login;
   const isToAddParentUser = mode === 'add' && login?.user.role === UserRoleEnum.Student;
 
@@ -191,13 +185,13 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     .refine(
       (data) =>
         emptyStringToUndefined(data.entitledStudentId) === undefined ||
-        studentListState.result.find((s) => s.id === data.entitledStudentId),
+        (state.student ?? []).find((s) => s.id === data.entitledStudentId),
       { message: 'zod.error.user.invalidStudentId', path: ['entitledStudentId'] },
     )
     .refine(
       (data) =>
         emptyStringToUndefined(data.entitledStudentId2) === undefined ||
-        studentListState.result.find((s) => s.id === data.entitledStudentId2),
+        (state.student ?? []).find((s) => s.id === data.entitledStudentId2),
       { message: 'zod.error.user.invalidStudentId', path: ['entitledStudentId2'] },
     )
     .refine(
@@ -238,7 +232,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
     } else {
       action({ reset: {} });
       if (isToAddParentUser && formValues.entitledStudentId) {
-        studentListAction({ search: { id: [formValues.entitledStudentId] } });
+        action({ searchStudent: { studentIds: [formValues.entitledStudentId] } });
       }
     }
   }, [id]);
@@ -250,7 +244,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
         reset(_user2FormData(state.result));
         const studentId = state.result.entitledStudentId;
         if (studentId.length > 0) {
-          studentListAction({ search: { id: studentId } });
+          action({ searchStudent: { studentIds: studentId } });
         }
       } else if (state instanceof UserDetailStateUpdateSuccess) {
         dispatchMessage({
@@ -258,53 +252,45 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
           text: constructMessage(t, 'system.message.saveObjectSuccess', ['User', state.result.id]),
         });
         onSave();
+      } else if (state instanceof UserDetailStateSearchStudentSuccess) {
+        if (mode !== 'add' || isToAddParentUser) {
+          return;
+        }
+
+        const [student, student2] = state.student ?? [];
+        if (!student) {
+          return;
+        }
+
+        const isMatchingStudent1 =
+          student.id === formValues.entitledStudentId ||
+          `${student.classId}-${student.studentNumber}` === formValues.entitledStudentId;
+
+        if (isMatchingStudent1) {
+          setValue('entitledStudentId', student.id);
+
+          if (formValues.role === UserRoleEnum.Student) {
+            setValue('name', {
+              [LanguageEnum.English]: `${student.name[LanguageEnum.English] ?? ''}`,
+              [LanguageEnum.TraditionalChinese]: `${student.name[LanguageEnum.TraditionalChinese] ?? ''}}`,
+            });
+          }
+        }
+
+        if (!student2) {
+          return;
+        }
+
+        const isMatchingStudent2 =
+          student2.id === formValues.entitledStudentId2 ||
+          `${student2.classId}-${student2.studentNumber}` === formValues.entitledStudentId2;
+
+        if (isMatchingStudent2) {
+          setValue('entitledStudentId2', student2.id);
+        }
       }
     }
   }, [state]);
-
-  useEffect(() => {
-    baselineTimestamp.current = state.eventTime;
-
-    if (!(studentListState instanceof StudentListStateSuccess)) {
-      return;
-    }
-    if (mode !== 'add' || isToAddParentUser) {
-      return;
-    }
-
-    const [student, student2] = studentListState.result;
-    if (!student) {
-      return;
-    }
-
-    const isMatchingStudent1 =
-      student.id === formValues.entitledStudentId ||
-      `${student.classId}-${student.studentNumber}` === formValues.entitledStudentId;
-
-    if (isMatchingStudent1) {
-      setValue('entitledStudentId', student.id);
-
-      if (formValues.role === UserRoleEnum.Student) {
-        setValue('name', {
-          [LanguageEnum.English]: `${student.name[LanguageEnum.English] ?? ''}`,
-          [LanguageEnum.TraditionalChinese]: `${student.name[LanguageEnum.TraditionalChinese] ?? ''}}`,
-          // [Language.SIMPLIFIED_CHINESE]: `${student.lastName[Language.SIMPLIFIED_CHINESE] ?? ''}${student.firstName[Language.SIMPLIFIED_CHINESE] ?? ''}`,
-        });
-      }
-    }
-
-    if (!student2) {
-      return;
-    }
-
-    const isMatchingStudent2 =
-      student2.id === formValues.entitledStudentId2 ||
-      `${student2.classId}-${student2.studentNumber}` === formValues.entitledStudentId2;
-
-    if (isMatchingStudent2) {
-      setValue('entitledStudentId2', student2.id);
-    }
-  }, [studentListState]);
 
   useEffect(() => {
     isToAddParentUser
@@ -526,7 +512,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                 render={({ field }) => {
                   const { value, ...others } = field;
                   const student = value
-                    ? studentListState.result.find((s) => s.id === value)
+                    ? (state.student ?? []).find((s) => s.id === value)
                     : undefined;
                   return (
                     <Field
@@ -541,7 +527,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                       <Input
                         {...others}
                         contentAfter={
-                          studentListState instanceof StudentListStateProgress ? (
+                          state instanceof UserDetailStateSearchStudentProgress ? (
                             <Spinner size="extra-tiny" />
                           ) : undefined
                         }
@@ -551,7 +537,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                             formValues.entitledStudentId2,
                           ].filter((s) => s !== undefined);
                           if (entitledStudentIds.length > 0) {
-                            studentListAction({ search: { id: entitledStudentIds } });
+                            action({ searchStudent: { studentIds: entitledStudentIds } });
                           }
                         }}
                         readOnly={readOnly || isToAddParentUser}
@@ -591,7 +577,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                 render={({ field }) => {
                   const { value, ...others } = field;
                   const student = value
-                    ? studentListState.result.find((s) => s.id === value)
+                    ? (state.student ?? []).find((s) => s.id === value)
                     : undefined;
                   return (
                     <Field
@@ -604,7 +590,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                       <Input
                         {...others}
                         contentAfter={
-                          studentListState instanceof StudentListStateProgress ? (
+                          state instanceof UserDetailStateSearchStudentProgress ? (
                             <Spinner size="extra-tiny" />
                           ) : undefined
                         }
@@ -614,7 +600,7 @@ export const UserEditPage: React.FC<UserEditPageProps> = ({
                             formValues.entitledStudentId2,
                           ].filter((s) => s !== undefined);
                           if (entitledStudentIds.length > 0) {
-                            studentListAction({ search: { id: entitledStudentIds } });
+                            action({ searchStudent: { studentIds: entitledStudentIds } });
                           }
                         }}
                         readOnly={readOnly || isToAddParentUser}

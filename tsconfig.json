@@ -24,7 +24,7 @@
       "@hooks/*": ["hooks/*"],
       "@pages/*": ["pages/*"],
       "@providers/*": ["providers/*"],
-      "@repo/*": ["repo/*"],
+      "@repos/*": ["repos/*"],
       "@schemas/*": ["schemas/*"],
       "@states/*": ["states/*"],
       "@t/*": ["types/*"],

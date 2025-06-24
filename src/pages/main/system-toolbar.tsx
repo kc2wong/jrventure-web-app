@@ -1,4 +1,3 @@
-import { SignoutButton } from '@components/signout-button';
 import {
   makeStyles,
   Menu,
@@ -29,13 +28,13 @@ import {
   DarkThemeRegular,
   WeatherSunnyRegular,
 } from '@fluentui/react-icons';
-import { LanguageEnum, UserRoleEnum } from '@schemas/webapi';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DeviceComponent } from '@components/device-component';
 import { MultiLangLabel } from '@components/multi-lang-field';
+import { SignoutButton } from '@components/signout-button';
 import { Theme } from '@contexts/theme';
 import { useBreadcrumb } from '@hooks/use-breadcrumb';
 import { useNavigationHelpers } from '@hooks/use-delay-navigate';
@@ -43,6 +42,7 @@ import { useIsMobile } from '@hooks/use-mobile';
 import { useNameInPreferredLanguage } from '@hooks/use-preferred-language';
 import { useTimezone } from '@hooks/use-timezone';
 import { RoleIcon } from '@pages/user-maintenance/role-label';
+import { LanguageEnum, UserRoleEnum } from '@schemas/webapi';
 import { authenticationAtom } from '@states/authentication';
 import { Student, SimpleUser } from '@webapi/types';
 
@@ -60,6 +60,7 @@ const useStyles = makeStyles({
   divider: { width: '8px' },
   classStudentWrapper: {
     display: 'flex',
+    alignItems: 'center',
     flexDirection: 'row',
     '@media (max-width: 600px)': {
       flexDirection: 'column',
