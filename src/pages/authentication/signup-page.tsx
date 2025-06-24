@@ -1,10 +1,11 @@
-import { makeStyles } from '@fluentui/react-components';
+import { makeStyles, Subtitle2 } from '@fluentui/react-components';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { Field } from '@components/field';
@@ -24,10 +25,9 @@ import { AuthPage } from './authen-page';
 import { MessageType } from '../../models/system';
 
 export const useStyles = makeStyles({
-  formSpacer: {
-    height: '120px',
+  spacer: {
     '@media (min-width: 601px)': {
-      height: '20px',
+      marginBottom: '20px',
     },
   },
 });
@@ -116,9 +116,13 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
 
   return (
     <AuthPage
-      greetingKey={t('signup.greeting')}
-      onSubmit={hasMissingRequiredField(formValues, schema) ? undefined : handleGoogleLogin}
-      submitLabelKey={t('signup.signUpWithGoogle')}
+      greetingMessage={t('signup.greeting')}
+      spaceEvenly={false}
+      submitButton={{
+        label: t('signup.signUpWithGoogle'),
+        icon: <FcGoogle />,
+        action: hasMissingRequiredField(formValues, schema) ? undefined : handleGoogleLogin,
+      }}
       switchLink={{
         prefix: `${t('signup.alreadyUser')}?`,
         linkText: t('signup.login'),
@@ -146,12 +150,10 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
         name="name"
         render={({ field: { ref, ...rest } }) => (
           <Field label={t('signup.name')} required validationMessage={errors.name?.message}>
-            <Input ref={ref} {...rest} />
+            <Input ref={ref} className={styles.spacer} {...rest} />
           </Field>
         )}
       />
-      {/* Spacer to visually match login form height */}
-      <div className={styles.formSpacer} />
     </AuthPage>
   );
 };

@@ -1,4 +1,5 @@
 import { Button, Divider, Link, tokens } from '@fluentui/react-components';
+import { PersonPasskeyRegular } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAtom } from 'jotai';
@@ -100,9 +101,13 @@ export const LoginPage = (props: LoginPageProps) => {
 
   return (
     <AuthPage
-      greetingKey={t('login.greeting')}
-      onSubmit={hasMissingRequiredField(formValues, schema) ? undefined : handleLogin}
-      submitLabelKey={t('login.signIn')}
+      greetingMessage={t('login.greeting')}
+      spaceEvenly={true}
+      submitButton={{
+        label: t('login.signIn'),
+        icon: <PersonPasskeyRegular/>,
+        action: hasMissingRequiredField(formValues, schema) ? undefined : handleLogin,
+      }}
       switchLink={{
         prefix: `${t('login.newUser')}?`,
         linkText: t('login.register'),

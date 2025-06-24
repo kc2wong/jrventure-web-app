@@ -1,6 +1,6 @@
 import { Card, Body1, Button, tokens, Image, Link, makeStyles } from '@fluentui/react-components';
-import { PersonPasskeyRegular } from '@fluentui/react-icons';
 import React, { ReactNode } from 'react';
+import { ReactElement } from 'react';
 
 const useStyles = makeStyles({
   page: {
@@ -15,6 +15,7 @@ const useStyles = makeStyles({
 
     '@media (max-width: 600px)': {
       height: 'auto',
+      justifyContent: 'flex-start',
       minHeight: '100vh',
       paddingTop: '24px',
       paddingBottom: '24px',
@@ -41,12 +42,16 @@ const useStyles = makeStyles({
 
   formSection: {
     width: '500px',
+    height: '384px',
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'space-between',
     gap: '12px',
 
     '@media (max-width: 600px)': {
       width: '100%',
+      height: 'unset',
+      justifyContent: 'flex-start',
       minHeight: 'auto',
       gap: '12px',
     },
@@ -88,8 +93,13 @@ const useStyles = makeStyles({
     textAlign: 'center',
     padding: '0 12px',
   },
-
 });
+
+type SubmitButtonProps = {
+  label: string;
+  icon: ReactElement;
+  action?: () => void;
+};
 
 type SwitchLinkProps = {
   prefix: string;
@@ -99,39 +109,39 @@ type SwitchLinkProps = {
 };
 
 type AuthPageProps = {
-  greetingKey: string;
-  submitLabelKey: string;
-  onSubmit?: () => void;
+  greetingMessage: string;
+  submitButton: SubmitButtonProps;
   children: ReactNode;
   switchLink?: SwitchLinkProps;
+  spaceEvenly: boolean; // Optional prop to control spacing between elements in formSection
 };
 
 export const AuthPage: React.FC<AuthPageProps> = ({
-  greetingKey,
-  submitLabelKey,
-  onSubmit,
+  greetingMessage,
+  submitButton: { label: submitButtonLabelKey, icon: submitButtonIcon, action: submitAction },
   children,
   switchLink,
+  spaceEvenly,
 }) => {
   const styles = useStyles();
   return (
     <div className={styles.page}>
       <Card className={styles.card}>
-        <div className={styles.formSection}>
+        <div className={styles.formSection} style={spaceEvenly ? {} : { justifyContent: 'unset' }}>
           <Body1>
-            {greetingKey} <b>{import.meta.env.VITE_REACT_APP_NAME}</b>
+            {greetingMessage} <b>{import.meta.env.VITE_REACT_APP_NAME}</b>
           </Body1>
-          <form noValidate onSubmit={onSubmit} style={{ margin: 0 }}>
+          <form noValidate onSubmit={submitAction} style={{ margin: 0 }}>
             {children}
             <div className={styles.buttonRow}>
               <Button
                 appearance="primary"
                 className={styles.signInButton}
-                disabled={onSubmit === undefined}
-                icon={<PersonPasskeyRegular />}
+                disabled={submitAction === undefined}
+                icon={submitButtonIcon}
                 type="submit"
               >
-                {submitLabelKey}
+                {submitButtonLabelKey}
               </Button>
             </div>
           </form>
