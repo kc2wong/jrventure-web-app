@@ -1,13 +1,16 @@
 import { jwtDecode } from 'jwt-decode';
-import { Login } from '../models/login';
-import { entity2Model as menuEntity2Model } from '../mapper/menu-item-mapper';
-import { Error as ErrorModel, User } from '../models/openapi';
+
 import {
   authenticateGoogleUser,
   postUserAuthentications,
-} from '../__generated__/linkedup-web-api-client';
-import { callRepo } from './repo-util';
+  User,
+} from '@webapi/linkedup-web-api-client';
+
 import { createSystemError } from './error-util';
+import { callRepo } from './repo-util';
+import { entity2Model as menuEntity2Model } from '../mapper/menu-item-mapper';
+import { Login } from '../models/login';
+import { Error as ErrorModel } from '../models/openapi';
 import { isError } from '../models/system';
 
 export const authenticateUser = async (
@@ -36,7 +39,7 @@ export const authenticateUser = async (
 export const googleAuthenticate = async (accessToken: string): Promise<Login | ErrorModel> => {
   try {
     const resp = await callRepo(() => {
-      return authenticateGoogleUser({ body: { accessToken } });
+      return authenticateGoogleUser({ body: { type: 'Web', token: accessToken } });
     });
     if (isError(resp)) {
       return resp;

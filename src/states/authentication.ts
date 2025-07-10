@@ -52,7 +52,7 @@ class AuthenticationStateFail extends AuthenticationState {
 const authenticationBaseAtom = atomWithReset<AuthenticationState>(new AuthenticationStateInitial());
 
 type SignInPayload = { email: string; password: string };
-type GoogleAuthenticatePayload = { idToken: string };
+type GoogleAuthenticatePayload = { accessToken: string };
 type AuthenticationPayload = {
   signIn: SignInPayload;
   googleAuthenticate: GoogleAuthenticatePayload;
@@ -106,7 +106,7 @@ export const authenticationAtom = atom<
 
     if (action.googleAuthenticate) {
       set(authenticationBaseAtom, new AuthenticationStateProgress(current));
-      const result = await googleAuthenticateRepo(action.googleAuthenticate.idToken);
+      const result = await googleAuthenticateRepo(action.googleAuthenticate.accessToken);
       await handleAuthResult(result, get(authenticationBaseAtom), set);
     }
 

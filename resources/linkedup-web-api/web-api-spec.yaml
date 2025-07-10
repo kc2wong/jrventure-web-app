@@ -23,7 +23,7 @@ tags:
 servers:
   - url: http://localhost:8080
     description: Local development server
-  - url: https://9vgxkkxc65.execute-api.eu-west-2.amazonaws.com/prod
+  - url: https://ijy33r6ikl.execute-api.eu-west-2.amazonaws.com/prod
     description: Demo server
 
 paths:
@@ -465,9 +465,16 @@ paths:
             schema:
               type: object
               required:
-                - accessToken
+                - type
+                - token
               properties:
-                accessToken:
+                type:
+                  type: string
+                  enum:
+                    - Web
+                    - Android
+                    - iOS
+                token:
                   type: string
                   description: Access token returned from Google
       responses:
@@ -1008,21 +1015,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - objectKey
-                  - putUrl
-                  - getUrl
-                  - deleteUrl
-                properties:
-                  objectKey:
-                    type: string
-                  putUrl:
-                    type: string
-                  getUrl:
-                    type: string
-                  deleteUrl:
-                    type: string
+                $ref: "#/components/schemas/FileUpload"
         "500":
           description: Unexpected error
           content:
@@ -1175,7 +1168,7 @@ components:
           type: string
           description: id of class
         studentNumber:
-          type: number
+          type: integer
         name:
           type: object
           additionalProperties: true
@@ -1595,4 +1588,20 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Achievement'
-        - $ref: '#/components/schemas/Pagination'              
+        - $ref: '#/components/schemas/Pagination'
+    FileUpload:
+      type: object
+      required:
+        - objectKey
+        - putUrl
+        - getUrl
+        - deleteUrl
+      properties:
+        objectKey:
+          type: string
+        putUrl:
+          type: string
+        getUrl:
+          type: string
+        deleteUrl:
+          type: string

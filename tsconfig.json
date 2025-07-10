@@ -26,6 +26,7 @@
       "@providers/*": ["providers/*"],
       "@repos/*": ["repos/*"],
       "@schemas/*": ["schemas/*"],
+      "@services/*": ["services/*"],
       "@states/*": ["states/*"],
       "@t/*": ["types/*"],
       "@utils/*": ["utils/*"]

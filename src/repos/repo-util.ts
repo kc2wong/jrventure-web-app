@@ -4,7 +4,7 @@ import type { _Error as Error } from '@webapi/';
 import { delay } from '@utils/date-util';
 
 client.setConfig({
-  baseURL: import.meta.env.REACT_APP_WEB_API_URL,
+  baseURL: import.meta.env.VITE_REACT_APP_WEB_API_URL,
   withCredentials: true,
 });
 

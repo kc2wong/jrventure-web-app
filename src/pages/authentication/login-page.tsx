@@ -42,7 +42,7 @@ const GoogleSignInButton = () => {
 
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      action({ googleAuthenticate: { idToken: tokenResponse.access_token } });
+      action({ googleAuthenticate: { accessToken: tokenResponse.access_token } });
     },
     onError: (errorResponse) => {
       dispatchMessage({
