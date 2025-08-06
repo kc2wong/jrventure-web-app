@@ -1,0 +1,36 @@
+{
+  "version": "41.0.0",
+  "files": {
+    "d41c8e6342cd078b5ea5aec11522bdb605eae00f4bb98a3fb0b44c827e9b5ca9": {
+      "displayName": "LinkedupWebAppCloudFrontStack/Custom::CrossRegionExportReaderCustomResourceProvider Code",
+      "source": {
+        "path": "asset.d41c8e6342cd078b5ea5aec11522bdb605eae00f4bb98a3fb0b44c827e9b5ca9",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "390870940440-us-east-1": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-us-east-1",
+          "objectKey": "d41c8e6342cd078b5ea5aec11522bdb605eae00f4bb98a3fb0b44c827e9b5ca9.zip",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-us-east-1"
+        }
+      }
+    },
+    "081fc83e4b4c0a871bcb6fe975ac8922424cc0109bad730a608ef64e1cba3733": {
+      "displayName": "LinkedupWebAppCloudFrontStack Template",
+      "source": {
+        "path": "LinkedupWebAppCloudFrontStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "390870940440-us-east-1": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-us-east-1",
+          "objectKey": "081fc83e4b4c0a871bcb6fe975ac8922424cc0109bad730a608ef64e1cba3733.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

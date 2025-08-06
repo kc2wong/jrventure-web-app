@@ -1,0 +1,236 @@
+{
+ "Resources": {
+  "LinkedUpWebAppNoCachePolicy8895DE76": {
+   "Type": "AWS::CloudFront::CachePolicy",
+   "Properties": {
+    "CachePolicyConfig": {
+     "Comment": "No caching for index.html and root",
+     "DefaultTTL": 0,
+     "MaxTTL": 0,
+     "MinTTL": 0,
+     "Name": "LinkedUpWebAppNoCachePolicy",
+     "ParametersInCacheKeyAndForwardedToOrigin": {
+      "CookiesConfig": {
+       "CookieBehavior": "none"
+      },
+      "EnableAcceptEncodingBrotli": false,
+      "EnableAcceptEncodingGzip": false,
+      "HeadersConfig": {
+       "HeaderBehavior": "none"
+      },
+      "QueryStringsConfig": {
+       "QueryStringBehavior": "none"
+      }
+     }
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LinkedupWebAppCloudFrontStack/LinkedUpWebAppNoCachePolicy/Resource"
+   }
+  },
+  "LinkedUpWebAppDistribution97CF9085": {
+   "Type": "AWS::CloudFront::Distribution",
+   "Properties": {
+    "DistributionConfig": {
+     "Aliases": [
+      "www.kelvin-wong.cloud"
+     ],
+     "CacheBehaviors": [
+      {
+       "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+       "Compress": true,
+       "PathPattern": "assets/*",
+       "TargetOriginId": "LinkedupWebAppCloudFrontStackLinkedUpWebAppDistributionOrigin1EA3D17C3",
+       "ViewerProtocolPolicy": "redirect-to-https"
+      }
+     ],
+     "DefaultCacheBehavior": {
+      "CachePolicyId": {
+       "Ref": "LinkedUpWebAppNoCachePolicy8895DE76"
+      },
+      "Compress": true,
+      "TargetOriginId": "LinkedupWebAppCloudFrontStackLinkedUpWebAppDistributionOrigin1EA3D17C3",
+      "ViewerProtocolPolicy": "redirect-to-https"
+     },
+     "Enabled": true,
+     "HttpVersion": "http2",
+     "IPV6Enabled": true,
+     "Origins": [
+      {
+       "CustomOriginConfig": {
+        "OriginProtocolPolicy": "http-only",
+        "OriginSSLProtocols": [
+         "TLSv1.2"
+        ]
+       },
+       "DomainName": {
+        "Fn::Select": [
+         2,
+         {
+          "Fn::Split": [
+           "/",
+           {
+            "Fn::GetAtt": [
+             "ExportsReader8B249524",
+             "/cdk/exports/LinkedupWebAppCloudFrontStack/LinkedupWebAppBucketStackeuwest2FnGetAttLinkedupWebAppBucket30D28B76WebsiteURLEEE44F06"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "Id": "LinkedupWebAppCloudFrontStackLinkedUpWebAppDistributionOrigin1EA3D17C3"
+      }
+     ],
+     "ViewerCertificate": {
+      "AcmCertificateArn": {
+       "Fn::ImportValue": "LinkedupWebAppCertificateStack:ExportsOutputRefLinkedupWebAppCertDAC4266F05983C5A"
+      },
+      "MinimumProtocolVersion": "TLSv1.2_2021",
+      "SslSupportMethod": "sni-only"
+     }
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "LinkedupWebAppCloudFrontStack/LinkedUpWebAppDistribution/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/52QMU/DMBCFf0s9osSkmaAjZWFBFbBFFXLtS3Ot7UP2JQFZ+e8oSqKUlcl6J7/73r1Sbh9LWWxUH3NtrrnFk0zvrPQ1U3381JZaUwfyLNNe6QYOZFH/VEnoVb0qB2In7kQmNDkHnmfl0H+wnYWBWrWW14FT34sYjtm+9jeA7BkjBzy1jOSrtJifoFEdUhC7JCjgGf28q0PoIRwCMWmy0w6xEwEMBtCcM+UN81ccI66UiZ0JZQyOIGUXQFxCk1PoxwOXiYbAWKNWDLM9jf41WTV+S+P4v6H+lPtiJsxwnEq6LWYYMk8G5CXed2Uhtw+y2FwiYh5az+hAvk3vLx4LK8/lAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "LinkedupWebAppCloudFrontStack/CDKMetadata/Default"
+   }
+  },
+  "ExportsReader8B249524": {
+   "Type": "Custom::CrossRegionExportReader",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomCrossRegionExportReaderCustomResourceProviderHandler46647B68",
+      "Arn"
+     ]
+    },
+    "ReaderProps": {
+     "region": "us-east-1",
+     "prefix": "LinkedupWebAppCloudFrontStack",
+     "imports": {
+      "/cdk/exports/LinkedupWebAppCloudFrontStack/LinkedupWebAppBucketStackeuwest2FnGetAttLinkedupWebAppBucket30D28B76WebsiteURLEEE44F06": "{{resolve:ssm:/cdk/exports/LinkedupWebAppCloudFrontStack/LinkedupWebAppBucketStackeuwest2FnGetAttLinkedupWebAppBucket30D28B76WebsiteURLEEE44F06}}"
+     }
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "LinkedupWebAppCloudFrontStack/ExportsReader/Resource/Default"
+   }
+  },
+  "CustomCrossRegionExportReaderCustomResourceProviderRole10531BBD": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyName": "Inline",
+      "PolicyDocument": {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Resource": "arn:aws:ssm:us-east-1:390870940440:parameter/cdk/exports/LinkedupWebAppCloudFrontStack/*",
+         "Action": [
+          "ssm:AddTagsToResource",
+          "ssm:RemoveTagsFromResource",
+          "ssm:GetParameters"
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "LinkedupWebAppCloudFrontStack/Custom::CrossRegionExportReaderCustomResourceProvider/Role"
+   }
+  },
+  "CustomCrossRegionExportReaderCustomResourceProviderHandler46647B68": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-390870940440-us-east-1",
+     "S3Key": "d41c8e6342cd078b5ea5aec11522bdb605eae00f4bb98a3fb0b44c827e9b5ca9.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "__entrypoint__.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomCrossRegionExportReaderCustomResourceProviderRole10531BBD",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x"
+   },
+   "DependsOn": [
+    "CustomCrossRegionExportReaderCustomResourceProviderRole10531BBD"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "LinkedupWebAppCloudFrontStack/Custom::CrossRegionExportReaderCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.d41c8e6342cd078b5ea5aec11522bdb605eae00f4bb98a3fb0b44c827e9b5ca9",
+    "aws:asset:property": "Code"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,81 @@
+{
+  "version": "41.0.0",
+  "files": {
+    "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6": {
+      "displayName": "LinkedupWebAppBucketStack/Custom::S3AutoDeleteObjectsCustomResourceProvider Code",
+      "source": {
+        "path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "390870940440-eu-west-2": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-eu-west-2",
+          "objectKey": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+          "region": "eu-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-eu-west-2"
+        }
+      }
+    },
+    "a912487bb1b34f5e5f6f07325f76f44d9faf30d9054d221303f1f3220d1d610e": {
+      "displayName": "JrventureWebAppDeployment/AwsCliLayer/Code",
+      "source": {
+        "path": "asset.a912487bb1b34f5e5f6f07325f76f44d9faf30d9054d221303f1f3220d1d610e.zip",
+        "packaging": "file"
+      },
+      "destinations": {
+        "390870940440-eu-west-2": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-eu-west-2",
+          "objectKey": "a912487bb1b34f5e5f6f07325f76f44d9faf30d9054d221303f1f3220d1d610e.zip",
+          "region": "eu-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-eu-west-2"
+        }
+      }
+    },
+    "9a1fcb4a7ecba81ad70e9d3fb241f6794497da945dae5f25924e4dd002b65f2d": {
+      "displayName": "Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Code",
+      "source": {
+        "path": "asset.9a1fcb4a7ecba81ad70e9d3fb241f6794497da945dae5f25924e4dd002b65f2d",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "390870940440-eu-west-2": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-eu-west-2",
+          "objectKey": "9a1fcb4a7ecba81ad70e9d3fb241f6794497da945dae5f25924e4dd002b65f2d.zip",
+          "region": "eu-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-eu-west-2"
+        }
+      }
+    },
+    "45040fbdae0e9277b24569361d4e756c850ed33f3f0d3817cd4ae216161d1503": {
+      "displayName": "JrventureWebAppDeployment/Asset1",
+      "source": {
+        "path": "asset.45040fbdae0e9277b24569361d4e756c850ed33f3f0d3817cd4ae216161d1503",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "390870940440-eu-west-2": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-eu-west-2",
+          "objectKey": "45040fbdae0e9277b24569361d4e756c850ed33f3f0d3817cd4ae216161d1503.zip",
+          "region": "eu-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-eu-west-2"
+        }
+      }
+    },
+    "376dc7aa222cccf38b5ec4e86c87f44a356b286ccd5f0e31298731dc5a43a392": {
+      "displayName": "LinkedupWebAppBucketStack Template",
+      "source": {
+        "path": "LinkedupWebAppBucketStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "390870940440-eu-west-2": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-eu-west-2",
+          "objectKey": "376dc7aa222cccf38b5ec4e86c87f44a356b286ccd5f0e31298731dc5a43a392.json",
+          "region": "eu-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-eu-west-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

@@ -1,0 +1,73 @@
+{
+ "Resources": {
+  "LinkedupWebAppCertDAC4266F": {
+   "Type": "AWS::CertificateManager::Certificate",
+   "Properties": {
+    "DomainName": "www.kelvin-wong.cloud",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "LinkedupWebAppCertificateStack/LinkedupWebAppCert"
+     }
+    ],
+    "ValidationMethod": "DNS"
+   },
+   "Metadata": {
+    "aws:cdk:path": "LinkedupWebAppCertificateStack/LinkedupWebAppCert/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/03LsQrCMBCA4WdpRknONJO6dneoo4icSSrXNldIYjuEvLugg04/fPAbaI8GdINbUtZNaqYHlEtGO0nc0t36mGkgi9kHZHz6CKX72bUItwQkPmPw4iR2QooVZ3KYaeEP1JvsBv57apW8OA9j2q9GQ3sA3YyJSMUXZwoe+m/fuU0KF5oAAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "LinkedupWebAppCertificateStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ExportsOutputRefLinkedupWebAppCertDAC4266F05983C5A": {
+   "Value": {
+    "Ref": "LinkedupWebAppCertDAC4266F"
+   },
+   "Export": {
+    "Name": "LinkedupWebAppCertificateStack:ExportsOutputRefLinkedupWebAppCertDAC4266F05983C5A"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

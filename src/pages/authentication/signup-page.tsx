@@ -60,6 +60,22 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
 
   const formValues = watch();
 
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      action({
+        accessToken: tokenResponse.access_token,
+        studentId: formValues.studentId,
+        studentName: formValues.name,
+      });
+    },
+    onError: (errorResponse) => {
+      dispatchMessage({
+        type: MessageType.Error,
+        text: errorResponse.error_description ?? errorResponse.error ?? 'Unknown Error',
+      });
+    },
+  });
+
   useEffect(() => {
     if (state.eventTime <= baselineTimestamp.current) {
       return;
@@ -97,21 +113,7 @@ export const SignupPage = ({ onNavigateToLogin }: SignupPageProps) => {
   }, [state]);
 
   const handleGoogleLogin = handleSubmit(() => {
-    useGoogleLogin({
-      onSuccess: (tokenResponse) => {
-        action({
-          accessToken: tokenResponse.access_token,
-          studentId: formValues.studentId,
-          studentName: formValues.name,
-        });
-      },
-      onError: (errorResponse) => {
-        dispatchMessage({
-          type: MessageType.Error,
-          text: errorResponse.error_description ?? errorResponse.error ?? 'Unknown Error',
-        });
-      },
-    });
+    login();
   });
 
   return (

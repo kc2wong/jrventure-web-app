@@ -1,0 +1,21 @@
+{
+  "version": "41.0.0",
+  "files": {
+    "f66988237b24d94bbe6e22bc07a1d84e3fd7b79b6007c9496e0ba5c92f2e5f1e": {
+      "displayName": "LinkedupWebAppCertificateStack Template",
+      "source": {
+        "path": "LinkedupWebAppCertificateStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "390870940440-us-east-1": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-us-east-1",
+          "objectKey": "f66988237b24d94bbe6e22bc07a1d84e3fd7b79b6007c9496e0ba5c92f2e5f1e.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

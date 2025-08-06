@@ -1,0 +1,36 @@
+{
+  "version": "41.0.0",
+  "files": {
+    "d41c8e6342cd078b5ea5aec11522bdb605eae00f4bb98a3fb0b44c827e9b5ca9": {
+      "displayName": "CloudFrontStack/Custom::CrossRegionExportReaderCustomResourceProvider Code",
+      "source": {
+        "path": "asset.d41c8e6342cd078b5ea5aec11522bdb605eae00f4bb98a3fb0b44c827e9b5ca9",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "390870940440-us-east-1": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-us-east-1",
+          "objectKey": "d41c8e6342cd078b5ea5aec11522bdb605eae00f4bb98a3fb0b44c827e9b5ca9.zip",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-us-east-1"
+        }
+      }
+    },
+    "e23c5e5287959a184c9ba239d3368ae512babc2e443ee1325b7301d1498f0670": {
+      "displayName": "CloudFrontStack Template",
+      "source": {
+        "path": "CloudFrontStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "390870940440-us-east-1": {
+          "bucketName": "cdk-hnb659fds-assets-390870940440-us-east-1",
+          "objectKey": "e23c5e5287959a184c9ba239d3368ae512babc2e443ee1325b7301d1498f0670.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-file-publishing-role-390870940440-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

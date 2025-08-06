@@ -1,60 +1,60 @@
 {
   "version": "41.0.0",
   "artifacts": {
-    "LinkedupWebAppStack.assets": {
+    "LinkedupWebAppBucketStack.assets": {
       "type": "cdk:asset-manifest",
       "properties": {
-        "file": "LinkedupWebAppStack.assets.json",
+        "file": "LinkedupWebAppBucketStack.assets.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
       }
     },
-    "LinkedupWebAppStack": {
+    "LinkedupWebAppBucketStack": {
       "type": "aws:cloudformation:stack",
-      "environment": "aws://unknown-account/unknown-region",
+      "environment": "aws://390870940440/eu-west-2",
       "properties": {
-        "templateFile": "LinkedupWebAppStack.template.json",
+        "templateFile": "LinkedupWebAppBucketStack.template.json",
         "terminationProtection": false,
         "validateOnSynth": false,
-        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
-        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/3d07483deba5245a5adbcdb20599569285859f4c21ebf852bf97219cea0d0cc8.json",
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-deploy-role-390870940440-eu-west-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-cfn-exec-role-390870940440-eu-west-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-390870940440-eu-west-2/376dc7aa222cccf38b5ec4e86c87f44a356b286ccd5f0e31298731dc5a43a392.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
-          "LinkedupWebAppStack.assets"
+          "LinkedupWebAppBucketStack.assets"
         ],
         "lookupRole": {
-          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "arn": "arn:${AWS::Partition}:iam::390870940440:role/cdk-hnb659fds-lookup-role-390870940440-eu-west-2",
           "requiresBootstrapStackVersion": 8,
           "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
         }
       },
       "dependencies": [
-        "LinkedupWebAppStack.assets"
+        "LinkedupWebAppBucketStack.assets"
       ],
       "metadata": {
-        "/LinkedupWebAppStack/LinkedupWebAppBucket": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppBucket": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
               "bucketName": "*",
+              "publicReadAccess": true,
+              "blockPublicAccess": "*",
               "removalPolicy": "destroy",
               "autoDeleteObjects": true,
               "websiteIndexDocument": "*",
-              "websiteErrorDocument": "*",
-              "publicReadAccess": true,
-              "blockPublicAccess": "*"
+              "websiteErrorDocument": "*"
             }
           }
         ],
-        "/LinkedupWebAppStack/LinkedupWebAppBucket/Resource": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppBucket/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "LinkedupWebAppBucket30D28B76"
+            "data": "JrventureWebAppBucket6F36E03F"
           }
         ],
-        "/LinkedupWebAppStack/LinkedupWebAppBucket/Policy": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppBucket/Policy": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -62,99 +62,61 @@
             }
           }
         ],
-        "/LinkedupWebAppStack/LinkedupWebAppBucket/Policy/Resource": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppBucket/Policy/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "LinkedupWebAppBucketPolicy8F82975C"
+            "data": "JrventureWebAppBucketPolicy31F79585"
           }
         ],
-        "/LinkedupWebAppStack/LinkedupWebAppBucket/AutoDeleteObjectsCustomResource": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppBucket/AutoDeleteObjectsCustomResource": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
           }
         ],
-        "/LinkedupWebAppStack/LinkedupWebAppBucket/AutoDeleteObjectsCustomResource/Default": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppBucket/AutoDeleteObjectsCustomResource/Default": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "LinkedupWebAppBucketAutoDeleteObjectsCustomResource8F6099F7"
+            "data": "JrventureWebAppBucketAutoDeleteObjectsCustomResource35AA5A64"
           }
         ],
-        "/LinkedupWebAppStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+        "/LinkedupWebAppBucketStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
           {
             "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
             "data": true
           }
         ],
-        "/LinkedupWebAppStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+        "/LinkedupWebAppBucketStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
           }
         ],
-        "/LinkedupWebAppStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+        "/LinkedupWebAppBucketStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
           }
         ],
-        "/LinkedupWebAppStack/LinkedupWebAppMediaBucket": [
-          {
-            "type": "aws:cdk:analytics:construct",
-            "data": {
-              "bucketName": "*",
-              "removalPolicy": "destroy",
-              "autoDeleteObjects": true,
-              "publicReadAccess": true,
-              "blockPublicAccess": "*"
-            }
-          }
-        ],
-        "/LinkedupWebAppStack/LinkedupWebAppMediaBucket/Resource": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppBucketNameOutput": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "LinkedupWebAppMediaBucket0F228ABC"
+            "data": "JrventureWebAppBucketNameOutput"
           }
         ],
-        "/LinkedupWebAppStack/LinkedupWebAppMediaBucket/Policy": [
-          {
-            "type": "aws:cdk:analytics:construct",
-            "data": {
-              "bucket": "*"
-            }
-          }
-        ],
-        "/LinkedupWebAppStack/LinkedupWebAppMediaBucket/Policy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "LinkedupWebAppMediaBucketPolicyFD771293"
-          }
-        ],
-        "/LinkedupWebAppStack/LinkedupWebAppMediaBucket/AutoDeleteObjectsCustomResource": [
-          {
-            "type": "aws:cdk:analytics:construct",
-            "data": "*"
-          }
-        ],
-        "/LinkedupWebAppStack/LinkedupWebAppMediaBucket/AutoDeleteObjectsCustomResource/Default": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "LinkedupWebAppMediaBucketAutoDeleteObjectsCustomResource525A576B"
-          }
-        ],
-        "/LinkedupWebAppStack/DeployLinkedupWebAppIndexHtml/AwsCliLayer": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppDeployment/AwsCliLayer": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {}
           }
         ],
-        "/LinkedupWebAppStack/DeployLinkedupWebAppIndexHtml/AwsCliLayer/Resource": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppDeployment/AwsCliLayer/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "DeployLinkedupWebAppIndexHtmlAwsCliLayerE5EE6B22"
+            "data": "JrventureWebAppDeploymentAwsCliLayerFB897F65"
           }
         ],
-        "/LinkedupWebAppStack/DeployLinkedupWebAppIndexHtml/CustomResourceHandler": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppDeployment/CustomResourceHandler": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -196,19 +158,19 @@
             }
           }
         ],
-        "/LinkedupWebAppStack/DeployLinkedupWebAppIndexHtml/CustomResource": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppDeployment/CustomResource": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
           }
         ],
-        "/LinkedupWebAppStack/DeployLinkedupWebAppIndexHtml/CustomResource/Default": [
+        "/LinkedupWebAppBucketStack/JrventureWebAppDeployment/CustomResource/Default": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "DeployLinkedupWebAppIndexHtmlCustomResource0CA54423"
+            "data": "JrventureWebAppDeploymentCustomResourceB167C116"
           }
         ],
-        "/LinkedupWebAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C": [
+        "/LinkedupWebAppBucketStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -253,17 +215,9 @@
           {
             "type": "aws:cdk:is-custom-resource-handler-runtime-family",
             "data": 2
-          },
-          {
-            "type": "aws:cdk:is-custom-resource-handler-singleton",
-            "data": true
-          },
-          {
-            "type": "aws:cdk:is-custom-resource-handler-runtime-family",
-            "data": 2
           }
         ],
-        "/LinkedupWebAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole": [
+        "/LinkedupWebAppBucketStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -309,37 +263,21 @@
                 {}
               ]
             }
-          },
-          {
-            "type": "aws:cdk:analytics:method",
-            "data": {
-              "addToPrincipalPolicy": [
-                {}
-              ]
-            }
-          },
-          {
-            "type": "aws:cdk:analytics:method",
-            "data": {
-              "addToPrincipalPolicy": [
-                {}
-              ]
-            }
           }
         ],
-        "/LinkedupWebAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/ImportServiceRole": [
+        "/LinkedupWebAppBucketStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/ImportServiceRole": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
           }
         ],
-        "/LinkedupWebAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource": [
+        "/LinkedupWebAppBucketStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
           }
         ],
-        "/LinkedupWebAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy": [
+        "/LinkedupWebAppBucketStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
@@ -375,134 +313,40 @@
                 {}
               ]
             }
-          },
-          {
-            "type": "aws:cdk:analytics:method",
-            "data": {
-              "addStatements": [
-                {}
-              ]
-            }
-          },
-          {
-            "type": "aws:cdk:analytics:method",
-            "data": {
-              "addStatements": [
-                {}
-              ]
-            }
           }
         ],
-        "/LinkedupWebAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource": [
+        "/LinkedupWebAppBucketStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF"
           }
         ],
-        "/LinkedupWebAppStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource": [
+        "/LinkedupWebAppBucketStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536"
           }
         ],
-        "/LinkedupWebAppStack/DeployLinkedupWebApp/AwsCliLayer": [
-          {
-            "type": "aws:cdk:analytics:construct",
-            "data": {}
-          }
-        ],
-        "/LinkedupWebAppStack/DeployLinkedupWebApp/AwsCliLayer/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "DeployLinkedupWebAppAwsCliLayerCF95E1EF"
-          }
-        ],
-        "/LinkedupWebAppStack/DeployLinkedupWebApp/CustomResourceHandler": [
-          {
-            "type": "aws:cdk:analytics:construct",
-            "data": {
-              "uuid": "*",
-              "layers": [
-                "*"
-              ],
-              "environment": "*",
-              "lambdaPurpose": "*",
-              "timeout": "*",
-              "role": "*",
-              "memorySize": "*",
-              "ephemeralStorageSize": "*",
-              "vpc": "*",
-              "vpcSubnets": "*",
-              "filesystem": "*",
-              "logGroup": "*",
-              "code": "*",
-              "handler": "*",
-              "runtime": "*"
-            }
-          },
-          {
-            "type": "aws:cdk:analytics:method",
-            "data": {
-              "addMetadata": [
-                "*",
-                true
-              ]
-            }
-          },
-          {
-            "type": "aws:cdk:analytics:method",
-            "data": {
-              "addMetadata": [
-                "*",
-                "*"
-              ]
-            }
-          }
-        ],
-        "/LinkedupWebAppStack/DeployLinkedupWebApp/CustomResource": [
-          {
-            "type": "aws:cdk:analytics:construct",
-            "data": "*"
-          }
-        ],
-        "/LinkedupWebAppStack/DeployLinkedupWebApp/CustomResource/Default": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "DeployLinkedupWebAppCustomResourceF5DD15CF"
-          }
-        ],
-        "/LinkedupWebAppStack/LinkedupWebAppUrl": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "LinkedupWebAppUrl"
-          }
-        ],
-        "/LinkedupWebAppStack/CDKMetadata/Default": [
+        "/LinkedupWebAppBucketStack/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CDKMetadata"
           }
         ],
-        "/LinkedupWebAppStack/CDKMetadata/Condition": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadataAvailable"
-          }
-        ],
-        "/LinkedupWebAppStack/BootstrapVersion": [
+        "/LinkedupWebAppBucketStack/BootstrapVersion": [
           {
             "type": "aws:cdk:logicalId",
             "data": "BootstrapVersion"
           }
         ],
-        "/LinkedupWebAppStack/CheckBootstrapVersion": [
+        "/LinkedupWebAppBucketStack/CheckBootstrapVersion": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CheckBootstrapVersion"
           }
         ]
       },
-      "displayName": "LinkedupWebAppStack"
+      "displayName": "LinkedupWebAppBucketStack"
     },
     "Tree": {
       "type": "cdk:tree",
