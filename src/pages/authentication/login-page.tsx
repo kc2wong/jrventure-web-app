@@ -1,6 +1,7 @@
 import { Button, Divider, Link, tokens } from '@fluentui/react-components';
 import { PersonPasskeyRegular } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { MessageType } from '@models/system';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAtom } from 'jotai';
 import { useContext, useEffect } from 'react';
@@ -23,9 +24,9 @@ import { zodEmail, zodString } from '@t/zod';
 import { hasMissingRequiredField } from '@utils/form-util';
 import { logger } from '@utils/logging-util';
 import { constructErrorMessage } from '@utils/string-util';
+import { resetRootSpan } from '@utils/tracing';
 
 import { AuthPage } from './authen-page';
-import { MessageType } from '../../models/system';
 
 const schema = z.object({
   email: zodEmail(),
@@ -73,6 +74,10 @@ export const LoginPage = (props: LoginPageProps) => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
+    resetRootSpan();
+  }, []);
+
+  useEffect(() => {
     if (authenticationState instanceof AuthenticationStateProgress) {
       showSpinner();
     } else if (
@@ -105,7 +110,7 @@ export const LoginPage = (props: LoginPageProps) => {
       spaceEvenly={true}
       submitButton={{
         label: t('login.signIn'),
-        icon: <PersonPasskeyRegular/>,
+        icon: <PersonPasskeyRegular />,
         action: hasMissingRequiredField(formValues, schema) ? undefined : handleLogin,
       }}
       switchLink={{

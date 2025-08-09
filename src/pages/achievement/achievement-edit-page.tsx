@@ -1,5 +1,3 @@
-import { z } from 'zod';
-import { AchievementAttachmentCreation, AchievementCreation } from '../../models/openapi';
 import {
   Body1,
   Button,
@@ -15,10 +13,6 @@ import {
   Skeleton,
   SkeletonItem,
 } from '@fluentui/react-components';
-import { EmptyCell, Form, Root, Row } from '@components/container';
-import { Field } from '@components/field';
-import { Input } from '@components/input';
-import { Dropdown } from '@components/drop-down';
 import {
   AddRegular,
   AppsListDetailFilled,
@@ -32,20 +26,27 @@ import {
   SearchRegular,
 } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
-import { zodInt, zodOptionalString, zodString } from '../../types/zod';
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useMessage } from '@hooks/use-message';
 import { useAtom, useAtomValue } from 'jotai';
+import { useEffect, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+import { z } from 'zod';
+
+import { EmptyCell, Form, Root, Row } from '@components/container';
+import { Dropdown } from '@components/drop-down';
+import { DropzoneBox } from '@components/drop-zone';
+import { Field } from '@components/field';
+import { ImagePreview } from '@components/image-preview';
+import { Input } from '@components/input';
+import { ReviewPanel } from '@components/review-panel';
+import { useBreadcrumb } from '@hooks/use-breadcrumb';
 import { useDialog } from '@hooks/use-dialog';
 import { useFormDirtiness } from '@hooks/use-form-dirtiness';
-import { constructErrorMessage, constructMessage } from '@utils/string-util';
-import { useLocation } from 'react-router-dom';
-import { hasMissingRequiredField } from '@utils/form-util';
-import { Message, MessageType } from '../../models/system';
-import { useBreadcrumb } from '@hooks/use-breadcrumb';
-import { authenticationAtom } from '@states/authentication';
+import { useMessage } from '@hooks/use-message';
+import { AchievementAttachmentCreation, AchievementCreation } from '@models/openapi';
+import { Message, MessageType } from '@models/system';
+import { deleteMedia, uploadMedia } from '@repos/media-repo';
 import {
   achievementDetailAtom,
   AchievementDetailStateFail,
@@ -54,14 +55,16 @@ import {
   AchievementDetailStateSearchStudentSuccess,
   AchievementDetailStateSearchSuccess,
   AchievementDetailStateUpdateSuccess,
-} from '../../states/achievement-detail';
-import { getFieldValueInPreferredLanguage } from '../../utils/language-util';
+} from '@states/achievement-detail';
+import { authenticationAtom } from '@states/authentication';
+import { hasMissingRequiredField } from '@utils/form-util';
+import { getFieldValueInPreferredLanguage } from '@utils/language-util';
+import { logger } from '@utils/logging-util';
+import { constructErrorMessage, constructMessage } from '@utils/string-util';
+import { AchievementDetail } from '@webapi/';
+
 import { AchievementStatusIcon } from './achievement-status-label';
-import { ReviewPanel } from '../../components/review-panel';
-import { DropzoneBox } from '../../components/drop-zone';
-import { deleteMedia, uploadMedia } from '../../repos/media-repo';
-import { AchievementDetail } from '../../__generated__/linkedup-web-api-client';
-import { ImagePreview } from 'components/image-preview';
+import { zodInt, zodOptionalString, zodString } from '../../types/zod';
 
 const attachmentSchema = z.object({
   fileName: z.string(),
@@ -173,6 +176,7 @@ export const AchievementEditPage: React.FC<
   useEffect(() => {
     const student = authentication.selectedStudent;
     if (student) {
+      logger.info(`Start searching student ${student.id}`);
       action({ searchStudent: { student } });
     }
   }, [authentication]);

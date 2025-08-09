@@ -1,4 +1,7 @@
-import { TraceManager, traceManager } from './trace-manager';
+import { trace, context } from '@opentelemetry/api';
+import pino from 'pino';
+
+import { runWithDefaultSpan } from './tracing';
 
 interface Logger {
   info: (message: string) => void;
@@ -7,26 +10,22 @@ interface Logger {
   error: (message: string) => void;
 }
 
-const logMessage = (tm: TraceManager, type: string, message: string) => {
-  const trace = tm.getCurrentTrace();
-  /* eslint-disable no-console */
-  console.log(`${type} [${trace.traceId},${trace.spanId}] ${message}`);
-};
-
-// Console-based logger
-const createLoggerConsole = (traceManager: TraceManager): Logger => ({
-  info: (message: string) => {
-    logMessage(traceManager, 'INFO ', message);
-  },
-  debug: (message: string) => {
-    logMessage(traceManager, 'DEBUG', message);
-  },
-  warn: (message: string) => {
-    logMessage(traceManager, 'WARN ', message);
-  },
-  error: (message: string) => {
-    logMessage(traceManager, 'ERROR', message);
+const pinoLogger = pino({
+  browser: {
+    asObject: true, // logs as objects instead of strings
   },
 });
 
-export const logger: Logger = createLoggerConsole(traceManager);
+// Utility to format messages with traceId if available
+const formatMessage = (message: string): string => {
+  const span = trace.getSpan(context.active());
+  const traceId = span?.spanContext().traceId;
+  return traceId ? `[traceId=${traceId}] ${message}` : message;
+};
+
+export const logger: Logger = {
+  info: (message: string) => runWithDefaultSpan(() => pinoLogger.info(formatMessage(message))),
+  debug: (message: string) => runWithDefaultSpan(() => pinoLogger.debug(formatMessage(message))),
+  warn: (message: string) => runWithDefaultSpan(() => pinoLogger.warn(formatMessage(message))),
+  error: (message: string) => runWithDefaultSpan(() => pinoLogger.error(formatMessage(message))),
+};
