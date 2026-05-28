@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "handy-fluentui": {
+      "signature": "a8c210e8796cddabc6eae52bc88fc601",
+      "file": true
+    }
+  }
+}

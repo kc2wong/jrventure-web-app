@@ -1,0 +1,7 @@
+<svg width="48px" height="48px" viewBox="0 0 1.44 1.44" fill="none" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <!-- Solid Orange Background -->
+  <rect width="1.44" height="1.44" rx="0.36" fill="#ff7f00" />
+  
+  <!-- Icon Path with White Stroke -->
+  <path d="m1.26 0.6 -0.54 -0.3 -0.54 0.3 0.18 0.1M1.26 0.6l-0.18 0.1M1.26 0.6c0.037 0.018 0.06 0.056 0.06 0.097V1.02M0.36 0.7 0.72 0.9l0.36 -0.2m-0.72 0v0.36L0.72 1.26l0.36 -0.2v-0.36" stroke="#ffffff" stroke-width="0.12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
