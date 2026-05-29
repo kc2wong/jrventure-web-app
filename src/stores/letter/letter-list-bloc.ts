@@ -1,4 +1,5 @@
-import { findLetter } from '@openapi/sdk.gen';
+import { getLetter } from '@openapi/letter';
+import { toApiError } from '@store/api-error';
 import { atom } from 'jotai';
 
 import type { LetterListAction, LetterListState } from './letter-types';
@@ -22,27 +23,25 @@ export const letterListActionAtom = atom(
       const filter = action.filter ?? state.filter;
       const pagination = action.pagination;
       set(letterListStateAtom, { ...state, status: 'loading', filter, pagination: state.pagination ?? pagination });
-      const { data, error } = await findLetter({
-        query: {
+      try {
+        const data = await getLetter().findLetter({
           studentId: filter.studentId ? [filter.studentId] : undefined,
           status: filter.status?.length ? filter.status : undefined,
           fromCreatedAt: filter.fromCreatedAt?.toISOString(),
           toCreatedAt: filter.toCreatedAt?.toISOString(),
           limit: pagination.pageSize,
           skip: pagination.offset,
-        },
-      });
-      if (error) {
-        set(letterListStateAtom, { ...state, status: 'error', filter, pagination, error });
-        return;
+        });
+        set(letterListStateAtom, {
+          status: 'success',
+          data: data.items ?? [],
+          filter,
+          pagination,
+          total: data.total ?? 0,
+        });
+      } catch (err) {
+        set(letterListStateAtom, { ...state, status: 'error', filter, pagination, error: toApiError(err) });
       }
-      set(letterListStateAtom, {
-        status: 'success',
-        data: data?.items ?? [],
-        filter,
-        pagination,
-        total: data?.total ?? 0,
-      });
     } else if (action.type === 'REFRESH') {
       if (
         state.status !== 'success' &&
@@ -52,26 +51,24 @@ export const letterListActionAtom = atom(
         return;
       }
       set(letterListStateAtom, { ...state, status: 'loading' });
-      const { data, error } = await findLetter({
-        query: {
+      try {
+        const data = await getLetter().findLetter({
           studentId: state.filter.studentId ? [state.filter.studentId] : undefined,
           status: state.filter.status?.length ? state.filter.status : undefined,
           fromCreatedAt: state.filter.fromCreatedAt?.toISOString(),
           toCreatedAt: state.filter.toCreatedAt?.toISOString(),
           limit: state.pagination.pageSize,
           skip: state.pagination.offset,
-        },
-      });
-      if (error) {
-        set(letterListStateAtom, { ...state, status: 'error', error });
-        return;
+        });
+        set(letterListStateAtom, {
+          ...state,
+          status: 'success',
+          data: data.items ?? [],
+          total: data.total ?? 0,
+        });
+      } catch (err) {
+        set(letterListStateAtom, { ...state, status: 'error', error: toApiError(err) });
       }
-      set(letterListStateAtom, {
-        ...state,
-        status: 'success',
-        data: data?.items ?? [],
-        total: data?.total ?? 0,
-      });
     } else if (action.type === 'INVALIDATE') {
       if (state.status !== 'success' && state.status !== 'error') {
         return;

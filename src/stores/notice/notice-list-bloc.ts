@@ -1,4 +1,5 @@
-import { findNotice } from '@openapi/sdk.gen';
+import { getNotice } from '@openapi/notice';
+import { toApiError } from '@store/api-error';
 import { toIsoDateString } from '@util/date-util';
 import { atom } from 'jotai';
 
@@ -23,8 +24,8 @@ export const noticeListActionAtom = atom(
       const filter = action.filter ?? state.filter;
       const pagination = action.pagination;
       set(noticeListStateAtom, { ...state, status: 'loading', filter, pagination: state.pagination ?? pagination });
-      const { data, error } = await findNotice({
-        query: {
+      try {
+        const data = await getNotice().findNotice({
           forClass: filter.forClass?.length ? filter.forClass : undefined,
           forGrade: filter.forGrade?.length ? filter.forGrade : undefined,
           fromDistributedAt: filter.fromDistributedAt ? toIsoDateString(filter.fromDistributedAt) : undefined,
@@ -35,19 +36,17 @@ export const noticeListActionAtom = atom(
           title: filter.title || undefined,
           toDistributedAt: filter.toDistributedAt ? toIsoDateString(filter.toDistributedAt) : undefined,
           toDueAt: filter.toDueAt ? toIsoDateString(filter.toDueAt) : undefined,
-        },
-      });
-      if (error) {
-        set(noticeListStateAtom, { ...state, status: 'error', filter, pagination, error });
-        return;
+        });
+        set(noticeListStateAtom, {
+          status: 'success',
+          data: data.items ?? [],
+          filter,
+          pagination,
+          total: data.total ?? 0,
+        });
+      } catch (err) {
+        set(noticeListStateAtom, { ...state, status: 'error', filter, pagination, error: toApiError(err) });
       }
-      set(noticeListStateAtom, {
-        status: 'success',
-        data: data?.items ?? [],
-        filter,
-        pagination,
-        total: data?.total ?? 0,
-      });
     } else if (action.type === 'REFRESH') {
       if (
         state.status !== 'success' &&
@@ -57,8 +56,8 @@ export const noticeListActionAtom = atom(
         return;
       }
       set(noticeListStateAtom, { ...state, status: 'loading' });
-      const { data, error } = await findNotice({
-        query: {
+      try {
+        const data = await getNotice().findNotice({
           forClass: state.filter.forClass?.length ? state.filter.forClass : undefined,
           forGrade: state.filter.forGrade?.length ? state.filter.forGrade : undefined,
           fromDistributedAt: state.filter.fromDistributedAt ? toIsoDateString(state.filter.fromDistributedAt) : undefined,
@@ -69,18 +68,16 @@ export const noticeListActionAtom = atom(
           title: state.filter.title || undefined,
           toDistributedAt: state.filter.toDistributedAt ? toIsoDateString(state.filter.toDistributedAt) : undefined,
           toDueAt: state.filter.toDueAt ? toIsoDateString(state.filter.toDueAt) : undefined,
-        },
-      });
-      if (error) {
-        set(noticeListStateAtom, { ...state, status: 'error', error });
-        return;
+        });
+        set(noticeListStateAtom, {
+          ...state,
+          status: 'success',
+          data: data.items ?? [],
+          total: data.total ?? 0,
+        });
+      } catch (err) {
+        set(noticeListStateAtom, { ...state, status: 'error', error: toApiError(err) });
       }
-      set(noticeListStateAtom, {
-        ...state,
-        status: 'success',
-        data: data?.items ?? [],
-        total: data?.total ?? 0,
-      });
     } else if (action.type === 'INVALIDATE') {
       if (state.status !== 'success' && state.status !== 'error') {
         return;

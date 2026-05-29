@@ -1,4 +1,4 @@
-import type { Auditible, Student } from '@openapi/types.gen';
+import type { Auditible, Student } from '@openapi/index.schemas';
 import type { ApiError } from '@store/api-error';
 
 export type StudentListFilter = {

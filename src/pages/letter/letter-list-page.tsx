@@ -134,7 +134,7 @@ const LetterListPage = ({ onView }: MaintenanceListPageProps) => {
       >
         <FuiColumn
           builder={(_, record) => {
-            const letter = record as Letter;
+            const letter = record as Letter & Record<string, unknown>;
             return <span>{nameInPreferredLanguage(letter.title)}</span>;
           }}
           field="title"
@@ -143,7 +143,7 @@ const LetterListPage = ({ onView }: MaintenanceListPageProps) => {
         />
         {isTeacher && (
           <FuiColumn
-            builder={(_, record) => <span>{(record as Letter).studentId}</span>}
+            builder={(_, record) => <span>{record.studentId as string}</span>}
             field="studentId"
             header={t('letter.studentId')}
             style={{ width: '20%' }}
@@ -151,7 +151,7 @@ const LetterListPage = ({ onView }: MaintenanceListPageProps) => {
         )}
         <FuiColumn
           builder={(_, record) => {
-            const letter = record as Letter;
+            const letter = record as Letter & Record<string, unknown>;
             return (
               <span>
                 {t(
@@ -166,7 +166,7 @@ const LetterListPage = ({ onView }: MaintenanceListPageProps) => {
         />
         <FuiColumn
           builder={(_, record) => {
-            const letter = record as Letter;
+            const letter = record as Letter & Record<string, unknown>;
             return (
               <span>
                 {letter.acknowledgedAt
@@ -181,7 +181,7 @@ const LetterListPage = ({ onView }: MaintenanceListPageProps) => {
         />
         <FuiColumn
           builder={(_, record) => {
-            const id = (record as Letter).id;
+            const id = record.id as string;
             return (
               <div className={commonStyles.actionCell}>
                 <Tooltip

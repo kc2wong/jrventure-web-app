@@ -1,4 +1,5 @@
-import { createUser, getUserById, updateUserById } from '@openapi/sdk.gen';
+import { getUserMaintenance } from '@openapi/user-maintenance';
+import { toApiError } from '@store/api-error';
 import { atom } from 'jotai';
 
 import type { UserEditAction, UserEditState } from './user-types';
@@ -15,29 +16,29 @@ export const userEditActionAtom = atom(
   async (_, set, action: UserEditAction) => {
     if (action.type === 'GET') {
       set(userEditStateAtom, { status: 'loading', data: null });
-      const { data, error } = await getUserById({ path: { id: action.id } });
-      if (error) {
-        set(userEditStateAtom, (prev) => ({ ...prev, status: 'error', error: error }));
-        return;
+      try {
+        const data = await getUserMaintenance().getUserById(action.id);
+        set(userEditStateAtom, { status: 'success', data });
+      } catch (err) {
+        set(userEditStateAtom, (prev) => ({ ...prev, status: 'error', error: toApiError(err) }));
       }
-      set(userEditStateAtom, { status: 'success', data: data ?? null });
     } else if (action.type === 'CREATE') {
       set(userEditStateAtom, (prev) => ({ ...prev, status: 'loading' }));
-      const { data, error } = await createUser({ body: action.payload });
-      if (error) {
-        set(userEditStateAtom, (prev) => ({ ...prev, status: 'error', error: error }));
-        return;
+      try {
+        const data = await getUserMaintenance().createUser(action.payload);
+        set(userEditStateAtom, (prev) => ({ ...prev, status: 'success', data }));
+      } catch (err) {
+        set(userEditStateAtom, (prev) => ({ ...prev, status: 'error', error: toApiError(err) }));
       }
-      set(userEditStateAtom, (prev) => ({ ...prev, status: 'success', data: data ?? null }));
     } else if (action.type === 'UPDATE') {
       set(userEditStateAtom, (prev) => ({ ...prev, status: 'loading' }));
       const { id, ...rest } = action.payload;
-      const { data, error } = await updateUserById({ path: { id }, body: rest });
-      if (error) {
-        set(userEditStateAtom, (prev) => ({ ...prev, status: 'error', error: error }));
-        return;
+      try {
+        const data = await getUserMaintenance().updateUserById(id, rest);
+        set(userEditStateAtom, (prev) => ({ ...prev, status: 'success', data }));
+      } catch (err) {
+        set(userEditStateAtom, (prev) => ({ ...prev, status: 'error', error: toApiError(err) }));
       }
-      set(userEditStateAtom, (prev) => ({ ...prev, status: 'success', data: data ?? null }));
     } else if (action.type === 'RESET') {
       set(userEditStateAtom, initialState);
     }

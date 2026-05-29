@@ -1,4 +1,4 @@
-import { findClass } from '@openapi/sdk.gen';
+import { getStudent } from '@openapi/student';
 import { atom } from 'jotai';
 
 import type {
@@ -26,10 +26,10 @@ export const referenceDataActionAtom = atom(
       set(referenceDataStateAtom, { ...state, status: 'loading' });
 
       try {
-        const { data } = await findClass({ throwOnError: true });
+        const data = await getStudent().findClass();
         set(referenceDataStateAtom, {
           status: 'success',
-          classes: data ?? [],
+          classes: data,
         });
       } catch (_error) {
         set(referenceDataStateAtom, { ...state, status: 'error' });

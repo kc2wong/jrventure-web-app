@@ -1,7 +1,7 @@
 import { JrVcInputText } from '@component/jr-venture-input';
 import { Spinner } from '@fluentui/react-components';
 import { usePreferredLanguage } from '@hook/use-preferred-language';
-import { findStudent } from '@openapi/sdk.gen';
+import { getStudent } from '@openapi/student';
 import type { Student } from '@store/student/student-types';
 import type { InputTextProps } from 'handy-fluentui';
 import { type Ref, useEffect, useImperativeHandle, useReducer, useRef } from 'react';
@@ -51,7 +51,7 @@ const StudentIdInputText = ({
       return false;
     }
     updateLookup({ status: 'looking' });
-    const { data: result } = await findStudent({ query: { id: [trimmed], limit: 1, skip: 0 } });
+    const result = await getStudent().findStudent({ id: [trimmed], limit: 1, skip: 0 });
     const found = result?.items?.[0] as Student | undefined;
     const next: StudentLookup = found ? { status: 'valid', student: found } : { status: 'invalid' };
     updateLookup(next);

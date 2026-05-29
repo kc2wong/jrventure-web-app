@@ -4,7 +4,6 @@ import { JrVcTable } from '@component/jr-venture-table';
 import type { MaintenanceListPageProps } from '@component/with-maintenance-page';
 import { Button, Tooltip } from '@fluentui/react-components';
 import { EyeRegular } from '@fluentui/react-icons';
-import type { Class } from '@openapi/index';
 import { classEditActionAtom } from '@store/class/class-edit-bloc';
 import {
   classListActionAtom,
@@ -90,7 +89,7 @@ const ClassListPage = ({ onView }: MaintenanceListPageProps) => {
         />
         <FuiColumn
           builder={(_, record) => {
-            const id = (record as Class).id;
+            const id = record.id as string;
             return (
               <div className={commonStyles.actionCell}>
                 <Tooltip

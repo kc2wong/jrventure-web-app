@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
         '@hook': path.resolve(__dirname, 'src/hooks'),
         '@i18n': path.resolve(__dirname, 'src/i18n'),
         '@model': path.resolve(__dirname, 'src/models'),
-        '@openapi': path.resolve(__dirname, 'src/__generated__/web-api-client'),
+        '@openapi': path.resolve(__dirname, 'src/__generated__/openapi-client'),
         '@page': path.resolve(__dirname, 'src/pages'),
         '@store': path.resolve(__dirname, 'src/stores'),
         '@util': path.resolve(__dirname, 'src/utils'),

@@ -1,4 +1,4 @@
-import type { MultiLanguageName } from '@openapi/types.gen';
+import type { MultiLanguageName } from '@openapi/index.schemas';
 import { useTranslation } from 'react-i18next';
 
 const isoToLangKey = (isoCode: string): keyof MultiLanguageName =>

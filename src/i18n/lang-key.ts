@@ -1,4 +1,4 @@
-import type { MultiLanguageName } from '@openapi/types.gen';
+import type { MultiLanguageName } from '@openapi/index.schemas';
 
 const isoToLangKey = (isoCode: string): keyof MultiLanguageName =>
   (isoCode === 'zh-Hant'

@@ -5,7 +5,7 @@ import type { MaintenanceListPageProps } from '@component/with-maintenance-page'
 import { Button, Tooltip } from '@fluentui/react-components';
 import { EditRegular, EyeRegular } from '@fluentui/react-icons';
 import { usePreferredLanguage } from '@hook/use-preferred-language';
-import type { MultiLanguageName } from '@openapi/types.gen';
+import type { MultiLanguageName } from '@openapi/index.schemas';
 import { userEditActionAtom } from '@store/user/user-edit-bloc';
 import {
   userListActionAtom,

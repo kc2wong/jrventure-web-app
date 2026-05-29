@@ -1,4 +1,4 @@
-import type { Auditible, Letter, LetterStatus } from '@openapi/types.gen';
+import type { Auditible, Letter, LetterStatus } from '@openapi/index.schemas';
 import type { ApiError } from '@store/api-error';
 
 export type LetterListFilter = {

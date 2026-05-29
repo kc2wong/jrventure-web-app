@@ -1,4 +1,4 @@
-import type { MultiLanguageName } from '@openapi/types.gen';
+import type { MultiLanguageName } from '@openapi/index.schemas';
 import type { MultiLangText } from 'handy-fluentui';
 
 const EMPTY_MULTI_LANG_TEXT: MultiLangText = {

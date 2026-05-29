@@ -1,4 +1,4 @@
-import type { Participation, ParticipationStatus } from '@openapi/types.gen';
+import type { Participation, ParticipationStatus } from '@openapi/index.schemas';
 import type { ApiError } from '@store/api-error';
 
 export type ParticipationEditStatus = 'idle' | 'loading' | 'success' | 'error';

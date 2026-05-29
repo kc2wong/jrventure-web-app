@@ -1,4 +1,5 @@
-import { getLetterById, updateLetterById } from '@openapi/sdk.gen';
+import { getLetter } from '@openapi/letter';
+import { toApiError } from '@store/api-error';
 import { atom } from 'jotai';
 
 import type { LetterEditAction, LetterEditState } from './letter-types';
@@ -15,21 +16,21 @@ export const letterEditActionAtom = atom(
   async (get, set, action: LetterEditAction) => {
     if (action.type === 'GET') {
       set(letterEditStateAtom, { status: 'loading', data: null });
-      const { data, error } = await getLetterById({ path: { id: action.id } });
-      if (error) {
-        set(letterEditStateAtom, { status: 'error', data: null, error });
-        return;
+      try {
+        const data = await getLetter().getLetterById(action.id);
+        set(letterEditStateAtom, { status: 'success', data });
+      } catch (err) {
+        set(letterEditStateAtom, { status: 'error', data: null, error: toApiError(err) });
       }
-      set(letterEditStateAtom, { status: 'success', data: data ?? null });
     } else if (action.type === 'ACKNOWLEDGE') {
       const state = get(letterEditStateAtom);
       set(letterEditStateAtom, { ...state, status: 'loading' });
-      const { data, error } = await updateLetterById({ path: { id: action.id }, body: { version: action.version, status: 'ACKNOWLEDGED' } });
-      if (error) {
-        set(letterEditStateAtom, { ...state, status: 'error', error });
-        return;
+      try {
+        const data = await getLetter().updateLetterById(action.id, { version: action.version, status: 'ACKNOWLEDGED' });
+        set(letterEditStateAtom, { status: 'success', data });
+      } catch (err) {
+        set(letterEditStateAtom, { ...state, status: 'error', error: toApiError(err) });
       }
-      set(letterEditStateAtom, { status: 'success', data: data ?? null });
     } else if (action.type === 'RESET') {
       set(letterEditStateAtom, initialState);
     }
