@@ -16,7 +16,6 @@ import {
 } from '@store/activity/activity-list-bloc';
 import type {
   Activity,
-  ActivityListItem,
   ActivityPayloadForGrade,
 } from '@store/activity/activity-types';
 import { authStateAtom } from '@store/auth/auth-bloc';
@@ -202,7 +201,7 @@ const ActivityListPage = ({
       >
         <FuiColumn
           builder={(_, record) => {
-            const activity = record as Activity;
+            const activity = record as Activity & Record<string, unknown>;
             return <span>{nameInPreferredLanguage(activity.description)}</span>;
           }}
           field="description"
@@ -211,7 +210,7 @@ const ActivityListPage = ({
         />
         <FuiColumn
           builder={(_, record) => {
-            const activity = record as Activity;
+            const activity = record as Activity & Record<string, unknown>;
             return (
               <span>
                 {t(
@@ -226,7 +225,7 @@ const ActivityListPage = ({
         />
         <FuiColumn
           builder={(_, record) => {
-            const activity = record as Activity;
+            const activity = record as Activity & Record<string, unknown>;
             return (
               <span>{formatDateDDMMYYYY(new Date(activity.startDate))}</span>
             );
@@ -237,7 +236,7 @@ const ActivityListPage = ({
         />
         <FuiColumn
           builder={(_, record) => {
-            const activity = record as Activity;
+            const activity = record as Activity & Record<string, unknown>;
             return (
               <span>{formatDateDDMMYYYY(new Date(activity.endDate))}</span>
             );
@@ -249,7 +248,7 @@ const ActivityListPage = ({
         {isParentOrStudent ? (
           <FuiColumn
             builder={(_, record) => {
-              const { withParticipation } = record as ActivityListItem;
+              const withParticipation = record.withParticipation as boolean | null | undefined;
               return (
                 <div className={commonStyles.centeredCell}>
                   {withParticipation && <CheckmarkCircleRegular />}
@@ -263,7 +262,7 @@ const ActivityListPage = ({
         ) : (
           <FuiColumn
             builder={(_, record) => {
-              const activity = record as Activity;
+              const activity = record as Activity & Record<string, unknown>;
               return (
                 <span>
                   {t(
@@ -279,7 +278,7 @@ const ActivityListPage = ({
         )}
         <FuiColumn
           builder={(_, record) => {
-            const activity = record as Activity;
+            const activity = record as Activity & Record<string, unknown>;
             return (
               <span>
                 {isForGrade(activity) ? activity.forGrade.join(', ') : ''}
@@ -292,14 +291,12 @@ const ActivityListPage = ({
         />
         <FuiColumn
           builder={(_, record) => {
-            const activity = record as Activity;
+            const activity = record as Activity & Record<string, unknown>;
             return (
               <span>
                 {isForGrade(activity)
                   ? ''
-                  : (
-                      activity as Activity & { forClass: string[] }
-                    ).forClass.join(', ')}
+                  : (activity.forClass as string[]).join(', ')}
               </span>
             );
           }}
@@ -309,7 +306,7 @@ const ActivityListPage = ({
         />
         <FuiColumn
           builder={(_, record) => {
-            const id = (record as Activity).id;
+            const id = record.id as string;
             return (
               <div className={commonStyles.actionCell}>
                 <Tooltip

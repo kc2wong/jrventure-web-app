@@ -1,4 +1,4 @@
-import type { JwtPayload, Student } from '@openapi/types.gen';
+import type { JwtPayload, Student } from '@openapi/index.schemas';
 
 export type AuthUser = JwtPayload;
 

@@ -1,7 +1,7 @@
-import { getClassById } from '@openapi/index';
+import { getStudent } from '@openapi/student';
+import { toApiError } from '@store/api-error';
 import { atom } from 'jotai';
 
-import { mockCreate, mockUpdate } from './class-mock';
 import type { ClassEditAction, ClassEditState } from './class-types';
 
 const initialState: ClassEditState = {
@@ -16,20 +16,12 @@ export const classEditActionAtom = atom(
   async (_, set, action: ClassEditAction) => {
     if (action.type === 'GET') {
       set(classEditStateAtom, (prev) => ({ ...prev, status: 'loading', data: null }));
-      const { data, error } = await getClassById({ path: { id: action.id } });
-      if (error) {
-        set(classEditStateAtom, (prev) => ({ ...prev, status: 'error', error }));
-        return;
+      try {
+        const data = await getStudent().getClassById(action.id);
+        set(classEditStateAtom, (prev) => ({ ...prev, status: 'success', data }));
+      } catch (err) {
+        set(classEditStateAtom, (prev) => ({ ...prev, status: 'error', error: toApiError(err) }));
       }
-      set(classEditStateAtom, (prev) => ({ ...prev, status: 'success', data: data ?? null }));
-    } else if (action.type === 'CREATE') {
-      set(classEditStateAtom, (prev) => ({ ...prev, status: 'loading' }));
-      const created = mockCreate(action.payload);
-      set(classEditStateAtom, (prev) => ({ ...prev, status: 'success', data: created }));
-    } else if (action.type === 'UPDATE') {
-      set(classEditStateAtom, (prev) => ({ ...prev, status: 'loading' }));
-      const updated = mockUpdate(action.payload);
-      set(classEditStateAtom, (prev) => ({ ...prev, status: 'success', data: updated }));
     } else if (action.type === 'RESET') {
       set(classEditStateAtom, initialState);
     }

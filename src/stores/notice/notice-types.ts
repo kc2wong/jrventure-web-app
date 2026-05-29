@@ -1,4 +1,4 @@
-import type { Auditible, Notice, NoticePayload, NoticePayloadForClass, NoticePayloadForGrade, NoticeStatus } from '@openapi/types.gen';
+import type { Auditible, Notice, NoticePayload, NoticePayloadForClass, NoticePayloadForGrade, NoticeStatus } from '@openapi/index.schemas';
 import type { ApiError } from '@store/api-error';
 
 export type NoticeListFilter = {

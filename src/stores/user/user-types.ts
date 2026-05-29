@@ -1,4 +1,4 @@
-import type { User, UserCreation, UserRole, UserStatus } from '@openapi/types.gen';
+import type { User, UserCreation, UserRole, UserStatus } from '@openapi/index.schemas';
 import type { ApiError } from '@store/api-error';
 
 export type UserListFilter = {
@@ -49,5 +49,5 @@ export type UserEditAction =
   | { type: 'UPDATE'; payload: UserCreation & { id: string; version: number } }
   | { type: 'RESET' };
 
-export type { ParentEntitlement, StudentEntitlement, TeacherEntitlement } from '@openapi/types.gen';
+export type { ParentEntitlement, StudentEntitlement, TeacherEntitlement } from '@openapi/index.schemas';
 export type { User, UserCreation, UserRole, UserStatus };

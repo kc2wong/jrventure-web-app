@@ -1,5 +1,6 @@
-import { findClass } from '@openapi/sdk.gen';
-import type { Class } from '@store/class/class-types';
+import { getStudent } from '@openapi/student';
+import { toApiError } from '@store/api-error';
+import type { SchoolClass } from '@store/class/class-types';
 import { atom } from 'jotai';
 
 import type {
@@ -9,12 +10,12 @@ import type {
   ClassListState,
 } from './class-types';
 
-const applyFilter = (all: Class[], filter: ClassListFilter) =>
+const applyFilter = (all: SchoolClass[], filter: ClassListFilter) =>
   filter.grade !== undefined && filter.grade.length > 0
     ? all.filter((c) => filter.grade!.includes(c.grade))
     : all;
 
-const applyPagination = (list: Class[], pagination: ClassListPagination) => {
+const applyPagination = (list: SchoolClass[], pagination: ClassListPagination) => {
   const start = pagination.offset;
   return list.slice(start, start + pagination.pageSize);
 };
@@ -38,20 +39,20 @@ export const classListActionAtom = atom(
       const filter = action.filter ?? state.filter;
       const pagination = action.pagination;
       set(classListStateAtom, { ...state, status: 'loading', filter, pagination: state.pagination ?? pagination });
-      const { data, error } = await findClass();
-      if (error) {
-        set(classListStateAtom, { ...state, status: 'error', filter, pagination, error });
-        return;
+      try {
+        const data = await getStudent().findClass();
+        const filtered = applyFilter(data, filter);
+        const pageData = applyPagination(filtered, pagination);
+        set(classListStateAtom, {
+          status: 'success',
+          data: pageData,
+          filter,
+          pagination,
+          total: filtered.length,
+        });
+      } catch (err) {
+        set(classListStateAtom, { ...state, status: 'error', filter, pagination, error: toApiError(err) });
       }
-      const filtered = applyFilter(data ?? [], filter);
-      const pageData = applyPagination(filtered, pagination);
-      set(classListStateAtom, {
-        status: 'success',
-        data: pageData,
-        filter,
-        pagination,
-        total: filtered.length,
-      });
     } else if (action.type === 'REFRESH') {
       if (
         state.status !== 'success' &&
@@ -61,19 +62,19 @@ export const classListActionAtom = atom(
         return;
       }
       set(classListStateAtom, { ...state, status: 'loading' });
-      const { data, error } = await findClass();
-      if (error) {
-        set(classListStateAtom, { ...state, status: 'error', error });
-        return;
+      try {
+        const data = await getStudent().findClass();
+        const filtered = applyFilter(data, state.filter);
+        const pageData = applyPagination(filtered, state.pagination);
+        set(classListStateAtom, {
+          ...state,
+          status: 'success',
+          data: pageData,
+          total: filtered.length,
+        });
+      } catch (err) {
+        set(classListStateAtom, { ...state, status: 'error', error: toApiError(err) });
       }
-      const filtered = applyFilter(data ?? [], state.filter);
-      const pageData = applyPagination(filtered, state.pagination);
-      set(classListStateAtom, {
-        ...state,
-        status: 'success',
-        data: pageData,
-        total: filtered.length,
-      });
     } else if (action.type === 'INVALIDATE') {
       if (state.status !== 'success' && state.status !== 'error') {
         return;

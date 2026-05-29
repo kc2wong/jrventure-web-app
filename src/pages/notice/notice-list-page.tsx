@@ -151,7 +151,7 @@ const NoticeListPage = ({ onAdd, onEdit, onView }: MaintenanceListPageProps) => 
       >
         <FuiColumn
           builder={(_, record) => {
-            const notice = record as Notice;
+            const notice = record as Notice & Record<string, unknown>;
             return <span>{notice.id}</span>;
           }}
           field="id"
@@ -160,7 +160,7 @@ const NoticeListPage = ({ onAdd, onEdit, onView }: MaintenanceListPageProps) => 
         />
         <FuiColumn
           builder={(_, record) => {
-            const notice = record as Notice;
+            const notice = record as Notice & Record<string, unknown>;
             return <span>{nameInPreferredLanguage(notice.title)}</span>;
           }}
           field="title"
@@ -169,7 +169,7 @@ const NoticeListPage = ({ onAdd, onEdit, onView }: MaintenanceListPageProps) => 
         />
         <FuiColumn
           builder={(_, record) => {
-            const notice = record as Notice;
+            const notice = record as Notice & Record<string, unknown>;
             return <span>{notice.dueAt ? formatDateDDMMYYYY(new Date(notice.dueAt)) : ''}</span>;
           }}
           field="dueAt"
@@ -178,7 +178,7 @@ const NoticeListPage = ({ onAdd, onEdit, onView }: MaintenanceListPageProps) => 
         />
         <FuiColumn
           builder={(_, record) => {
-            const notice = record as Notice;
+            const notice = record as Notice & Record<string, unknown>;
             return <span>{t(`notice.status${notice.status.charAt(0) + notice.status.slice(1).toLowerCase()}`)}</span>;
           }}
           field="status"
@@ -187,7 +187,7 @@ const NoticeListPage = ({ onAdd, onEdit, onView }: MaintenanceListPageProps) => 
         />
         <FuiColumn
           builder={(_, record) => {
-            const notice = record as Notice;
+            const notice = record as Notice & Record<string, unknown>;
             return <span>{isForGrade(notice) ? notice.forGrade.join(', ') : ''}</span>;
           }}
           field="forGrade"
@@ -196,8 +196,8 @@ const NoticeListPage = ({ onAdd, onEdit, onView }: MaintenanceListPageProps) => 
         />
         <FuiColumn
           builder={(_, record) => {
-            const notice = record as Notice;
-            return <span>{isForGrade(notice) ? '' : (notice as Notice & { forClass: string[] }).forClass.join(', ')}</span>;
+            const notice = record as Notice & Record<string, unknown>;
+            return <span>{isForGrade(notice) ? '' : (notice.forClass as string[]).join(', ')}</span>;
           }}
           field="forClass"
           header={t('notice.forClass')}
@@ -205,7 +205,7 @@ const NoticeListPage = ({ onAdd, onEdit, onView }: MaintenanceListPageProps) => 
         />
         <FuiColumn
           builder={(_, record) => {
-            const notice = record as Notice;
+            const notice = record as Notice & Record<string, unknown>;
             return <span>{notice.distributedAt ? formatDateDDMMYYYY(new Date(notice.distributedAt)) : ''}</span>;
           }}
           field="distributedAt"
@@ -214,7 +214,7 @@ const NoticeListPage = ({ onAdd, onEdit, onView }: MaintenanceListPageProps) => 
         />
         <FuiColumn
           builder={(_, record) => {
-            const id = (record as Notice).id;
+            const id = record.id as string;
             return (
               <div className={commonStyles.actionCell}>
                 <Tooltip

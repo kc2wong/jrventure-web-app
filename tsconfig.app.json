@@ -26,7 +26,7 @@
       "@hook/*": ["./src/hooks/*"],
       "@i18n/*": ["./src/i18n/*"],
       "@model/*": ["./src/models/*"],
-      "@openapi/*": ["./src/__generated__/web-api-client/*"],
+      "@openapi/*": ["./src/__generated__/openapi-client/*"],
       "@page/*": ["./src/pages/*"],
       "@store/*": ["./src/stores/*"],
       "@util/*": ["./src/utils/*"]

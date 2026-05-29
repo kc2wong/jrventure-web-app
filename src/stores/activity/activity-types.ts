@@ -5,7 +5,7 @@ import type {
   ActivityPayloadForClass,
   ActivityPayloadForGrade,
   ActivityStatus,
-} from '@openapi/types.gen';
+} from '@openapi/index.schemas';
 import type { ApiError } from '@store/api-error';
 
 export type ActivityListItem = Activity & { withParticipation?: boolean | null };

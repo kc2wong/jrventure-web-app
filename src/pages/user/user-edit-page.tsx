@@ -32,7 +32,7 @@ import {
   WrenchRegular,
 } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Class } from '@store/class/class-types';
+import type { SchoolClass } from '@store/class/class-types';
 import { referenceDataStateAtom } from '@store/reference-data/reference-data-bloc';
 import {
   userEditActionAtom,
@@ -135,7 +135,7 @@ const UserEditPage = ({
   const studentId2Ref = useRef<StudentIdInputTextRef>(null);
 
   const gradeGroups = useMemo(() => {
-    const map = new Map<number, Class[]>();
+    const map = new Map<number, SchoolClass[]>();
     for (const cls of refClasses) {
       if (!map.has(cls.grade)) {
         map.set(cls.grade, []);

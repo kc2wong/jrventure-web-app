@@ -1,4 +1,6 @@
-import { findActivity, findParticipation } from '@openapi/sdk.gen';
+import { getActivity } from '@openapi/activity';
+import { getActivityParticipation } from '@openapi/activity-participation';
+import { toApiError } from '@store/api-error';
 import type { ApiError } from '@store/api-error';
 import { atom } from 'jotai';
 
@@ -42,40 +44,28 @@ const fetchActivities = async (
   filter: ActivityListFilter,
   pagination: ActivityListPagination,
 ): Promise<FetchResult> => {
-  if (filter.withParticipation && filter.studentIds?.length) {
-    // findParticipation drives pagination and carries full activity data per item
-    const { data, error } = await findParticipation({
-      query: {
-        activityCategories: filter.category?.length
-          ? filter.category
-          : undefined,
+  try {
+    if (filter.withParticipation && filter.studentIds?.length) {
+      const data = await getActivityParticipation().findParticipation({
+        activityCategories: filter.category?.length ? filter.category : undefined,
         activityFromStartDate: filter.fromStartDate?.toISOString(),
         activityToStartDate: filter.toEndDate?.toISOString(),
         limit: pagination.pageSize,
         skip: pagination.offset,
         studentIds: filter.studentIds,
-      },
-    });
-    if (error) {
-      return { items: [], total: 0, error };
+      });
+      const items = (data.items ?? []).map((p) => ({
+        ...p.activity,
+        withParticipation: true as const,
+      }));
+      return { items, total: data.total ?? 0 };
     }
 
-    const items = (data?.items ?? []).map((p) => ({
-      ...p.activity,
-      withParticipation: true as const,
-    }));
-    return { items, total: data?.total ?? 0 };
+    const data = await getActivity().findActivity(buildActivityQuery(filter, pagination));
+    return { items: data.items ?? [], total: data.total ?? 0 };
+  } catch (err) {
+    return { items: [], total: 0, error: toApiError(err) };
   }
-
-  // findActivity returns withParticipation per item when studentIds is provided
-  const { data, error } = await findActivity({
-    query: buildActivityQuery(filter, pagination),
-  });
-  if (error) {
-    return { items: [], total: 0, error };
-  }
-
-  return { items: data?.items ?? [], total: data?.total ?? 0 };
 };
 
 export const activityListStateAtom = atom<ActivityListState>(initialState);

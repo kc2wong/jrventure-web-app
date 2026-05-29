@@ -1,4 +1,5 @@
-import { createActivity, getActivityById, updateActivityById } from '@openapi/sdk.gen';
+import { getActivity } from '@openapi/activity';
+import { toApiError } from '@store/api-error';
 import { atom } from 'jotai';
 
 import type { ActivityEditAction, ActivityEditState } from './activity-types';
@@ -15,29 +16,29 @@ export const activityEditActionAtom = atom(
   async (_get, set, action: ActivityEditAction) => {
     if (action.type === 'GET') {
       set(activityEditStateAtom, { status: 'loading', data: null });
-      const { data, error } = await getActivityById({ path: { id: action.id } });
-      if (error) {
-        set(activityEditStateAtom, { status: 'error', data: null, error });
-        return;
+      try {
+        const data = await getActivity().getActivityById(action.id);
+        set(activityEditStateAtom, { status: 'success', data });
+      } catch (err) {
+        set(activityEditStateAtom, { status: 'error', data: null, error: toApiError(err) });
       }
-      set(activityEditStateAtom, { status: 'success', data: data ?? null });
     } else if (action.type === 'CREATE') {
       set(activityEditStateAtom, (prev) => ({ ...prev, status: 'loading' }));
-      const { data, error } = await createActivity({ body: action.payload });
-      if (error) {
-        set(activityEditStateAtom, (prev) => ({ ...prev, status: 'error', error }));
-        return;
+      try {
+        const data = await getActivity().createActivity(action.payload);
+        set(activityEditStateAtom, { status: 'success', data });
+      } catch (err) {
+        set(activityEditStateAtom, (prev) => ({ ...prev, status: 'error', error: toApiError(err) }));
       }
-      set(activityEditStateAtom, { status: 'success', data: data ?? null });
     } else if (action.type === 'UPDATE') {
       set(activityEditStateAtom, (prev) => ({ ...prev, status: 'loading' }));
       const { id, version, ...payload } = action.payload;
-      const { data, error } = await updateActivityById({ path: { id }, body: { version, ...payload } });
-      if (error) {
-        set(activityEditStateAtom, (prev) => ({ ...prev, status: 'error', error }));
-        return;
+      try {
+        const data = await getActivity().updateActivityById(id, { version, ...payload });
+        set(activityEditStateAtom, { status: 'success', data });
+      } catch (err) {
+        set(activityEditStateAtom, (prev) => ({ ...prev, status: 'error', error: toApiError(err) }));
       }
-      set(activityEditStateAtom, { status: 'success', data: data ?? null });
     } else if (action.type === 'RESET') {
       set(activityEditStateAtom, initialState);
     }

@@ -4,7 +4,7 @@ import type { MaintenanceEditMode } from '@component/with-maintenance-page';
 import { makeStyles, mergeClasses, tokens } from '@fluentui/react-components';
 import { ChevronDownRegular } from '@fluentui/react-icons';
 import { usePreferredLanguage } from '@hook/use-preferred-language';
-import type { Auditible } from '@openapi/types.gen';
+import type { Auditible } from '@openapi/index.schemas';
 import { useIsMobile, useBreadcrumb, type FuiButtonPanel } from 'handy-fluentui';
 import type { CSSProperties, ComponentProps, ReactElement, ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';

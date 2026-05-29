@@ -1,4 +1,5 @@
-import { authenticateUser, findStudent } from '@openapi/sdk.gen';
+import { getUserAuthentication } from '@openapi/user-authentication';
+import { getStudent } from '@openapi/student';
 import { clearTrace, initTrace, logger } from '@util/logger';
 import { atom } from 'jotai';
 
@@ -72,14 +73,12 @@ export const authActionAtom = atom(
           const entitledStudents =
             studentIds.length > 0
               ? ((
-                  await findStudent({
-                    query: {
-                      id: studentIds,
-                      limit: studentIds.length,
-                      skip: 0,
-                    },
+                  await getStudent().findStudent({
+                    id: studentIds,
+                    limit: studentIds.length,
+                    skip: 0,
                   })
-                ).data?.items ?? [])
+                ).items ?? [])
               : [];
           set(authStateAtom, {
             status: 'authenticated',
@@ -110,15 +109,36 @@ export const authActionAtom = atom(
           error: null,
         }));
         logger.info('authActionAtom.LOGIN', { email: action.payload.email });
-        const { data, error } = await authenticateUser({
-          body: {
+        try {
+          const data = await getUserAuthentication().authenticateUser({
             email: action.payload.email,
             password: action.payload.password,
-          },
-          throwOnError: false,
-        });
-
-        if (error) {
+          });
+          const token = getCookie(JWT_COOKIE);
+          if (!token) {
+            set(authStateAtom, {
+              status: 'unauthenticated',
+              user: null,
+              lastLoginDatetime: null,
+              selectedStudentId: undefined,
+              entitledStudents: [],
+              entitledMenuItemIds: [],
+              error: 'Authentication failed',
+            });
+            break;
+          }
+          const user = parseJwt(token);
+          set(authStateAtom, {
+            status: 'authenticated',
+            user,
+            lastLoginDatetime: data.lastLoginDatetime ?? null,
+            selectedStudentId: getSelectedStudentId(user),
+            entitledStudents: data.entitlementStudents ?? [],
+            entitledMenuItemIds: user.menuItemId ?? [],
+            error: null,
+          });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
           set(authStateAtom, {
             status: 'unauthenticated',
             user: null,
@@ -126,33 +146,9 @@ export const authActionAtom = atom(
             selectedStudentId: undefined,
             entitledStudents: [],
             entitledMenuItemIds: [],
-            error: error.message,
+            error: message,
           });
-          break;
         }
-        const token = getCookie(JWT_COOKIE);
-        if (!token) {
-          set(authStateAtom, {
-            status: 'unauthenticated',
-            user: null,
-            lastLoginDatetime: null,
-            selectedStudentId: undefined,
-            entitledStudents: [],
-            entitledMenuItemIds: [],
-            error: 'Authentication failed',
-          });
-          break;
-        }
-        const user = parseJwt(token);
-        set(authStateAtom, {
-          status: 'authenticated',
-          user,
-          lastLoginDatetime: data?.lastLoginDatetime ?? null,
-          selectedStudentId: getSelectedStudentId(user),
-          entitledStudents: data?.entitlementStudents ?? [],
-          entitledMenuItemIds: user.menuItemId ?? [],
-          error: null,
-        });
         break;
       }
       case 'SWITCH_STUDENT': {

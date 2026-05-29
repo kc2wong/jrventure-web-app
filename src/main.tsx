@@ -1,7 +1,5 @@
 import { webLightTheme, webDarkTheme } from '@fluentui/react-components';
-import { client } from '@openapi/client.gen';
 import { initTrace, logger } from '@util/logger';
-import { applyOtelInterceptors } from '@util/otel-axios';
 import { HandyFluentUiProvider } from 'handy-fluentui';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -11,13 +9,6 @@ import './index.css';
 import App from './app';
 
 initTrace();
-
-client.setConfig({
-  // empty string will make request go to dev server
-  baseURL: import.meta.env.VITE_API_URL || '',
-  withCredentials: true,
-});
-applyOtelInterceptors(client.instance);
 
 function AppShell() {
   return (

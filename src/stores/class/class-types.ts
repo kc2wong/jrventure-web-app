@@ -1,4 +1,4 @@
-import type { Class } from '@openapi/types.gen';
+import type { SchoolClass } from '@openapi/index.schemas';
 import type { ApiError } from '@store/api-error';
 
 export type ClassListFilter = {
@@ -18,7 +18,7 @@ export type ClassListStatus =
   | 'error';
 
 type ClassListStateBase = {
-  data: Class[];
+  data: SchoolClass[];
   error?: ApiError;
   filter: ClassListFilter;
   total: number;
@@ -45,14 +45,12 @@ export type ClassEditStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export type ClassEditState = {
   status: ClassEditStatus;
-  data: Class | null;
+  data: SchoolClass | null;
   error?: ApiError;
 };
 
 export type ClassEditAction =
   | { type: 'GET'; id: string }
-  | { type: 'CREATE'; payload: Omit<Class, 'id'> }
-  | { type: 'UPDATE'; payload: Class }
   | { type: 'RESET' };
 
-export type { Class };
+export type { SchoolClass };
