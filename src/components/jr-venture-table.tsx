@@ -1,12 +1,12 @@
 import { FuiTable } from 'handy-fluentui';
-import type { TableProps } from 'handy-fluentui';
+import type { FuiTableProps } from 'handy-fluentui';
 import { useTranslation } from 'react-i18next';
 
-type JrVcTableProps = Omit<TableProps<Record<string, unknown>>, 'data'> & {
+type JrVcTableProps = Omit<FuiTableProps<Record<string, unknown>>, 'data'> & {
   data: unknown[];
 };
 
-const JrVcTable = ({ data, ...props }: JrVcTableProps) => {
+const JrVcTable = ({ data, children, ...props }: JrVcTableProps) => {
   const { t } = useTranslation();
 
   return (
@@ -24,7 +24,9 @@ const JrVcTable = ({ data, ...props }: JrVcTableProps) => {
         },
         noData: t('component.fuiTable.paginationBar.noData'),
       }}
-    />
+    >
+      {children}
+    </FuiTable>
   );
 };
 

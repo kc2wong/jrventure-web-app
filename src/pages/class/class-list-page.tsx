@@ -2,14 +2,13 @@ import { useCommonStyles } from '@component/common-styles';
 import { JrVcSearchPageLayout } from '@component/jr-venture-search-page-layout';
 import { JrVcTable } from '@component/jr-venture-table';
 import type { MaintenanceListPageProps } from '@component/with-maintenance-page';
-import { Button, Tooltip } from '@fluentui/react-components';
 import { EyeRegular } from '@fluentui/react-icons';
 import { classEditActionAtom } from '@store/class/class-edit-bloc';
 import {
   classListActionAtom,
   classListStateAtom,
 } from '@store/class/class-list-bloc';
-import { FuiColumn } from 'handy-fluentui';
+import { FuiButton, FuiColumn, FuiTooltip } from 'handy-fluentui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -92,16 +91,13 @@ const ClassListPage = ({ onView }: MaintenanceListPageProps) => {
             const id = record.id as string;
             return (
               <div className={commonStyles.actionCell}>
-                <Tooltip
-                  content={t('general.text.view', { entityName: '' }).trim()}
-                  relationship="label"
-                >
-                  <Button
+                <FuiTooltip text={t('general.text.view', { entityName: '' }).trim()}>
+                  <FuiButton
                     appearance="outline"
                     icon={<EyeRegular />}
                     onClick={() => handleView(id)}
                   />
-                </Tooltip>
+                </FuiTooltip>
               </div>
             );
           }}

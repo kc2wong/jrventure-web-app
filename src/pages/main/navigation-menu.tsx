@@ -1,14 +1,12 @@
 import {
-  Caption1,
-  Caption2,
   makeStyles,
   mergeClasses,
   Tab,
   TabList,
   tokens,
-  Tooltip,
 } from '@fluentui/react-components';
 import { ChevronLeftRegular, ChevronRightRegular } from '@fluentui/react-icons';
+import { FuiCaption1, FuiCaption2, FuiTooltip } from 'handy-fluentui';
 import { useAtomValue } from 'jotai';
 import React, { useEffect, useRef, useState, type SVGProps } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -153,9 +151,7 @@ const SidebarDivider = ({ title, collapsed, visible }: SidebarDividerProps) => {
     <div className={styles.divider} style={visible ? {} : { visibility: 'hidden' }}>
       <div className={styles.dividerLine} />
       {!collapsed && title && (
-        <Caption1 className={styles.dividerTitle} italic>
-          {title}
-        </Caption1>
+        <FuiCaption1 className={styles.dividerTitle} italic text={title} />
       )}
       <div className={styles.dividerLine} />
     </div>
@@ -189,9 +185,9 @@ const MenuItem = ({ collapsed, icon: Icon, label, path }: MenuItemProps) => {
   );
 
   return collapsed ? (
-    <Tooltip content={label} positioning="after" relationship="label">
+    <FuiTooltip position="right" text={label}>
       {content}
-    </Tooltip>
+    </FuiTooltip>
   ) : (
     content
   );
@@ -251,7 +247,7 @@ const ButtombarMenuItem = ({ icon: Icon, label }: ButtombarMenuItemProps) => {
     <Tab className={styles.tab} onClick={() => {}} value={label}>
       <div className={styles.tabContent}>
         <Icon className={styles.icon} />
-        <Caption2>{label}</Caption2>
+        <FuiCaption2 text={label} />
       </div>
     </Tab>
   );

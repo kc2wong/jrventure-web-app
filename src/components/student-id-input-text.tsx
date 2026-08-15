@@ -3,7 +3,7 @@ import { Spinner } from '@fluentui/react-components';
 import { usePreferredLanguage } from '@hook/use-preferred-language';
 import { getStudent } from '@openapi/student';
 import type { Student } from '@store/student/student-types';
-import type { InputTextProps } from 'handy-fluentui';
+import type { FuiInputTextProps } from 'handy-fluentui';
 import { type Ref, useEffect, useImperativeHandle, useReducer, useRef } from 'react';
 
 type StudentLookup = {
@@ -15,7 +15,7 @@ type StudentIdInputTextRef = {
   triggerLookup: () => Promise<boolean>;
 };
 
-type StudentIdInputTextProps = Omit<InputTextProps, 'contentAfter' | 'infoMessage' | 'onChange'> & {
+type StudentIdInputTextProps = Omit<FuiInputTextProps, 'contentAfter' | 'infoMessage' | 'onChange'> & {
   ref?: Ref<StudentIdInputTextRef>;
   onChange?: (value: string | null) => void;
   onLookupChange?: (lookup: StudentLookup) => void;
@@ -77,10 +77,10 @@ const StudentIdInputText = ({
 
   return (
     <JrVcInputText
-      // Cast required: Omit<InputTextProps, ...> flattens the discriminated union on
+      // Cast required: Omit<FuiInputTextProps, ...> flattens the discriminated union on
       // direction/labelWidth from FieldLayoutProps, making the spread no longer
-      // directly assignable to InputTextProps without the cast.
-      {...(rest as InputTextProps)}
+      // directly assignable to FuiInputTextProps without the cast.
+      {...(rest as FuiInputTextProps)}
       contentAfter={lookup.status === 'looking' ? <Spinner size="tiny" /> : undefined}
       infoMessage={studentName}
       onBlur={readOnly ? undefined : () => void doLookup(value)}

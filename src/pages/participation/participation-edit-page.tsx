@@ -7,8 +7,6 @@ import {
   JrVcInputText,
 } from '@component/jr-venture-input';
 import {
-  Button,
-  Divider,
   makeStyles,
   tokens,
 } from '@fluentui/react-components';
@@ -26,7 +24,9 @@ import {
 } from '@store/participation/participation-edit-bloc';
 import { EMPTY_MULTI_LANG_TEXT, multiLangNameToText } from '@util/form-util';
 import {
+  FuiButton,
   FuiButtonPanel,
+  FuiDivider,
   FuiInputTextArea,
   FuiTab,
   FuiTabList,
@@ -83,16 +83,16 @@ const ParticipationEditPage = ({ onExit }: { onExit: () => void }) => {
   };
 
   const actionButtons = !participation ? (
-    <Button
+    <FuiButton
       appearance="primary"
       icon={<PersonAddRegular />}
       onClick={handleEnroll}
     >
       {t('participation.enroll')}
-    </Button>
+    </FuiButton>
   ) : participation.status === 'ENROLLED' ? (
     <>
-      <Button
+      <FuiButton
         icon={<ShoppingBagDismissRegular />}
         onClick={() => {
           dialog.openDialog({
@@ -110,14 +110,14 @@ const ParticipationEditPage = ({ onExit }: { onExit: () => void }) => {
         }}
       >
         {t('participation.withdraw')}
-      </Button>
-      <Button
+      </FuiButton>
+      <FuiButton
         appearance="primary"
         icon={<ShoppingBagCheckmarkRegular />}
         onClick={handleCheckIn}
       >
         {t('participation.checkIn')}
-      </Button>
+      </FuiButton>
     </>
   ) : null;
 
@@ -235,7 +235,7 @@ const ParticipationEditPage = ({ onExit }: { onExit: () => void }) => {
         />
       </JrVcGrid>
 
-      <Divider>{t('participation.enrollment')}</Divider>
+      <FuiDivider>{t('participation.enrollment')}</FuiDivider>
 
       {participation ? (
         <JrVcGrid columns={2}>

@@ -5,7 +5,7 @@ import {
   MailReadRegular,
   MailUnreadRegular,
 } from '@fluentui/react-icons';
-import type { InputDropdownProps } from 'handy-fluentui';
+import type { FuiInputDropdownProps } from 'handy-fluentui';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   },
 });
 
-type LetterStatusDropdownProps = Omit<InputDropdownProps, 'options'>;
+type LetterStatusDropdownProps = Omit<FuiInputDropdownProps, 'options'>;
 
 const LetterStatusDropdown = (props: LetterStatusDropdownProps) => {
   const styles = useStyles();
@@ -59,7 +59,7 @@ const LetterStatusDropdown = (props: LetterStatusDropdownProps) => {
     [t, styles.optionContent],
   );
 
-  return <JrVcInputDropdown {...(props as InputDropdownProps)} options={options} />;
+  return <JrVcInputDropdown {...(props as FuiInputDropdownProps)} options={options} />;
 };
 
 export { LetterStatusDropdown };

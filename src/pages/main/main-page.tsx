@@ -1,12 +1,5 @@
 import {
   Avatar,
-  Body1,
-  Caption1,
-  Menu,
-  MenuItemRadio,
-  MenuList,
-  MenuPopover,
-  MenuTrigger,
   Persona,
   Popover,
   PopoverSurface,
@@ -15,8 +8,6 @@ import {
   ToolbarButton,
   ToolbarDivider,
   ToolbarGroup,
-  ToolbarRadioButton,
-  ToolbarRadioGroup,
   makeStyles,
   mergeClasses,
   tokens,
@@ -33,7 +24,12 @@ import {
 import { usePreferredLanguage } from '@hook/use-preferred-language';
 import type { AuthUser } from '@store/auth/auth-types';
 import {
-  FuiInputSwitch,
+  FuiCaption1,
+  FuiMenuBar,
+  FuiMenuBarMenu,
+  FuiMenuBarRadioGroup,
+  FuiMenuBarRadioItem,
+  FuiSwitch,
   useDialog,
   useIsMobile,
   useTheme,
@@ -64,39 +60,6 @@ const useStyles = makeStyles({
     boxShadow: tokens.shadow2,
     paddingLeft: tokens.spacingHorizontalS,
     paddingRight: tokens.spacingHorizontalS,
-  },
-  toolbarRadio: {
-    minWidth: 'auto',
-    paddingLeft: tokens.spacingHorizontalS,
-    paddingRight: tokens.spacingHorizontalS,
-
-    backgroundColor: 'transparent',
-    color: tokens.colorNeutralForeground1,
-
-    // selected
-    '&[aria-checked="true"]': {
-      backgroundColor: tokens.colorBrandBackground,
-      color: tokens.colorNeutralForegroundOnBrand,
-    },
-
-    // hover (unselected)
-    '&:hover': {
-      backgroundColor: tokens.colorNeutralBackground1Hover,
-    },
-
-    // hover (selected)
-    '&[aria-checked="true"]:hover': {
-      backgroundColor: tokens.colorBrandBackgroundHover,
-    },
-
-    // optional: pressed state
-    '&:active': {
-      backgroundColor: tokens.colorNeutralBackground1Pressed,
-    },
-
-    '&[aria-checked="true"]:active': {
-      backgroundColor: tokens.colorBrandBackgroundPressed,
-    },
   },
   breadcrumb: {
     flex: '1',
@@ -161,7 +124,7 @@ const ToggleThemeButton = () => {
 
   const isDark = currentTheme === 'dark';
   return (
-    <FuiInputSwitch
+    <FuiSwitch
       checked={isDark}
       label={t('setting.darkMode')}
       onChange={() => {
@@ -172,25 +135,23 @@ const ToggleThemeButton = () => {
 };
 
 const ChangeLanguageButtonPanel = () => {
-  const styles = useStyles();
   const { t, i18n } = useTranslation();
 
-  const buttons = ['en', 'zh-Hant', 'zh-Hans'].map((lng) => (
-    <ToolbarRadioButton
-      key={`btn-${lng}`}
-      aria-label="English"
-      className={styles.toolbarRadio}
-      name="languageOptions"
-      onClick={() => i18n.changeLanguage(lng)}
-      value={lng}
-    >
-      <Body1>{t(`general.language.${lng}Short`)}</Body1>
-    </ToolbarRadioButton>
-  ));
   return (
-    <Toolbar checkedValues={{ languageOptions: [i18n.language] }}>
-      <ToolbarRadioGroup>{buttons}</ToolbarRadioGroup>
-    </Toolbar>
+    <FuiMenuBar>
+      <FuiMenuBarMenu label={t(`general.language.${i18n.language}Short`)}>
+        <FuiMenuBarRadioGroup
+          onValueChange={(lng) => i18n.changeLanguage(lng)}
+          value={i18n.language}
+        >
+          {(['en', 'zh-Hant', 'zh-Hans'] as const).map((lng) => (
+            <FuiMenuBarRadioItem key={lng} value={lng}>
+              {t(`general.language.${lng}Short`)}
+            </FuiMenuBarRadioItem>
+          ))}
+        </FuiMenuBarRadioGroup>
+      </FuiMenuBarMenu>
+    </FuiMenuBar>
   );
 };
 
@@ -232,8 +193,8 @@ const SelectedStudentDisplay = () => {
     >
       <HatGraduationRegular fontSize={24} />
       <div className={styles.selectedStudentTexts}>
-        <Caption1 className={styles.selectedStudentCaption}>{gradeClass}</Caption1>
-        <Caption1 className={styles.selectedStudentCaption}>{name}</Caption1>
+        <FuiCaption1 className={styles.selectedStudentCaption} text={gradeClass} />
+        <FuiCaption1 className={styles.selectedStudentCaption} text={name} />
       </div>
     </div>
   );
@@ -262,26 +223,22 @@ const SelectedStudentDisplay = () => {
   }
 
   return (
-    <Menu
-      checkedValues={{ student: [selectedStudentId ?? ''] }}
-      onCheckedValueChange={(_, data) => {
-        const [studentId] = data.checkedItems;
-        if (studentId) {
-          dispatch({ type: 'SWITCH_STUDENT', payload: { studentId } });
-        }
-      }}
-    >
-      <MenuTrigger disableButtonEnhancement>{inner}</MenuTrigger>
-      <MenuPopover>
-        <MenuList>
+    <FuiMenuBar>
+      <FuiMenuBarMenu label={inner}>
+        <FuiMenuBarRadioGroup
+          onValueChange={(studentId) =>
+            dispatch({ type: 'SWITCH_STUDENT', payload: { studentId } })
+          }
+          value={selectedStudentId ?? ''}
+        >
           {entitledStudents.map((s) => (
-            <MenuItemRadio key={s.id} name="student" value={s.id}>
+            <FuiMenuBarRadioItem key={s.id} value={s.id}>
               {`${s.classId}-${s.studentNumber}  ${fullNameInPreferredLanguage(s.firstName, s.lastName)}`}
-            </MenuItemRadio>
+            </FuiMenuBarRadioItem>
           ))}
-        </MenuList>
-      </MenuPopover>
-    </Menu>
+        </FuiMenuBarRadioGroup>
+      </FuiMenuBarMenu>
+    </FuiMenuBar>
   );
 };
 

@@ -2,7 +2,6 @@ import { useCommonStyles } from '@component/common-styles';
 import { JrVcSearchPageLayout } from '@component/jr-venture-search-page-layout';
 import { JrVcTable } from '@component/jr-venture-table';
 import type { MaintenanceListPageProps } from '@component/with-maintenance-page';
-import { Button, Tooltip } from '@fluentui/react-components';
 import { EditRegular, EyeRegular } from '@fluentui/react-icons';
 import { usePreferredLanguage } from '@hook/use-preferred-language';
 import type { MultiLanguageName } from '@openapi/index.schemas';
@@ -12,7 +11,7 @@ import {
   userListStateAtom,
 } from '@store/user/user-list-bloc';
 import { toTitleCase } from '@util/string-util';
-import { FuiColumn } from 'handy-fluentui';
+import { FuiButton, FuiColumn, FuiTooltip } from 'handy-fluentui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -157,27 +156,21 @@ const UserListPage = ({ onAdd, onEdit, onView }: MaintenanceListPageProps) => {
             const id = row.id as string;
             return (
               <div className={commonStyles.actionCell}>
-                <Tooltip
-                  content={t('general.text.view', { entityName: '' }).trim()}
-                  relationship="label"
-                >
-                  <Button
+                <FuiTooltip text={t('general.text.view', { entityName: '' }).trim()}>
+                  <FuiButton
                     appearance="outline"
                     icon={<EyeRegular />}
                     onClick={() => handleView(id)}
                   />
-                </Tooltip>
+                </FuiTooltip>
                 {handleEdit && (
-                  <Tooltip
-                    content={t('general.text.edit', { entityName: '' }).trim()}
-                    relationship="label"
-                  >
-                    <Button
+                  <FuiTooltip text={t('general.text.edit', { entityName: '' }).trim()}>
+                    <FuiButton
                       appearance="outline"
                       icon={<EditRegular />}
                       onClick={() => handleEdit(id)}
                     />
-                  </Tooltip>
+                  </FuiTooltip>
                 )}
               </div>
             );

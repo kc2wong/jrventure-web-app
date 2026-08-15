@@ -9,8 +9,6 @@ import {
 } from '@component/jr-venture-input';
 import type { MaintenanceEditPageProps } from '@component/with-maintenance-page';
 import {
-  Button,
-  Radio,
   makeStyles,
   tokens,
 } from '@fluentui/react-components';
@@ -45,9 +43,11 @@ import {
   multiLangTextToName,
 } from '@util/form-util';
 import {
+  FuiButton,
   FuiButtonPanel,
-  FuiInputRadio,
-  FuiInputSwitch,
+  FuiRadio,
+  FuiRadioGroup,
+  FuiSwitch,
   FuiInputTextArea,
   FuiTab,
   FuiTabList,
@@ -351,29 +351,29 @@ const NoticeEditPage = ({ id, mode, onExit }: MaintenanceEditPageProps) => {
 
   const submitButton =
     data?.status === 'NEW' ? (
-      <Button
+      <FuiButton
         appearance="primary"
         icon={<MailRegular />}
         onClick={() => void onDistribute()}
       >
         {t('notice.distribute')}
-      </Button>
+      </FuiButton>
     ) : data?.status === 'DISTRIBUTED' ? (
-      <Button icon={<ArrowUndoRegular />} onClick={() => void onRecall()}>
+      <FuiButton icon={<ArrowUndoRegular />} onClick={() => void onRecall()}>
         {t('notice.recall')}
-      </Button>
+      </FuiButton>
     ) : data?.status === 'DISTRIBUTING' ? (
-      <Button disabled icon={<ArrowSyncRegular />}>
+      <FuiButton disabled icon={<ArrowSyncRegular />}>
         {t('notice.statusDistributing')}
-      </Button>
+      </FuiButton>
     ) : (
-      <Button
+      <FuiButton
         appearance="primary"
         icon={<SaveRegular />}
         onClick={handleSubmit(onSubmit)}
       >
         {t('general.text.save')}
-      </Button>
+      </FuiButton>
     );
 
   const { field: titleField, fieldState: titleState } = useController({
@@ -525,11 +525,11 @@ const NoticeEditPage = ({ id, mode, onExit }: MaintenanceEditPageProps) => {
           control={control}
           name="targetType"
           render={({ field }) => (
-            <FuiInputRadio
+            <FuiRadioGroup
               label={t('notice.targetType')}
               layout="horizontal"
-              onChange={(d) => {
-                const newTarget = (d.value as TargetType) ?? 'grade';
+              onChange={(value) => {
+                const newTarget = (value as TargetType) ?? 'grade';
                 field.onChange(newTarget);
                 if (newTarget === 'grade') {
                   setValue('forClass', []);
@@ -541,13 +541,13 @@ const NoticeEditPage = ({ id, mode, onExit }: MaintenanceEditPageProps) => {
               required
               value={field.value}
             >
-              <Radio
+              <FuiRadio
                 disabled={!hasGradeAccess}
                 label={t('notice.targetTypeGrade')}
                 value="grade"
               />
-              <Radio label={t('notice.targetTypeClass')} value="class" />
-            </FuiInputRadio>
+              <FuiRadio label={t('notice.targetTypeClass')} value="class" />
+            </FuiRadioGroup>
           )}
         />
 
@@ -556,7 +556,7 @@ const NoticeEditPage = ({ id, mode, onExit }: MaintenanceEditPageProps) => {
           name="isAcknowledgementRequired"
           render={({ field }) => (
             <div className={styles.switchRow}>
-              <FuiInputSwitch
+              <FuiSwitch
                 checked={field.value}
                 label={t('notice.isAcknowledgementRequired')}
                 onChange={(value) => field.onChange(value)}

@@ -12,16 +12,7 @@ import {
   type StudentLookup,
 } from '@component/student-id-input-text';
 import type { MaintenanceEditPageProps } from '@component/with-maintenance-page';
-import {
-  Accordion,
-  AccordionHeader,
-  AccordionItem,
-  AccordionPanel,
-  Divider,
-  Subtitle2,
-  makeStyles,
-  tokens,
-} from '@fluentui/react-components';
+import { makeStyles, tokens } from '@fluentui/react-components';
 import {
   CheckmarkCircleRegular,
   DismissCircleRegular,
@@ -52,11 +43,15 @@ import {
   multiLangTextToName,
 } from '@util/form-util';
 import {
+  FuiAccordion,
+  FuiAccordionItem,
   FuiButtonPanel,
-  FuiInputCheckbox,
+  FuiCheckbox,
+  FuiDivider,
   FuiInputDropdown,
   FuiInputGroup,
-  FuiInputSwitch,
+  FuiSubTitle2,
+  FuiSwitch,
   FuiTab,
   FuiTabList,
   type MultiLangText,
@@ -129,6 +124,7 @@ const UserEditPage = ({
   };
 
   const [activeTab, setActiveTab] = useState<EntitlementTab>('class');
+  const [openEntitlementPanel, setOpenEntitlementPanel] = useState('1');
   const [studentId1Lookup, setStudentId1Lookup] = useState<StudentLookup>({ status: 'idle' });
   const [studentId2Lookup, setStudentId2Lookup] = useState<StudentLookup>({ status: 'idle' });
   const studentId1Ref = useRef<StudentIdInputTextRef>(null);
@@ -571,140 +567,133 @@ const UserEditPage = ({
         />
       </JrVcGrid>
 
-      <Accordion onToggle={() => {}} openItems={['1']}>
-        <AccordionItem value="1">
-          <AccordionHeader>{t('user.entitlement')}</AccordionHeader>
-          <AccordionPanel>
-            <FuiTabList selectedValue={activeTab}>
-              <FuiTab
-                disabled={activeTab !== 'class'}
-                name={t('user.entitlementClass')}
-                value="class"
-              >
+      <FuiAccordion onChange={setOpenEntitlementPanel} value={openEntitlementPanel}>
+        <FuiAccordionItem header={t('user.entitlement')} value="1">
+          <FuiTabList selectedValue={activeTab}>
+            <FuiTab
+              disabled={activeTab !== 'class'}
+              name={t('user.entitlementClass')}
+              value="class"
+            >
+              <Controller
+                control={control}
+                name="allClasses"
+                render={({ field }) => (
+                  <div className={styles.checkboxRow}>
+                    <FuiSwitch
+                      checked={field.value}
+                      label={t('user.allClasses')}
+                      onChange={(checked) => {
+                        field.onChange(checked);
+                        if (checked) {
+                          setValue('classIds', []);
+                        }
+                      }}
+                      readOnly={isReadOnly}
+                    />
+                  </div>
+                )}
+              />
+              <FuiDivider>{t('user.individualClass')}</FuiDivider>
+              <div className={styles.individualClassSection}>
+                {gradeGroups.map(({ grade, classes }) => (
+                  <div key={grade} className={styles.gradeGroup}>
+                    {classes.map((cls) => (
+                      <FuiCheckbox
+                        key={cls.id}
+                        checked={watchedClassIds.includes(cls.id)}
+                        disabled={watchedAllClasses || isReadOnly}
+                        label={`${cls.grade}${cls.classNumber}`}
+                        onChange={(checked) => {
+                          const updated = checked
+                            ? [...watchedClassIds, cls.id]
+                            : watchedClassIds.filter((cid) => cid !== cls.id);
+                          setValue('classIds', updated);
+                        }}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </FuiTab>
+
+            <FuiTab
+              disabled={activeTab !== 'student'}
+              name={t('user.entitlementStudent')}
+              value="student"
+            >
+              <JrVcGrid columns={2}>
                 <Controller
                   control={control}
-                  name="allClasses"
-                  render={({ field }) => (
-                    <div className={styles.checkboxRow}>
-                      <FuiInputSwitch
-                        checked={field.value}
-                        label={t('user.allClasses')}
-                        onChange={(data) => {
-                          const checked = data;
-                          field.onChange(checked);
-                          if (checked) {
-                            setValue('classIds', []);
-                          }
-                        }}
-                        readOnly={isReadOnly}
-                      />
-                    </div>
+                  name="studentId1"
+                  render={({ field, fieldState }) => (
+                    <StudentIdInputText
+                      ref={studentId1Ref}
+                      errorMessage={fieldState.error?.message}
+                      label={t('user.studentId1')}
+                      onChange={(value) => {
+                        clearErrors('studentId1');
+                        field.onChange(value);
+                      }}
+                      onLookupChange={(lookup) => {
+                        setStudentId1Lookup(lookup);
+                        if (lookup.status === 'invalid') {
+                          setError('studentId1', { message: t('user.invalidStudentId'), type: 'manual' });
+                        } else if (lookup.status === 'valid') {
+                          clearErrors('studentId1');
+                        }
+                      }}
+                      placeholder={t('user.studentId1Placeholder')}
+                      readOnly={isReadOnly}
+                      required={watchedRole === 'STUDENT' || watchedRole === 'PARENT'}
+                      value={field.value}
+                    />
                   )}
                 />
-                <Divider>{t('user.individualClass')}</Divider>
-                <div className={styles.individualClassSection}>
-                  {gradeGroups.map(({ grade, classes }) => (
-                    <div key={grade} className={styles.gradeGroup}>
-                      {classes.map((cls) => (
-                        <FuiInputCheckbox
-                          key={cls.id}
-                          checked={watchedClassIds.includes(cls.id)}
-                          disabled={watchedAllClasses || isReadOnly}
-                          label={`${cls.grade}${cls.classNumber}`}
-                          onChange={(data) => {
-                            const updated =
-                              data.checked === true
-                                ? [...watchedClassIds, cls.id]
-                                : watchedClassIds.filter(
-                                    (cid) => cid !== cls.id,
-                                  );
-                            setValue('classIds', updated);
-                          }}
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </FuiTab>
 
-              <FuiTab
-                disabled={activeTab !== 'student'}
-                name={t('user.entitlementStudent')}
-                value="student"
-              >
-                <JrVcGrid columns={2}>
+                {watchedRole === 'PARENT' && (
                   <Controller
                     control={control}
-                    name="studentId1"
+                    name="studentId2"
                     render={({ field, fieldState }) => (
                       <StudentIdInputText
-                        ref={studentId1Ref}
+                        ref={studentId2Ref}
                         errorMessage={fieldState.error?.message}
-                        label={t('user.studentId1')}
+                        label={t('user.studentId2')}
                         onChange={(value) => {
-                          clearErrors('studentId1');
+                          clearErrors('studentId2');
                           field.onChange(value);
                         }}
                         onLookupChange={(lookup) => {
-                          setStudentId1Lookup(lookup);
+                          setStudentId2Lookup(lookup);
                           if (lookup.status === 'invalid') {
-                            setError('studentId1', { message: t('user.invalidStudentId'), type: 'manual' });
+                            setError('studentId2', { message: t('user.invalidStudentId'), type: 'manual' });
                           } else if (lookup.status === 'valid') {
-                            clearErrors('studentId1');
+                            clearErrors('studentId2');
                           }
                         }}
-                        placeholder={t('user.studentId1Placeholder')}
+                        placeholder={t('user.studentId2Placeholder')}
                         readOnly={isReadOnly}
-                        required={watchedRole === 'STUDENT' || watchedRole === 'PARENT'}
                         value={field.value}
                       />
                     )}
                   />
+                )}
+              </JrVcGrid>
+            </FuiTab>
 
-                  {watchedRole === 'PARENT' && (
-                    <Controller
-                      control={control}
-                      name="studentId2"
-                      render={({ field, fieldState }) => (
-                        <StudentIdInputText
-                          ref={studentId2Ref}
-                          errorMessage={fieldState.error?.message}
-                          label={t('user.studentId2')}
-                          onChange={(value) => {
-                            clearErrors('studentId2');
-                            field.onChange(value);
-                          }}
-                          onLookupChange={(lookup) => {
-                            setStudentId2Lookup(lookup);
-                            if (lookup.status === 'invalid') {
-                              setError('studentId2', { message: t('user.invalidStudentId'), type: 'manual' });
-                            } else if (lookup.status === 'valid') {
-                              clearErrors('studentId2');
-                            }
-                          }}
-                          placeholder={t('user.studentId2Placeholder')}
-                          readOnly={isReadOnly}
-                          value={field.value}
-                        />
-                      )}
-                    />
-                  )}
-                </JrVcGrid>
-              </FuiTab>
-
-              <FuiTab
-                disabled={activeTab !== 'none'}
-                name={'None'}
-                value="none"
-              >
-                <div className={styles.noEntitlementRow}>
-                  <Subtitle2>Entitlement not required</Subtitle2>
-                </div>
-              </FuiTab>
-            </FuiTabList>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
+            <FuiTab
+              disabled={activeTab !== 'none'}
+              name={'None'}
+              value="none"
+            >
+              <div className={styles.noEntitlementRow}>
+                <FuiSubTitle2 text="Entitlement not required" />
+              </div>
+            </FuiTab>
+          </FuiTabList>
+        </FuiAccordionItem>
+      </FuiAccordion>
 
     </JrVcEditPageLayout>
   );

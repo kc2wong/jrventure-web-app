@@ -1,5 +1,5 @@
 import { JrVcFilterForm } from '@component/jr-venture-filter-drawer-page';
-import { Switch, tokens } from '@fluentui/react-components';
+import { tokens } from '@fluentui/react-components';
 import { ActivityCategoryDropdown } from '@page/activity/activity-dropdown';
 import {
   activityListActionAtom,
@@ -7,7 +7,7 @@ import {
 } from '@store/activity/activity-list-bloc';
 import type { ActivityCategory } from '@store/activity/activity-types';
 import { authStateAtom } from '@store/auth/auth-bloc';
-import { FuiInputDate, FuiInputGroup } from 'handy-fluentui';
+import { FuiInputDate, FuiInputGroup, FuiSwitch } from 'handy-fluentui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -80,10 +80,10 @@ const StudentActivityFilterForm = ({ onSearch }: StudentActivityFilterFormProps)
         control={control}
         name="withParticipation"
         render={({ field }) => (
-          <Switch
+          <FuiSwitch
             checked={field.value}
             label={t('activity.withParticipation')}
-            onChange={(_, data) => field.onChange(data.checked)}
+            onChange={(checked) => field.onChange(checked)}
             style={{ paddingBottom: tokens.spacingVerticalM, paddingTop: tokens.spacingVerticalM }}
           />
         )}

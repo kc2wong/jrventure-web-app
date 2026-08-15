@@ -3491,10 +3491,10 @@ graceful-fs@^4.1.6, graceful-fs@^4.2.0:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.11.tgz#4183e4e8bf08bb6e05bbb2f7d2e0c8f712ca40e3"
   integrity sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==
 
-handy-fluentui@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/handy-fluentui/-/handy-fluentui-0.1.1.tgz#720cce63b23222a9ea8a5e9d126aa613eb185b14"
-  integrity sha512-DbGkNHOH2lWc7BMneUCnd5Y611facc/EJ5P/nVUuA0ig1cM764kPwEwcsef9jumVsiiAJ7wP7cGIGcX2HmSh/A==
+handy-fluentui@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/handy-fluentui/-/handy-fluentui-1.0.1.tgz#c78dd7373412f43b991229ff8a9a78457b951f93"
+  integrity sha512-TOoE2GB9EhlKCcHjV5uFCgBv4UNQOJ7KHTeznXB1d6/qxEN8LTldPcRyNJbqt1ITLxTWwytdq1/LJI4jlXaRsw==
 
 has-bigints@^1.0.2:
   version "1.1.0"

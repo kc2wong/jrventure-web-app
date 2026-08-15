@@ -1,16 +1,8 @@
 import {
-  Body1,
-  Button,
-  DrawerBody,
-  DrawerHeader,
-  DrawerHeaderTitle,
-  InlineDrawer,
   InteractionTag,
   InteractionTagPrimary,
   InteractionTagSecondary,
   TagGroup,
-  ToggleButton,
-  Tooltip,
   makeStyles,
   mergeClasses,
   tokens,
@@ -25,7 +17,17 @@ import {
   FilterAddRegular,
 } from '@fluentui/react-icons';
 import type { FuiTable } from 'handy-fluentui';
-import { useBreadcrumb, useIsMobile } from 'handy-fluentui';
+import {
+  FuiBody1,
+  FuiButton,
+  FuiDrawer,
+  FuiDrawerBody,
+  FuiDrawerHeader,
+  FuiToggle,
+  FuiTooltip,
+  useBreadcrumb,
+  useIsMobile,
+} from 'handy-fluentui';
 import type {
   ComponentProps,
   CSSProperties,
@@ -64,15 +66,15 @@ const useStyles = makeStyles({
     minHeight: '32px',
     display: 'flex',
     alignItems: 'stretch',
+    '& h2': {
+      margin: '0',
+      padding: '0',
+    },
   },
   drawerBody: {
     paddingLeft: tokens.spacingHorizontalS,
     paddingRight: tokens.spacingHorizontalL,
     paddingTop: '0',
-  },
-  drawerHeaderTitle: {
-    margin: '0',
-    padding: '0',
   },
   buttonBar: {
     alignItems: 'center',
@@ -282,35 +284,32 @@ export const JrVcSearchPageLayout = ({
   return (
     <div className={styles.root}>
       {!isMobile && (
-        <InlineDrawer
+        <FuiDrawer
+          onOpenChange={setIsDrawerOpen}
           open={isDrawerOpen}
-          position="start"
-          size="small"
           style={{ ...desktop?.filterWidth }}
+          type="inline"
         >
-          <DrawerHeader className={styles.drawerHeader}>
-            <DrawerHeaderTitle
-              action={
-                <Tooltip content={t('general.text.close')} relationship="label">
-                  <Button
-                    appearance="subtle"
-                    aria-label={t('general.text.close')}
-                    icon={<DismissRegular />}
-                    onClick={() => setIsDrawerOpen(false)}
-                  />
-                </Tooltip>
-              }
-              className={styles.drawerHeaderTitle}
-            >
-              {t('general.text.filter', {
-                entityName: isMobile ? entityName : '',
-              }).trim()}
-            </DrawerHeaderTitle>
-          </DrawerHeader>
-          <DrawerBody className={styles.drawerBody}>
+          <FuiDrawerHeader
+            action={
+              <FuiTooltip text={t('general.text.close')}>
+                <FuiButton
+                  appearance="subtle"
+                  aria-label={t('general.text.close')}
+                  icon={<DismissRegular />}
+                  onClick={() => setIsDrawerOpen(false)}
+                />
+              </FuiTooltip>
+            }
+            className={styles.drawerHeader}
+            title={t('general.text.filter', {
+              entityName: isMobile ? entityName : '',
+            }).trim()}
+          />
+          <FuiDrawerBody className={styles.drawerBody}>
             {filterForm(() => setIsDrawerOpen(false))}
-          </DrawerBody>
-        </InlineDrawer>
+          </FuiDrawerBody>
+        </FuiDrawer>
       )}
 
       <div
@@ -332,7 +331,7 @@ export const JrVcSearchPageLayout = ({
         >
           <div className={isMobile ? styles.filterTagsPlaceholder : undefined}>
             {status === 'idle' ? (
-              <Body1>{t('general.text.searchNotPerformed')}</Body1>
+              <FuiBody1 text={t('general.text.searchNotPerformed')} />
             ) : (
               <div
                 className={
@@ -362,9 +361,10 @@ export const JrVcSearchPageLayout = ({
                     isMobile && styles.filterTagsRowMobile,
                   )}
                 >
-                  <Body1 className={styles.filterLabel}>
-                    {t('general.text.filter', { entityName: '' }).trim()}:
-                  </Body1>
+                  <FuiBody1
+                    className={styles.filterLabel}
+                    text={`${t('general.text.filter', { entityName: '' }).trim()}:`}
+                  />
                   <TagGroup style={{ flexShrink: 0 }}>
                     {!filterTags?.length ? (
                       <InteractionTag appearance="filled" size="medium">
@@ -416,31 +416,27 @@ export const JrVcSearchPageLayout = ({
               isMobile && styles.buttonBarActionsMobile,
             )}
           >
-            <Tooltip
-              content={t('general.text.filter', {
+            <FuiTooltip
+              text={t('general.text.filter', {
                 entityName: isMobile ? entityName : '',
               }).trim()}
-              relationship="label"
             >
-              <ToggleButton
+              <FuiToggle
                 checked={isDrawerOpen}
                 icon={<FilterAddRegular />}
                 onClick={handleFilterClick}
               />
-            </Tooltip>
-            <Tooltip content={t('general.text.refresh')} relationship="label">
-              <Button icon={<ArrowClockwiseRegular />} onClick={onRefresh} />
-            </Tooltip>
-            <Tooltip content={t('general.text.clear')} relationship="label">
-              <Button icon={<EraserRegular />} onClick={onClear} />
-            </Tooltip>
+            </FuiTooltip>
+            <FuiTooltip text={t('general.text.refresh')}>
+              <FuiButton icon={<ArrowClockwiseRegular />} onClick={onRefresh} />
+            </FuiTooltip>
+            <FuiTooltip text={t('general.text.clear')}>
+              <FuiButton icon={<EraserRegular />} onClick={onClear} />
+            </FuiTooltip>
             {onAdd && (
-              <Tooltip
-                content={t('general.text.add', { entityName: '' }).trim()}
-                relationship="label"
-              >
-                <Button icon={<DocumentAddRegular />} onClick={onAdd} />
-              </Tooltip>
+              <FuiTooltip text={t('general.text.add', { entityName: '' }).trim()}>
+                <FuiButton icon={<DocumentAddRegular />} onClick={onAdd} />
+              </FuiTooltip>
             )}
           </div>
         </div>

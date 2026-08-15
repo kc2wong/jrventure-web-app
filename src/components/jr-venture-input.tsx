@@ -7,9 +7,9 @@ import {
   FuiInputMultiLangText,
   FuiInputNumber,
   FuiInputText,
-  type InputDateProps,
-  type InputMultiLangTextProps,
-  type InputTextProps,
+  type FuiInputDateProps,
+  type FuiInputMultiLangTextProps,
+  type FuiInputTextProps,
   useTimeZone,
 } from 'handy-fluentui';
 import React from 'react';
@@ -44,11 +44,11 @@ const JrVcInputDate = ({
   value,
   onChange,
   ...rest
-}: InputDateProps & { readOnly?: boolean }) => {
+}: FuiInputDateProps & { readOnly?: boolean }) => {
   if (readOnly) {
     return (
       <JrVcInputText
-        {...(rest as unknown as InputTextProps)}
+        {...(rest as unknown as FuiInputTextProps)}
         onChange={() => {}}
         readOnly
         value={value ? formatDateDDMMYYYY(value) : null}
@@ -59,7 +59,7 @@ const JrVcInputDate = ({
 };
 const JrVcInputDropdown = withReadOnlyUnderline(FuiInputDropdown);
 const JrVcInputMultiLangText = withReadOnlyUnderline(
-  (props: InputMultiLangTextProps) => {
+  (props: FuiInputMultiLangTextProps) => {
     const { t } = useTranslation();
     return (
       <FuiInputMultiLangText
@@ -78,7 +78,7 @@ const JrVcInputMultiLangText = withReadOnlyUnderline(
 );
 
 type LocalTime = { hour: number; minute: number; second: number };
-type InputDateTimeProps = InputDateProps & { withSeconds?: boolean };
+type InputDateTimeProps = FuiInputDateProps & { withSeconds?: boolean };
 
 const JrVcInputDateTime = ({
   label,

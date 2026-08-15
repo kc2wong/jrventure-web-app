@@ -1,16 +1,20 @@
 import {
-  Button,
   Card,
-  Divider,
   Link,
-  Text,
-  Title2,
   makeStyles,
   mergeClasses,
   tokens,
 } from '@fluentui/react-components';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FuiInputText, useIsMobile, useToast } from 'handy-fluentui';
+import {
+  FuiBody1,
+  FuiButton,
+  FuiDivider,
+  FuiInputText,
+  FuiTitle2,
+  useIsMobile,
+  useToast,
+} from 'handy-fluentui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
@@ -192,8 +196,8 @@ export const LoginPage = () => {
         >
           <div className={styles.formContainer}>
             <div className={styles.header}>
-              <Title2 block>{t('login.title')}</Title2>
-              <Text>{t('login.subtitle')}</Text>
+              <FuiTitle2 block text={t('login.title')} />
+              <FuiBody1 text={t('login.subtitle')} />
             </div>
 
             <form
@@ -233,22 +237,22 @@ export const LoginPage = () => {
                 )}
               />
 
-              <Button
+              <FuiButton
                 appearance="primary"
                 className={styles.signInButton}
                 disabled={isSubmitting}
                 type="submit"
               >
                 {isSubmitting ? t('login.signingIn') : t('login.signIn')}
-              </Button>
+              </FuiButton>
 
               <div className={styles.forgot}>
                 <Link href="#">{t('login.forgotPassword')}</Link>
               </div>
 
-              <Divider>or</Divider>
+              <FuiDivider>or</FuiDivider>
 
-              <Button
+              <FuiButton
                 className={styles.googleButton}
                 icon={
                   <svg
@@ -277,7 +281,7 @@ export const LoginPage = () => {
                 type="button"
               >
                 {t('login.loginWithGoogle')}
-              </Button>
+              </FuiButton>
             </form>
           </div>
         </div>

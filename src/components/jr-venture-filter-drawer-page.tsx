@@ -1,6 +1,6 @@
 import { SearchButton } from '@component/jr-venture-button';
-import { Button, Title1, makeStyles, tokens } from '@fluentui/react-components';
-import { FuiButtonPanel } from 'handy-fluentui';
+import { makeStyles, tokens } from '@fluentui/react-components';
+import { FuiButton, FuiButtonPanel, FuiTitle1 } from 'handy-fluentui';
 import type { ComponentType, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
@@ -55,10 +55,10 @@ const JrVcFilterPage = ({
   const { t } = useTranslation();
   return (
     <div className={styles.page}>
-      <Title1>{t('general.text.filter', { entityName })}</Title1>
+      <FuiTitle1 text={t('general.text.filter', { entityName })} />
       {children}
       <FuiButtonPanel>
-        <Button onClick={onCancel}>{t('general.text.cancel')}</Button>
+        <FuiButton onClick={onCancel}>{t('general.text.cancel')}</FuiButton>
       </FuiButtonPanel>
     </div>
   );

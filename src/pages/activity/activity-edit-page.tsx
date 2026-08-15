@@ -8,7 +8,6 @@ import {
   JrVcInputText,
 } from '@component/jr-venture-input';
 import type { MaintenanceEditPageProps } from '@component/with-maintenance-page';
-import { Button, Radio } from '@fluentui/react-components';
 import { SaveRegular } from '@fluentui/react-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -37,8 +36,10 @@ import {
   multiLangTextToName,
 } from '@util/form-util';
 import {
+  FuiButton,
   FuiButtonPanel,
-  FuiInputRadio,
+  FuiRadio,
+  FuiRadioGroup,
   FuiInputTextArea,
   FuiTab,
   FuiTabList,
@@ -346,13 +347,13 @@ const ActivityEditPage = ({ id, mode, onExit }: MaintenanceEditPageProps) => {
         <FuiButtonPanel>
           <CancelButton onClick={onExit} />
           {!isReadOnly && (
-            <Button
+            <FuiButton
               appearance="primary"
               icon={<SaveRegular />}
               onClick={handleSubmit(onSubmit)}
             >
               {t('general.text.save')}
-            </Button>
+            </FuiButton>
           )}
         </FuiButtonPanel>
       }
@@ -587,11 +588,11 @@ const ActivityEditPage = ({ id, mode, onExit }: MaintenanceEditPageProps) => {
           control={control}
           name="targetType"
           render={({ field }) => (
-            <FuiInputRadio
+            <FuiRadioGroup
               label={t('activity.targetType')}
               layout="horizontal"
-              onChange={(d) => {
-                const newTarget = (d.value as TargetType) ?? 'grade';
+              onChange={(value) => {
+                const newTarget = (value as TargetType) ?? 'grade';
                 field.onChange(newTarget);
                 if (newTarget === 'grade') {
                   setValue('forClass', []);
@@ -603,13 +604,13 @@ const ActivityEditPage = ({ id, mode, onExit }: MaintenanceEditPageProps) => {
               required
               value={field.value}
             >
-              <Radio
+              <FuiRadio
                 disabled={!hasGradeAccess}
                 label={t('activity.targetTypeGrade')}
                 value="grade"
               />
-              <Radio label={t('activity.targetTypeClass')} value="class" />
-            </FuiInputRadio>
+              <FuiRadio label={t('activity.targetTypeClass')} value="class" />
+            </FuiRadioGroup>
           )}
         />
 

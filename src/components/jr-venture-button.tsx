@@ -1,33 +1,29 @@
-import { Button } from '@fluentui/react-components';
-import type { ButtonProps } from '@fluentui/react-components';
 import {
   DismissRegular,
   SaveRegular,
   SearchRegular,
 } from '@fluentui/react-icons';
-import { useDialog } from 'handy-fluentui';
+import { FuiButton, useDialog } from 'handy-fluentui';
+import type { FuiButtonProps } from 'handy-fluentui';
 import { useTranslation } from 'react-i18next';
 
-type JrVcButtonProps = Omit<
-  Extract<ButtonProps, { as?: 'button' }>,
-  'children' | 'appearance' | 'icon'
->;
+type JrVcButtonProps = Omit<FuiButtonProps, 'children' | 'appearance' | 'icon'>;
 
 const SearchButton = (props: JrVcButtonProps) => {
   const { t } = useTranslation();
   return (
-    <Button {...props} appearance="primary" icon={<SearchRegular />}>
+    <FuiButton {...props} appearance="primary" icon={<SearchRegular />}>
       {t('general.text.search')}
-    </Button>
+    </FuiButton>
   );
 };
 
 const CancelButton = (props: JrVcButtonProps) => {
   const { t } = useTranslation();
   return (
-    <Button {...props} icon={<DismissRegular />}>
+    <FuiButton {...props} icon={<DismissRegular />}>
       {t('general.text.cancel')}
-    </Button>
+    </FuiButton>
   );
 };
 
@@ -53,14 +49,14 @@ const SaveButton = ({ onClick, ...props }: JrVcButtonProps) => {
   };
 
   return (
-    <Button
+    <FuiButton
       {...props}
       appearance="primary"
       icon={<SaveRegular />}
       onClick={handleClick}
     >
       {t('general.text.save')}
-    </Button>
+    </FuiButton>
   );
 };
 

@@ -6,10 +6,9 @@ import {
   tokens,
   makeStyles,
   mergeClasses,
-  Button,
 } from '@fluentui/react-components';
 import { ChevronCircleRightRegular } from '@fluentui/react-icons';
-import { useBreadcrumb } from 'handy-fluentui';
+import { FuiButton, useBreadcrumb } from 'handy-fluentui';
 import { Fragment } from 'react';
 
 const useStyles = makeStyles({
@@ -97,7 +96,7 @@ export const JrVcBreadcrumb = (props: JrVcBreadcrumbProps) => {
           </Fragment>
         );
       })}
-      <Button
+      <FuiButton
         appearance="subtle"
         icon={
           <ChevronCircleRightRegular

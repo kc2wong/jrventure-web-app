@@ -1,13 +1,15 @@
-import {
-  Body1,
-  Caption1,
-  Subtitle2,
-  makeStyles,
-  tokens,
-} from '@fluentui/react-components';
+import { makeStyles, tokens } from '@fluentui/react-components';
 import { CheckmarkRegular, ChevronLeftRegular } from '@fluentui/react-icons';
 import { usePreferredLanguage } from '@hook/use-preferred-language';
-import { FuiInputSwitch, useTheme } from 'handy-fluentui';
+import {
+  FuiBody1,
+  FuiCaption1,
+  FuiCard,
+  FuiCardHeader,
+  FuiSubTitle2,
+  FuiSwitch,
+  useTheme,
+} from 'handy-fluentui';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -133,31 +135,33 @@ export function SettingsPage() {
       <div className={styles.header}>
         <button className={styles.backButton} onClick={() => navigate(-1)} type="button">
           <ChevronLeftRegular fontSize={24} />
-          <Body1>{t('general.text.back')}</Body1>
+          <FuiBody1 text={t('general.text.back')} />
         </button>
-        <Subtitle2 className={styles.headerTitle}>{t('setting.title')}</Subtitle2>
+        <FuiSubTitle2 className={styles.headerTitle} text={t('setting.title')} />
       </div>
 
       <div className={styles.body}>
         <div className={styles.section}>
-          <Caption1 className={styles.sectionLabel}>{t('setting.appearance')}</Caption1>
-          <div className={styles.sectionCard}>
-            <div className={styles.row}>
-              <Body1>{t('setting.darkMode')}</Body1>
-              <div className={styles.rowRight}>
-                <FuiInputSwitch
+          <FuiCaption1 className={styles.sectionLabel} text={t('setting.appearance')} />
+          <FuiCard className={styles.sectionCard}>
+            <FuiCardHeader
+              action={
+                <FuiSwitch
                   checked={isDark}
+                  label=""
                   onChange={() => switchTheme(isDark ? 'light' : 'dark')}
                 />
-              </div>
-            </div>
-          </div>
+              }
+              className={styles.row}
+              header={<FuiBody1 text={t('setting.darkMode')} />}
+            />
+          </FuiCard>
         </div>
 
         {showStudentSection && (
           <div className={styles.section}>
-            <Caption1 className={styles.sectionLabel}>{t('setting.student')}</Caption1>
-            <div className={styles.sectionCard}>
+            <FuiCaption1 className={styles.sectionLabel} text={t('setting.student')} />
+            <FuiCard className={styles.sectionCard}>
               {entitledStudents.map((s, index) => (
                 <div key={s.id}>
                   <div
@@ -168,10 +172,14 @@ export function SettingsPage() {
                     tabIndex={0}
                   >
                     <div>
-                      <Body1>{fullNameInPreferredLanguage(s.firstName, s.lastName)}</Body1>
-                      <Caption1 style={{ display: 'block', color: tokens.colorNeutralForeground3 }}>
-                        {`${s.classId}-${s.studentNumber}`}
-                      </Caption1>
+                      <FuiBody1
+                        text={fullNameInPreferredLanguage(s.firstName, s.lastName)}
+                      />
+                      <FuiCaption1
+                        block
+                        style={{ color: tokens.colorNeutralForeground3 }}
+                        text={`${s.classId}-${s.studentNumber}`}
+                      />
                     </div>
                     <div className={styles.rowRight}>
                       {selectedStudentId === s.id && (
@@ -184,13 +192,13 @@ export function SettingsPage() {
                   )}
                 </div>
               ))}
-            </div>
+            </FuiCard>
           </div>
         )}
 
         <div className={styles.section}>
-          <Caption1 className={styles.sectionLabel}>{t('setting.language')}</Caption1>
-          <div className={styles.sectionCard}>
+          <FuiCaption1 className={styles.sectionLabel} text={t('setting.language')} />
+          <FuiCard className={styles.sectionCard}>
             {LANGUAGE_CODES.map((code, index) => (
               <div key={code}>
                 <div
@@ -200,7 +208,7 @@ export function SettingsPage() {
                   role="button"
                   tabIndex={0}
                 >
-                  <Body1>{t(`general.language.${code}`)}</Body1>
+                  <FuiBody1 text={t(`general.language.${code}`)} />
                   <div className={styles.rowRight}>
                     {i18n.language === code && (
                       <CheckmarkRegular className={styles.checkmark} />
@@ -212,7 +220,7 @@ export function SettingsPage() {
                 )}
               </div>
             ))}
-          </div>
+          </FuiCard>
         </div>
       </div>
     </div>

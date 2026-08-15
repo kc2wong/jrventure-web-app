@@ -5,7 +5,6 @@ import { JrVcInputDate, JrVcInputText } from '@component/jr-venture-input';
 import { RoleBasedComponent } from '@component/role-based-component';
 import { StudentIdInputText } from '@component/student-id-input-text';
 import type { MaintenanceEditPageProps } from '@component/with-maintenance-page';
-import { Button } from '@fluentui/react-components';
 import { PenSparkleRegular } from '@fluentui/react-icons';
 import { usePreferredLanguage } from '@hook/use-preferred-language';
 import {
@@ -15,6 +14,7 @@ import {
 import { letterListActionAtom } from '@store/letter/letter-list-bloc';
 import { multiLangNameToText } from '@util/form-util';
 import {
+  FuiButton,
   FuiButtonPanel,
   FuiInputTextArea,
   FuiTab,
@@ -61,13 +61,13 @@ const LetterEditPage = ({ id, mode, onExit }: MaintenanceEditPageProps) => {
           <CancelButton onClick={onExit} />
           {showAcknowledgeButton && (
             <RoleBasedComponent role="PARENT">
-              <Button
+              <FuiButton
                 appearance="primary"
                 icon={<PenSparkleRegular />}
                 onClick={() => void onAcknowledge()}
               >
                 {t('letter.acknowledge')}
-              </Button>
+              </FuiButton>
             </RoleBasedComponent>
           )}
         </FuiButtonPanel>
